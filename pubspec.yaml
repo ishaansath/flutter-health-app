@@ -1,0 +1,52 @@
+name: ishaan
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: 6.1.4
+  animations: ^2.0.8
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/body_outline.png
+    - assets/brain.png
+    - assets/eyes.png
+    - assets/heart.png
+    - assets/legs.png
+    - assets/lungs.png
+    - assets/muscle.png
+    - assets/stomach.png
+    - assets/Blueberries.png
+    - assets/tomatoes.png
+    - assets/spinach.png
+    - assets/beetroot.png
+    - assets/oranges.png
+    - assets/carrots.png
+    - assets/papaya.png
+    - assets/cabbage.png
+    - assets/apples.png
+    - assets/bananas.png
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/Poppins-Regular.ttf
+    - family: ComicNeue
+      fonts:
+        - asset: assets/ComicNeue-Bold.ttf
