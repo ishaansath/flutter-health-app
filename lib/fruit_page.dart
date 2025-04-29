@@ -9,19 +9,7 @@ class FruitPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = {
-      "Blueberries": {
-        "normal": "Blueberries are packed with antioxidants that boost brain health.",
-        "fun": "Cardio game strong, memory built diff, and no sugar spike—straight W",
-        "fruitImage": "assets/Blueberries.png", // Add image path for fruit
-      },
-      "Tomatoes": {
-        "normal": "Tomatoes are great for your heart and help prevent heart disease.",
-        "fun": "Yo! These tomatoes can keep your heart strong! Wanna check how?",
-        "fruitImage": "assets/tomatoes.png", // Add image path for fruit
-      },
-      // Add other fruits as needed...
-    }[fruit]!;
+    final data = {}[fruit]!;
 
     final text = mode == 'fun' ? data['fun']! : data['normal']!;
     final imagePath = data['fruitImage']!; // Get image path
