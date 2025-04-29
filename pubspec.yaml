@@ -42,6 +42,8 @@ flutter:
     - assets/cabbage.png
     - assets/apples.png
     - assets/bananas.png
+    - assets/vitamink.png
+    - assets/brain_fact.png
 
   fonts:
     - family: Poppins
