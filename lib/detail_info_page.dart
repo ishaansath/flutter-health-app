@@ -21,7 +21,7 @@ class DetailInfoPage extends StatelessWidget {
             // Display image
             Image.asset(image, width: 200, height: 200),
             const SizedBox(height: 20),
-            Text(displayText, style: const TextStyle(color: Colors.white, fontSize: 18)),
+            Text(displayText,textAlign:TextAlign.justify, style: const TextStyle(color: Colors.white, fontSize: 18)),
           ],
         ),
       ),

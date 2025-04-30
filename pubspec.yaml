@@ -58,6 +58,16 @@ flutter:
     - assets/vitamind.png
     - assets/muscle_fact.png
     - assets/models/brain.glb
+    - assets/models/heart.glb
+    - assets/models/eye.glb
+    - assets/models/lungs.glb
+    - assets/models/stomach.glb
+    - assets/models/muscle.glb
+    - assets/models/leg.glb
+    - assets/pineapple.png
+    - assets/sweet potato.png
+    - assets/vitaminb12.png
+    - assets/leg_fact.png
 
   fonts:
     - family: Poppins

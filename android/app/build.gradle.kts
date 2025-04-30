@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.ishaan"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -29,6 +29,9 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+    aaptOptions {
+        noCompress.addAll(listOf("glb", "txt","obj"))
+        }
 
     buildTypes {
         release {

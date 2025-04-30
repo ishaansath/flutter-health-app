@@ -13,7 +13,7 @@ class OrganDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = {
       "Brain 🧠": {
-        "image": "assets/brain.png",
+        "image": "assets/models/brain.glb",
         "fruit": "Blueberries",
         "vegetable": "Spinach",
         "vitamin": "K",
@@ -33,7 +33,7 @@ class OrganDetailPage extends StatelessWidget {
         "funFactImage": "assets/brain_fact.png"
       },
       "Heart ❤": {
-        "image": "assets/heart.png",
+        "image": "assets/models/heart.glb",
         "fruit": "Tomatoes",
         "vegetable": "Beetroot",
         "vitamin": "C",
@@ -53,7 +53,7 @@ class OrganDetailPage extends StatelessWidget {
         "funFactImage": "assets/heart_fact.png"
       },
       "Eyes 👁": {
-        "image": "assets/eyes.png",
+        "image": "assets/models/eye.glb",
         "fruit": "Oranges",
         "vegetable": "Carrot",
         "vitamin": "A",
@@ -73,7 +73,7 @@ class OrganDetailPage extends StatelessWidget {
         "funFactImage": "assets/eyes_fact.png"
       },
       "Lungs 🫁": {
-        "image": "assets/lungs.png",
+        "image": "assets/models/lungs.glb",
         "fruit": "Apples",
         "vegetable": "Broccoli",
         "vitamin": "E",
@@ -93,7 +93,7 @@ class OrganDetailPage extends StatelessWidget {
         "funFactImage": "assets/lung_fact.png"
       },
       "Stomach 🍽": {
-        "image": "assets/stomach.png",
+        "image": "assets/models/stomach.glb",
         "fruit": "Papaya",
         "vegetable": "Cabbage",
         "vitamin": "B",
@@ -113,24 +113,44 @@ class OrganDetailPage extends StatelessWidget {
         "funFactImage": "assets/stomach_fact.png"
       },
       "Muscles 💪": {
-        "image": "assets/muscle.png",
+        "image": "assets/models/muscle.glb",
         "fruit": "Banana",
         "vegetable": "Kale",
         "vitamin": "B",
-        "nfunFact": "Your stomach produces a new layer of mucus every two weeks to protect itself from being digested by its own acid!",
+        "nfunFact": "Muscles account for approximately 40% of your body weight and can adapt to become stronger and more efficient through regular exercise!",
         "ffunFact": "Your body’s flex game is strong—600+ muscles ready to slay every move.",
-        "briefInfo": "The stomach is responsible for breaking down food using strong acids and enzymes, aiding digestion and nutrient absorption.",
+        "briefInfo": "Muscles are specialized tissues that enable movement, maintain posture, and support bodily functions like circulation and respiration. They also contribute to strength and endurance.",
         "briefInfoFun": "Muscles move, flex, and power your body like champs.",
         "fruitDescriptionNormal": "Bananas are a great choice for muscle health, providing potassium to prevent cramps and energy-boosting carbs to aid muscle recovery and performance.",
         "fruitDescriptionFun": "Bananas are muscle fuel—potassium-packed for max strength and no cramp vibes.",
-        "vegetableDescriptionNormal": "Cabbage is excellent for stomach health, as it's rich in fiber, promotes digestion, and contains compounds like glucosinolates that support gut health.",
+        "vegetableDescriptionNormal": "Kale is a nutrient-rich vegetable that supports muscle health by providing essential vitamins like A, C, and K, along with calcium and antioxidants that aid recovery and strength.",
         "vegetableDescriptionFun": " Kale’s the OG muscle leaf—stacked with iron and nutrients for gains with no flop vibes.",
-        "vitaminDescriptionNormal": "Vitamin B plays a key role in stomach health, supporting energy production, digestion, and helping maintain a healthy gut lining.",
+        "vitaminDescriptionNormal": "Vitamin D is essential for muscle health, as it supports muscle strength and function by aiding calcium absorption and promoting healthy muscle growth and recovery.",
         "vitaminDescriptionFun": "Vitamin D is the muscle MVP—boosts strength, supports recovery, and keeps your bones solid for those gains.",
         "fruitImage": "assets/bananas.png",
         "vegetableImage": "assets/kale.png",
         "vitaminImage": "assets/vitamind.png",
         "funFactImage": "assets/muscle_fact.png"
+      },
+      "Legs 🦵": {
+        "image": "assets/models/leg.glb",
+        "fruit": "Pineapple",
+        "vegetable": "Sweet Potato",
+        "vitamin": "B12",
+        "nfunFact": "The longest muscle in your leg, the sartorius, is also the longest muscle in your entire body! It helps you bend and rotate your thigh!",
+        "ffunFact": "Leg bones are the OG speed demons and powerhouses—built for max strength and turbo vibes.",
+        "briefInfo": "Legs provide support, enable movement, and house strong muscles like quadriceps and hamstrings, along with bones like femur and tibia for stability and strength.",
+        "briefInfoFun": "Legs are turbo-charged—speed, flex, and beast-mode strength.",
+        "fruitDescriptionNormal": "Pineapple supports leg health by providing anti-inflammatory compounds like bromelain, which may help reduce muscle soreness, along with vitamin C to aid tissue repair.",
+        "fruitDescriptionFun": "Pineapple is the ultimate leg-day snack—loaded with bromelain to fight soreness and packed with vitamin C for muscle recovery",
+        "vegetableDescriptionNormal": "Sweet potatoes are great for leg health, as they provide complex carbohydrates for energy, potassium to prevent cramps, and vitamins like A and C to support muscle recovery and overall strength.",
+        "vegetableDescriptionFun": "Sweet Potato is stacked with carbs for energy, potassium to crush cramps, and vitamin A for muscle repair vibes. ",
+        "vitaminDescriptionNormal": "Vitamin B12 is important for leg health, as it helps maintain nerve function, supports the production of red blood cells, and promotes proper circulation, reducing fatigue and muscle weakness.",
+        "vitaminDescriptionFun": "Vitamin B12 keeps your legs in beast mode—supports energy, boosts endurance, and fires up muscle recovery.",
+        "fruitImage": "assets/pineapple.png",
+        "vegetableImage": "assets/sweet potato.png",
+        "vitaminImage": "assets/vitaminb12.png",
+        "funFactImage": "assets/leg_fact.png"
       },
     }[organ]!;
 
@@ -149,11 +169,14 @@ class OrganDetailPage extends StatelessWidget {
           children: [
             // Display the organ's image
             if (modelPath != null)
-              ModelView(modelPath: modelPath),
+              SizedBox(
+                height: 300, // Adjust to fit your layout
+                child: ModelView(modelPath: modelPath),
+              ),
             const SizedBox(height: 20),
 
             // Display the organ's description based on mode
-            Text(text, style: const TextStyle(color: Colors.white, fontSize: 18)),
+            Text(text, textAlign: TextAlign.justify, style: const TextStyle(color: Colors.white, fontSize: 18)),
             const SizedBox(height: 20),
 
             // CustomButton for fruit, vegetable, vitamin, and fun fact
@@ -218,7 +241,7 @@ class OrganDetailPage extends StatelessWidget {
 }
 class ModelView extends StatelessWidget {
   final String modelPath;
-  ModelView({super.key, required this.modelPath}); // Removed 'const'
+  const ModelView({super.key, required this.modelPath}); // Removed 'const'
 
   @override
   Widget build(BuildContext context) {
@@ -229,8 +252,8 @@ class ModelView extends StatelessWidget {
           height: 300,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.deepPurple, width: 2),
+            color: Colors.grey.shade900,
+            border: Border.all(color: Colors.black, width: 2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: ModelViewer(
@@ -239,7 +262,7 @@ class ModelView extends StatelessWidget {
             ar: true,
             autoRotate: true,
             cameraControls: true,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.grey.shade900,
           ),
         ),
       ),
