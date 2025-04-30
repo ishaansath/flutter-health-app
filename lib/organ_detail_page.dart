@@ -250,7 +250,7 @@ class ModelView extends StatelessWidget {
         child: Container(
           width: 300, // Adjust size as needed
           height: 300,
-          padding: const EdgeInsets.all(10),
+          // padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             border: Border.all(color: Colors.black, width: 2),
