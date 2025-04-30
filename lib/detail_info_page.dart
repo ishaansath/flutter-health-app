@@ -22,13 +22,13 @@ class DetailInfoPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Optional: custom close/back button if no AppBar
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
+                    // Align(
+                    //   alignment: Alignment.topLeft,
+                    //   child: IconButton(
+                    //     icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    //     onPressed: () => Navigator.pop(context),
+                    //   ),
+                    // ),
                     Image.asset(image, width: 200, height: 200),
                     const SizedBox(height: 20),
                     Text(
