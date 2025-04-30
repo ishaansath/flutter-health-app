@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'detail_info_page.dart';
 import 'custom_button.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 class OrganDetailPage extends StatelessWidget {
   final String organ;
@@ -20,7 +21,7 @@ class OrganDetailPage extends StatelessWidget {
         "ffunFact": "Big brain flex: 86 billion neuron homies in the squad",
         "briefInfo": "The brain is your body's control center.",
         "briefInfoFun": "The control tower, sparking thoughts, moves, and genius ideas",
-        "fruitDescriptionNormal": "Blueberries are rich in antioxidants, great for brain health.",
+        "fruitDescriptionNormal": "Blueberries are rich in vitamin C, K, and antioxidants, Supports heart health, brain function, and blood sugar regulation.",
         "fruitDescriptionFun": "Blueberries are like brain fuel, keeping you sharp and smart!",
         "vegetableDescriptionNormal": "Spinach is packed with nutrients that promote brain function.",
         "vegetableDescriptionFun": "Spinach = brain booster! Gives you superhero brain powers!",
@@ -42,7 +43,7 @@ class OrganDetailPage extends StatelessWidget {
         "briefInfoFun": "The life engine—pumping nonstop fuel 24/7.",
         "fruitDescriptionNormal": "Tomatoes are packed with antioxidants that support heart health.",
         "fruitDescriptionFun": "Tomatoes = heart protectors, keeping your ticker in tip-top shape!",
-        "vegetableDescriptionNormal": "Beetroot helps improve blood flow and reduce blood pressure.",
+        "vegetableDescriptionNormal": "Beetroot is low-calorie, rich in nitrates, and supports heart health by improving blood flow, lowering blood pressure, and reducing inflammation.",
         "vegetableDescriptionFun": "Beetroot = blood flow booster—keeps your heart on track!",
         "vitaminDescriptionNormal": "Vitamin C is essential for blood vessel health and repairing tissues.",
         "vitaminDescriptionFun": "Vitamin C is like your heart's personal repair crew!",
@@ -69,27 +70,67 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/oranges.png",
         "vegetableImage": "assets/carrots.png",
         "vitaminImage": "assets/vitamina.png",
-        "funFactImage": "assets/heart_fact.png"
+        "funFactImage": "assets/eyes_fact.png"
       },
       "Lungs 🫁": {
         "image": "assets/lungs.png",
         "fruit": "Apples",
         "vegetable": "Broccoli",
         "vitamin": "E",
-        "nfunFact": "Your eyes blink around 12,000 times a day!",
+        "nfunFact": "Your lungs are incredible multitaskers—they take in about 11,000 liters of air every day while filtering out harmful particles to keep you breathing smoothly!",
         "ffunFact": " Lungs are on grind mode—20K breaths a day without skipping a beat.",
-        "briefInfo": "Eyes convert light into sight, adapt to focus on details, and capture colors in high-definition.",
+        "briefInfo": "Lungs are vital organs that exchange oxygen and carbon dioxide, enabling you to breathe and support essential functions throughout your body.",
         "briefInfoFun": "Lungs = oxygen in, CO2 out—airflow GOATs keeping you alive. ",
-        "fruitDescriptionNormal": "Oranges are vibrant, juicy fruits packed with vitamin C, boosting immunity and refreshing your taste buds.",
-        "fruitDescriptionFun": "Lung legends—packed with antioxidants and flavonoids that support lung health, boost capacity, and fight oxidative damage. ",
-        "vegetableDescriptionNormal": "Carrots are crunchy, sweet vegetables rich in vitamin A, promoting healthy vision and overall wellness.",
-        "vegetableDescriptionFun": "Lung protector—stacked with antioxidants and sulforaphane to fight toxins and keep your breathing game strong.",
-        "vitaminDescriptionNormal": "Vitamin A is essential for maintaining good vision, supporting immune function, and promoting healthy skin. ",
-        "vitaminDescriptionFun": "Lung's shield—packed with antioxidants that combat oxidative damage, boost capacity, and keep your breathing game strong.",
+        "fruitDescriptionNormal": "Apples are crisp, sweet fruits rich in fiber, vitamin C, and antioxidants, making them a wholesome snack for a healthy lifestyle.",
+        "fruitDescriptionFun": "Apples = lung legends—packed with antioxidants and flavonoids that support lung health, boost capacity, and fight oxidative damage. ",
+        "vegetableDescriptionNormal": "Broccoli is a nutrient-packed vegetable, rich in vitamins C and K, fiber, and antioxidants, supporting strong immunity and overall health. ",
+        "vegetableDescriptionFun": "Broccoli AKA lung protectors—stacked with antioxidants and sulforaphane to fight toxins and keep your breathing game strong.",
+        "vitaminDescriptionNormal": "Vitamin E is a powerful antioxidant that helps protect cells from damage, supports skin health, and boosts immune function.",
+        "vitaminDescriptionFun": "Vitamin E is like a lung boss-packed with antioxidants that combat oxidative damage, boost capacity, and keep your breathing game strong.",
         "fruitImage": "assets/apples.png",
         "vegetableImage": "assets/broccoli.png",
         "vitaminImage": "assets/vitamine.png",
         "funFactImage": "assets/lung_fact.png"
+      },
+      "Stomach 🍽": {
+        "image": "assets/stomach.png",
+        "fruit": "Papaya",
+        "vegetable": "Cabbage",
+        "vitamin": "B",
+        "nfunFact": "Your stomach produces a new layer of mucus every two weeks to protect itself from being digested by its own acid!",
+        "ffunFact": " Your stomach’s acid is straight savage—powerful enough to melt metal while keeping your digestion on point.",
+        "briefInfo": "The stomach is responsible for breaking down food using strong acids and enzymes, aiding digestion and nutrient absorption.",
+        "briefInfoFun": "Stomach melts food, fuels you, and keeps vibes chill.",
+        "fruitDescriptionNormal": "Papaya supports stomach health by aiding digestion through its enzyme papain, promoting nutrient absorption, and preventing constipation with its high fiber content.",
+        "fruitDescriptionFun": "Papaya is the stomach's hero, loaded with papain to aid digestion, reduce bloating, and keep your gut running smooth.",
+        "vegetableDescriptionNormal": "Cabbage is excellent for stomach health, as it's rich in fiber, promotes digestion, and contains compounds like glucosinolates that support gut health.",
+        "vegetableDescriptionFun": " Cabbage AKA gut guardian, packed with fiber, vitamins, and antioxidants to keep digestion smooth and your stomach vibes strong.",
+        "vitaminDescriptionNormal": "Vitamin B plays a key role in stomach health, supporting energy production, digestion, and helping maintain a healthy gut lining.",
+        "vitaminDescriptionFun": "Vitamin B is the stomach's energy ally - boosts digestion, helps break down food into fuel, and supports gut health for smooth vibes.",
+        "fruitImage": "assets/papaya.png",
+        "vegetableImage": "assets/cabbage.png",
+        "vitaminImage": "assets/vitaminb.png",
+        "funFactImage": "assets/stomach_fact.png"
+      },
+      "Muscles 💪": {
+        "image": "assets/muscle.png",
+        "fruit": "Banana",
+        "vegetable": "Kale",
+        "vitamin": "B",
+        "nfunFact": "Your stomach produces a new layer of mucus every two weeks to protect itself from being digested by its own acid!",
+        "ffunFact": "Your body’s flex game is strong—600+ muscles ready to slay every move.",
+        "briefInfo": "The stomach is responsible for breaking down food using strong acids and enzymes, aiding digestion and nutrient absorption.",
+        "briefInfoFun": "Muscles move, flex, and power your body like champs.",
+        "fruitDescriptionNormal": "Bananas are a great choice for muscle health, providing potassium to prevent cramps and energy-boosting carbs to aid muscle recovery and performance.",
+        "fruitDescriptionFun": "Bananas are muscle fuel—potassium-packed for max strength and no cramp vibes.",
+        "vegetableDescriptionNormal": "Cabbage is excellent for stomach health, as it's rich in fiber, promotes digestion, and contains compounds like glucosinolates that support gut health.",
+        "vegetableDescriptionFun": " Kale’s the OG muscle leaf—stacked with iron and nutrients for gains with no flop vibes.",
+        "vitaminDescriptionNormal": "Vitamin B plays a key role in stomach health, supporting energy production, digestion, and helping maintain a healthy gut lining.",
+        "vitaminDescriptionFun": "Vitamin D is the muscle MVP—boosts strength, supports recovery, and keeps your bones solid for those gains.",
+        "fruitImage": "assets/bananas.png",
+        "vegetableImage": "assets/kale.png",
+        "vitaminImage": "assets/vitamind.png",
+        "funFactImage": "assets/muscle_fact.png"
       },
     }[organ]!;
 
@@ -97,7 +138,7 @@ class OrganDetailPage extends StatelessWidget {
     final fruitDescription = mode == 'fun' ? data['fruitDescriptionFun']! : data['fruitDescriptionNormal']!;
     final vegetableDescription = mode == 'fun' ? data['vegetableDescriptionFun']! : data['vegetableDescriptionNormal']!;
     final vitaminDescription = mode == 'fun' ? data['vitaminDescriptionFun']! : data['vitaminDescriptionNormal']!;
-    final imagePath = data['image']!; // Image path for the organ
+    final modelPath = data['image']!; // Image path for the organ
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
@@ -107,8 +148,8 @@ class OrganDetailPage extends StatelessWidget {
         child: Column(
           children: [
             // Display the organ's image
-            if (imagePath != null)
-              Image.asset(imagePath, width: 200, height: 200),
+            if (modelPath != null)
+              ModelView(modelPath: modelPath),
             const SizedBox(height: 20),
 
             // Display the organ's description based on mode
@@ -169,6 +210,37 @@ class OrganDetailPage extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+}
+class ModelView extends StatelessWidget {
+  final String modelPath;
+  ModelView({super.key, required this.modelPath}); // Removed 'const'
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          width: 300, // Adjust size as needed
+          height: 300,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.deepPurple, width: 2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ModelViewer(
+            src: modelPath,
+            alt: "A 3D model",
+            ar: true,
+            autoRotate: true,
+            cameraControls: true,
+            backgroundColor: Colors.white,
+          ),
         ),
       ),
     );
