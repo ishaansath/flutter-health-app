@@ -259,7 +259,7 @@ class ModelView extends StatelessWidget {
           child: ModelViewer(
             src: modelPath,
             alt: "A 3D model",
-            ar: true,
+            ar: false,
             autoRotate: true,
             cameraControls: true,
             backgroundColor: Colors.grey.shade900,
