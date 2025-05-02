@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'detail_info_page.dart';
 import 'custom_button.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:gif_view/gif_view.dart';
+
 
 class OrganDetailPage extends StatelessWidget {
   final String organ;
   final String mode;
 
-  const OrganDetailPage({super.key, required this.organ, required this.mode });
+
+  const OrganDetailPage({super.key, required this.organ, required this.mode});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/Blueberries.png",
         "vegetableImage": "assets/spinach.png",
         "vitaminImage": "assets/vitamink.png",
-        "funFactImage": "assets/brain_fact.png"
+        "funFactImage": "assets/gif/brain_fact.gif"
       },
       "Heart ❤": {
         "image": "assets/models/heart.glb",
@@ -50,7 +53,7 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/tomatoes.png",
         "vegetableImage": "assets/beetroot.png",
         "vitaminImage": "assets/vitaminc.png",
-        "funFactImage": "assets/heart_fact.png"
+        "funFactImage": "assets/gif/heart_fact.gif"
       },
       "Eyes 👁": {
         "image": "assets/models/eye.glb",
@@ -70,7 +73,7 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/oranges.png",
         "vegetableImage": "assets/carrots.png",
         "vitaminImage": "assets/vitamina.png",
-        "funFactImage": "assets/eyes_fact.png"
+        "funFactImage": "assets/gif/eye_fact.gif"
       },
       "Lungs 🫁": {
         "image": "assets/models/lungs.glb",
@@ -90,7 +93,7 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/apples.png",
         "vegetableImage": "assets/broccoli.png",
         "vitaminImage": "assets/vitamine.png",
-        "funFactImage": "assets/lung_fact.png"
+        "funFactImage": "assets/gif/lung_fact.gif"
       },
       "Stomach 🍽": {
         "image": "assets/models/stomach.glb",
@@ -110,7 +113,7 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/papaya.png",
         "vegetableImage": "assets/cabbage.png",
         "vitaminImage": "assets/vitaminb.png",
-        "funFactImage": "assets/stomach_fact.png"
+        "funFactImage": "assets/gif/stomach_fact.gif"
       },
       "Muscles 💪": {
         "image": "assets/models/muscle.glb",
@@ -130,14 +133,14 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/bananas.png",
         "vegetableImage": "assets/kale.png",
         "vitaminImage": "assets/vitamind.png",
-        "funFactImage": "assets/muscle_fact.png"
+        "funFactImage": "assets/gif/muscle_fact.gif"
       },
       "Legs 🦵": {
         "image": "assets/models/leg.glb",
         "fruit": "Pineapple",
         "vegetable": "Sweet Potato",
         "vitamin": "B12",
-        "nfunFact": "The longest muscle in your leg, the sartorius, is also the longest muscle in your entire body! It helps you bend and rotate your thigh!",
+        "nfunFact": "The longest bone in your leg, the femur, is also the longest bone in your entire body!",
         "ffunFact": "Leg bones are the OG speed demons and powerhouses—built for max strength and turbo vibes.",
         "briefInfo": "Legs provide support, enable movement, ensuring stability and strength.",
         "briefInfoFun": "Legs are turbo-charged—speed, flex, and beast-mode strength.",
@@ -150,7 +153,7 @@ class OrganDetailPage extends StatelessWidget {
         "fruitImage": "assets/pineapple.png",
         "vegetableImage": "assets/sweet potato.png",
         "vitaminImage": "assets/vitaminb12.png",
-        "funFactImage": "assets/leg_fact.png"
+        "funFactImage": "assets/gif/leg_fact.gif"
       },
     }[organ]!;
 
@@ -165,7 +168,11 @@ class OrganDetailPage extends StatelessWidget {
       appBar: AppBar(title: Text(organ)),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
+
+        child: Wrap(
+          spacing: 30,
+          runSpacing: 50,
+          alignment: WrapAlignment.center,
           children: [
             // Display the organ's image
             if (modelPath != null)
@@ -173,19 +180,19 @@ class OrganDetailPage extends StatelessWidget {
                 height: 300, // Adjust to fit your layout
                 child: ModelView(modelPath: modelPath),
               ),
-            const SizedBox(height: 20),
-
             // Display the organ's description based on mode
-            Text(text, textAlign: TextAlign.justify, style: const TextStyle(color: Colors.white, fontSize: 18)),
-            const SizedBox(height: 20),
+            Text(text, textAlign: TextAlign.justify, style: const TextStyle(color: Colors.white, fontSize: 20)),
 
             // CustomButton for fruit, vegetable, vitamin, and fun fact
             CustomButton(
               text: mode == 'fun' ? "Fruits" : "Fruit", // Button text based on mode
+              backgroundColor: Colors.redAccent,
+              textColor: Colors.white,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => DetailInfoPage(
+                    color: Colors.red,
                     info: fruitDescription,
                     image: data['fruitImage']!,
                     mode: mode,
@@ -194,12 +201,15 @@ class OrganDetailPage extends StatelessWidget {
               ),
             ),
             CustomButton(
+              backgroundColor: Colors.orange,
+              textColor: Colors.white,
               text: mode == 'fun' ? "Veggies" : "Vegetable", // Button text based on mode
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => DetailInfoPage(
                     info: vegetableDescription,
+                    color:  Colors.orange,
                     image: data['vegetableImage']!,
                     mode: mode,
                   ),
@@ -208,11 +218,14 @@ class OrganDetailPage extends StatelessWidget {
             ),
             CustomButton(
               text: mode == 'fun' ? "Vits" : "Vitamin", // Button text based on mode
+              backgroundColor: Colors.deepPurple,
+              textColor: Colors.white,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => DetailInfoPage(
                     info: vitaminDescription,
+                    color: Colors.deepPurple,
                     image: data['vitaminImage']!,
                     mode: mode,
                   ),
@@ -221,17 +234,21 @@ class OrganDetailPage extends StatelessWidget {
             ),
             CustomButton(
               text: mode == 'fun' ? "Brain Teasers" : "Fun Fact", // Button text based on mode
+              backgroundColor: Colors.teal,
+              textColor: Colors.white,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => DetailInfoPage(
                     info: mode == 'fun' ? data['ffunFact']! : data['nfunFact']!,
+                    color: Colors.teal,
                     image: data['funFactImage']!,
                     mode: mode,
                   ),
                 ),
               ),
-            ),
+            )
+            ,
           ],
         ),
       ),

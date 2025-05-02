@@ -15,6 +15,7 @@ dependencies:
   animations: ^2.0.8
   cupertino_icons: ^1.0.8
   model_viewer_plus: ^1.9.3
+  gif_view: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -44,19 +45,19 @@ flutter:
     - assets/apples.png
     - assets/bananas.png
     - assets/vitamink.png
-    - assets/brain_fact.png
+    - assets/gif/brain_fact.gif
     - assets/vitaminc.png
-    - assets/heart_fact.png
+    - assets/gif/heart_fact.gif
     - assets/broccoli.png
     - assets/vitamine.png
-    - assets/lung_fact.png
+    - assets/gif/lung_fact.gif
     - assets/vitamina.png
-    - assets/eyes_fact.png
+    - assets/gif/eye_fact.gif
     - assets/vitaminb.png
-    - assets/stomach_fact.png
+    - assets/gif/stomach_fact.gif
     - assets/kale.png
     - assets/vitamind.png
-    - assets/muscle_fact.png
+    - assets/gif/muscle_fact.gif
     - assets/models/brain.glb
     - assets/models/heart.glb
     - assets/models/eye.glb
@@ -67,7 +68,7 @@ flutter:
     - assets/pineapple.png
     - assets/sweet potato.png
     - assets/vitaminb12.png
-    - assets/leg_fact.png
+    - assets/gif/leg_fact.gif
 
 
   fonts:
