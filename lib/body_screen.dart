@@ -46,7 +46,7 @@ class BodyScreen extends StatelessWidget {
             alignment: Alignment.topCenter,
             children: [
               Image.asset('assets/body_outline.png', fit: BoxFit.contain),
-              Positioned(top: 30, right: 187, child: GestureDetector(onTap: () => showOrganDialog(context, "Brain 🧠"), child: const Text("🧠", style: emojiStyle))),
+              Positioned(top: 18, right: 187, child: GestureDetector(onTap: () => showOrganDialog(context, "Brain 🧠"), child: const Text("🧠", style: emojiStyle))),
               Positioned(top: 50, right: 187, child: GestureDetector(onTap: () => showOrganDialog(context, "Eyes 👁"), child: const Text("👁", style: emojiStyle))),
               Positioned(top: 145, right: 160, child: GestureDetector(onTap: () => showOrganDialog(context, "Heart ❤"), child: const Text("❤", style: emojiStyle))),
               Positioned(top: 180, right: 187, child: GestureDetector(onTap: () => showOrganDialog(context, "Lungs 🫁"), child: const Text("🫁", style: emojiStyle))),

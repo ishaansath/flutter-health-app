@@ -44,7 +44,7 @@ class DetailInfoPage extends StatelessWidget {
                 Text(
                   displayText,
                   textAlign: TextAlign.justify,
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                  style: const TextStyle(color: Colors.white, fontSize: 15),
                 ),
               ],
             ),
