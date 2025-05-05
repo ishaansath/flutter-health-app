@@ -21,7 +21,7 @@ class DetailInfoPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(title: const Text("Detail Info"), backgroundColor: color), // Use the passed color
+      appBar: AppBar(title: const Text(""), backgroundColor: Colors.grey.shade900, iconTheme: IconThemeData(color: Colors.white),), // Use the passed color
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -43,7 +43,7 @@ class DetailInfoPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 Text(
                   displayText,
-                  textAlign: TextAlign.justify,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white, fontSize: 15),
                 ),
               ],

@@ -15,7 +15,7 @@ class OrganDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = {
-      "Brain 🧠": {
+      "Brain": {
         "image": "assets/models/brain.glb",
         "fruit": "Blueberries",
         "vegetable": "Spinach",
@@ -35,7 +35,7 @@ class OrganDetailPage extends StatelessWidget {
         "vitaminImage": "assets/vitamink.png",
         "funFactImage": "assets/gif/brain_fact.gif"
       },
-      "Heart ❤": {
+      "Heart": {
         "image": "assets/models/heart.glb",
         "fruit": "Tomatoes",
         "vegetable": "Beetroot",
@@ -55,7 +55,7 @@ class OrganDetailPage extends StatelessWidget {
         "vitaminImage": "assets/vitaminc.png",
         "funFactImage": "assets/gif/heart_fact.gif"
       },
-      "Eyes 👁": {
+      "Eyes": {
         "image": "assets/models/eye.glb",
         "fruit": "Oranges",
         "vegetable": "Carrot",
@@ -75,7 +75,7 @@ class OrganDetailPage extends StatelessWidget {
         "vitaminImage": "assets/vitamina.png",
         "funFactImage": "assets/gif/eye_fact.gif"
       },
-      "Lungs 🫁": {
+      "Lungs": {
         "image": "assets/models/lungs.glb",
         "fruit": "Apples",
         "vegetable": "Broccoli",
@@ -95,7 +95,7 @@ class OrganDetailPage extends StatelessWidget {
         "vitaminImage": "assets/vitamine.png",
         "funFactImage": "assets/gif/lung_fact.gif"
       },
-      "Stomach 🍽": {
+      "Stomach": {
         "image": "assets/models/stomach.glb",
         "fruit": "Papaya",
         "vegetable": "Cabbage",
@@ -115,7 +115,7 @@ class OrganDetailPage extends StatelessWidget {
         "vitaminImage": "assets/vitaminb.png",
         "funFactImage": "assets/gif/stomach_fact.gif"
       },
-      "Muscles 💪": {
+      "Muscles": {
         "image": "assets/models/muscle.glb",
         "fruit": "Banana",
         "vegetable": "Kale",
@@ -135,7 +135,7 @@ class OrganDetailPage extends StatelessWidget {
         "vitaminImage": "assets/vitamind.png",
         "funFactImage": "assets/gif/muscle_fact.gif"
       },
-      "Legs 🦵": {
+      "Legs": {
         "image": "assets/models/leg.glb",
         "fruit": "Pineapple",
         "vegetable": "Sweet Potato",
@@ -165,7 +165,7 @@ class OrganDetailPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(title: Text(organ)),
+      appBar: AppBar(backgroundColor: Colors.grey.shade900, iconTheme: IconThemeData(color: Colors.white), title: Text(organ, style: TextStyle(color: Colors.white)), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(20),
 
@@ -181,7 +181,7 @@ class OrganDetailPage extends StatelessWidget {
                 child: ModelView(modelPath: modelPath),
               ),
             // Display the organ's description based on mode
-            Text(text, textAlign: TextAlign.justify, style: const TextStyle(color: Colors.white, fontSize: 15)),
+            Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 15)),
 
             // CustomButton for fruit, vegetable, vitamin, and fun fact
             CustomButton(
@@ -270,8 +270,8 @@ class ModelView extends StatelessWidget {
           // padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
-            border: Border.all(color: Colors.black, width: 2),
-            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(7),
           ),
           child: ModelViewer(
             src: modelPath,
