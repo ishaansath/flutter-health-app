@@ -74,6 +74,23 @@ flutter:
     - assets/pomegranate.png
     - assets/models/pomegranate.glb
     - assets/models/blueberry.glb
+    - assets/avocado.png
+    - assets/models/avocado.glb
+    - assets/models/beetroot.glb
+    - assets/models/broccoli.glb
+    - assets/models/tomato.glb
+    - assets/models/vitamin_c.glb
+    - assets/models/potassium.glb
+    - assets/potassium.png
+    - assets/models/apple.glb
+    - assets/models/spinach.glb
+    - assets/models/redonion.glb
+    - assets/redonion.png
+    - assets/cucumber.png
+    - assets/models/cucumber.glb
+    - assets/models/vitamin_b.glb
+    - assets/models/vitamin_e.glb
+    - assets/models/vitamin_k.glb
 
 
   fonts:

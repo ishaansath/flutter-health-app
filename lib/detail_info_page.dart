@@ -121,7 +121,7 @@ class DetailInfoPage extends StatelessWidget {
                                   const SizedBox(height: 10),
                                   Text(
                                     item['name']!,
-                                    style: const TextStyle(fontSize: 30, color: Colors.white), // Adjusted font size
+                                    style: const TextStyle(fontSize: 20, color: Colors.white), // Adjusted font size
                                     textAlign: TextAlign.center,
                                   ),
                                   if (item['shortDescription'] != null) // Display short description
@@ -129,7 +129,7 @@ class DetailInfoPage extends StatelessWidget {
                                       padding: const EdgeInsets.only(top: 3),
                                       child: Text(
                                         item['shortDescription']!,
-                                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                                        style: const TextStyle(color: Colors.white70, fontSize: 12),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
@@ -148,7 +148,7 @@ class DetailInfoPage extends StatelessWidget {
                                       padding: const EdgeInsets.only(top: 5),
                                       child: Text(
                                         item['additionalInfo']!,
-                                        style: const TextStyle(color: Colors.white38, fontSize: 11),
+                                        style: const TextStyle(color: Colors.white38, fontSize: 9),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
