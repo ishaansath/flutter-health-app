@@ -8,7 +8,7 @@ class HomePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[850],
+        backgroundColor: Colors.grey[900],
         title: const Text("Select Interaction Mode", style: TextStyle(color: Colors.white)),
         content: const Text("Choose how you want to explore!", style: TextStyle(color: Colors.white)),
         actions: [

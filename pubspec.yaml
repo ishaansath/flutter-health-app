@@ -16,6 +16,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   model_viewer_plus: ^1.9.3
   gif_view: ^1.0.2
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +70,10 @@ flutter:
     - assets/sweet potato.png
     - assets/vitaminb12.png
     - assets/gif/leg_fact.gif
+    - assets/models/banana.glb
+    - assets/pomegranate.png
+    - assets/models/pomegranate.glb
+    - assets/models/blueberry.glb
 
 
   fonts:
