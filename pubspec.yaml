@@ -91,6 +91,23 @@ flutter:
     - assets/models/vitamin_b.glb
     - assets/models/vitamin_e.glb
     - assets/models/vitamin_k.glb
+    - assets/mango.png
+    - assets/models/mango.glb
+    - assets/models/blackberries.glb
+    - assets/blackberry.png
+    - assets/kiwi.png
+    - assets/models/kiwi.glb
+    - assets/models/carrot.glb
+    - assets/models/kale.glb
+    - assets/models/red_bell_pepper.glb
+    - assets/redbellpepper.png
+    - assets/models/vitamin_a.glb
+    - assets/lutein.png
+    - assets/models/lutein.glb
+    - assets/models/pineapple.glb
+    - assets/models/cauliflower.glb
+    - assets/cauliflower.png
+    - assets/models/cauliflower.glb
 
 
   fonts:

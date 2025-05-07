@@ -69,7 +69,7 @@ class DetailInfoPage extends StatelessWidget {
                       autoPlay: true,
                       enableInfiniteScroll: false,
                       autoPlayInterval: const Duration(seconds: 10),
-                      viewportFraction: 0.8,
+                      viewportFraction: 0.75,
                     ),
                     items: items!.map((item) {
                       return Builder(

@@ -54,7 +54,7 @@ class ItemDetailPage extends StatelessWidget {
                         Text(
                           description,
                           style: const TextStyle(color: Colors.white, fontSize: 16),
-                          textAlign: TextAlign.justify,
+                          textAlign: TextAlign.left,
                         ),
                         const SizedBox(height: 10),
                       ],
