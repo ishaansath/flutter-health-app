@@ -53,10 +53,17 @@ class DetailInfoPage extends StatelessWidget {
               if (info != null && info!.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
-                  child: Text(
-                    info!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontSize: 15),
+                  child: Container( // Added Container for decoration
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      info!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                    ),
                   ),
                 ),
               if (items != null && items!.isNotEmpty)
