@@ -71,8 +71,8 @@ class BodyScreen extends StatelessWidget {
                           'assets/body_outline.png', fit: BoxFit.contain),
                       // Brain
                       Positioned(
-                        top: height * 0.20,
-                        left: width * 0.46,
+                        top: height * 0.1999,
+                        left: width * 0.45,
                         child: GestureDetector(
                           onTap: () => showOrganDialog(context, "Brain"),
                           child: const Text("🧠", style: emojiStyle),
@@ -81,7 +81,7 @@ class BodyScreen extends StatelessWidget {
                       // Eyes
                       Positioned(
                         top: height * 0.23,
-                        left: width * 0.46,
+                        left: width * 0.45,
                         child: GestureDetector(
                           onTap: () => showOrganDialog(context, "Eyes"),
                           child: const Text("👁", style: emojiStyle),
@@ -99,7 +99,7 @@ class BodyScreen extends StatelessWidget {
                       // Lungs
                       Positioned(
                         top: height * 0.35,
-                        left: width * 0.46,
+                        left: width * 0.45,
                         child: GestureDetector(
                           onTap: () => showOrganDialog(context, "Lungs"),
                           child: const Text("🫁", style: emojiStyle),
@@ -117,7 +117,7 @@ class BodyScreen extends StatelessWidget {
                       // Stomach
                       Positioned(
                         top: height * 0.43,
-                        left: width * 0.46,
+                        left: width * 0.45,
                         child: GestureDetector(
                           onTap: () => showOrganDialog(context, "Stomach"),
                           child: const Text("🍽", style: emojiStyle),

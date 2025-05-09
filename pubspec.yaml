@@ -108,6 +108,12 @@ flutter:
     - assets/models/cauliflower.glb
     - assets/cauliflower.png
     - assets/models/cauliflower.glb
+    - assets/models/garlic.glb
+    - assets/garlic.png
+    - assets/models/vitamin_d.glb
+    - assets/models/papaya.glb
+    - assets/models/sweet_potato.glb
+    - assets/models/vitamin_b1.glb
 
 
   fonts:
