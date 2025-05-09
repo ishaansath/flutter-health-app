@@ -113,7 +113,12 @@ flutter:
     - assets/models/vitamin_d.glb
     - assets/models/papaya.glb
     - assets/models/sweet_potato.glb
-    - assets/models/vitamin_b1.glb
+    - assets/grape.png
+    - assets/models/grape.glb
+    - assets/models/onion.glb
+    - assets/onion.png
+    - assets/models/mushroom.glb
+    - assets/mushroom.png
 
 
   fonts:

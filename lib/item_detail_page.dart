@@ -53,7 +53,7 @@ class ItemDetailPage extends StatelessWidget {
                       children: [
                         Text(
                           description,
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          style: const TextStyle(color: Colors.white, fontSize: 17),
                           textAlign: TextAlign.left,
                         ),
                         const SizedBox(height: 10),
@@ -63,7 +63,7 @@ class ItemDetailPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   Text(
                     additionalInfo,
-                    style: const TextStyle(color: Colors.white60, fontSize: 13),
+                    style: const TextStyle(color: Colors.white60, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 100),

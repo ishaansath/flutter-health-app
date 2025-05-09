@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'detail_info_page.dart';
 import 'custom_button.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
-import 'package:gif_view/gif_view.dart';
 
 class OrganDetailPage extends StatelessWidget {
   final String organ;
@@ -91,7 +90,7 @@ class OrganDetailPage extends StatelessWidget {
             "name": "Vitamin B12",
             "normalModeDescription": "🩸 Vitamin B12 helps maintain nerve health. \n \n 🩸 It helps to: \n  ★ Forms red blood cells \n  ★ Aids in the production of brain chemicals \n  ★ Ultimately, affect mood and thinking. \n \n 🩸 Deficiency can lead to confusion, poor memory, and even depression. \n \n 🩸 It’s especially vital for kids and older adults.",
             'funModeDescription': "🩸 B12 = brain’s router. \n \n 🩸 No B12 = no signal. 📶🧠 \n \n 🩸 What it does: \n ★ Keep your focus sharp \n ★ Your brain online \n ★ Your chill intact. \n \n 🩸 Plug in or lag out. 🚫🧠",
-            'additionalInfo': 'Daily Value: 2.4 mcg/day, Found in: Meat, dairy, eggs, fortified cereal',
+            'additionalInfo': 'Daily Value: 2.4 mcg, Found in: Meat, dairy, eggs, fortified cereal',
             'image': 'assets/vitaminb12.png',
             'modelPath': 'assets/models/vitamin_b.glb',
             'shortDescription': 'Essential for focus & nerves',
@@ -361,7 +360,7 @@ class OrganDetailPage extends StatelessWidget {
             "name": "Vitamin D",
             "normalModeDescription": " ☀️ Vitamin D plays a regulatory role in lung immunity and inflammation. \n \n ☀️ It helps modulate immune responses to infections and has been shown to reduce the risk of respiratory issues like: \n  1. Asthma \n  2. Chronic bronchitis. \n \n ☀️ Sun exposure is the best natural source! \n \n ☀️ Dietary intake is crucial for those with limited sunlight.",
             'funModeDescription': " ☀️ Vitamin D is basically sunshine bottled up for your chest ️🫁. \n \n ☀️ It’s like “Calm down, immune system”! \n \n ☀️ It keeps inflammation low-key while powering up your lung defenses. \n \n ☀️ Cold? Pollution? Smog? \nVitamin D just sun-blasts them out of the way so you can inhale peace and exhale strength.",
-            'additionalInfo': 'Fat-soluble, Daily Need: 600–800 IU, Found in: sunlight, mushrooms, eggs, fortified foods',
+            'additionalInfo': 'Fat-soluble, Daily Value: 600–800 IU, Found in: sunlight, mushrooms, eggs, fortified foods',
             'image': 'assets/vitamind.png',
             'modelPath': 'assets/models/vitamin_d.glb',
             'shortDescription': 'Regulates lung immunity and inflammation.',
@@ -394,7 +393,7 @@ class OrganDetailPage extends StatelessWidget {
             'additionalInfo': 'Calories: 86, Carbs: 20g, Fiber: 3g, Protein: 1.6g, Vitamin A: 283%, Resistant Starch: Present',
             'image': 'assets/sweet potato.png',
             'modelPath': 'assets/models/sweet_potato.glb',
-            'shortDescription': '',
+            'shortDescription': 'Anti-acid gut buddy',
           },
           {
             "name": "Carrot",
@@ -403,7 +402,7 @@ class OrganDetailPage extends StatelessWidget {
             'additionalInfo': 'Calories: 41, Carbs: 10g, Fiber: 2.8g, Vitamin A: 334%, Beta-carotene: High',
             'image': 'assets/carrots.png',
             'modelPath': 'assets/models/carrot.glb',
-            'shortDescription': '',
+            'shortDescription': 'Fiber-rich softener',
           },
         ],
         "vitamins": [
@@ -411,9 +410,9 @@ class OrganDetailPage extends StatelessWidget {
             "name": "Vitamin B1",
             "normalModeDescription": " ⚡ Vitamin B1 (thiamine) plays a crucial role in maintaining a healthy digestive system! \n \n ⚡ It stimulates the production of hydrochloric acid in the stomach. \n \n ⚡ This acid is essential for breaking down food effectively and preparing nutrients for absorption in the intestines. \n \n ⚡ Thiamine: \n  • Supports proper nerve function in the gastrointestinal tract \n  • Helps regulate muscle contractions and coordination \n  • Help in the movement of food smoothly through the digestive system.",
             'funModeDescription': " ⚡ Vitamin B1 AKA Thiamine is like the ignition key for your digestive engine 🚗💊.\n \n ⚡ What happens the moment food hits your mouth: \n  • It’s already revving things up \n  • Turns on the acid \n  • Sparking the belly into action \n  • Syncing your whole gut squad like a well-oiled machine.  \n \n ⚡ It’s the hype coach in your system, yelling “LET’S GOOOOO” every time you eat 🍽️🔥. \n \n ⚡ No B1? Your stomach’s just sitting there, confused and sluggish.",
-            'additionalInfo': 'Water-soluble, Daily Need: 1.3–1.7 mg, Found in: bananas, fish, potatoes, avocado',
+            'additionalInfo': 'Water-soluble, Daily Value: 1.3–1.7 mg, Found in: bananas, fish, potatoes, avocado',
             'image': 'assets/vitaminb.png',
-            'modelPath': 'assets/models/vitamin_b1.png',
+            'modelPath': 'assets/models/vitamin_b.glb',
             'shortDescription': 'Anti-nausea helper',
           },
         ],
@@ -425,9 +424,75 @@ class OrganDetailPage extends StatelessWidget {
         "image": "assets/models/muscle.glb",
         "briefInfo": "Muscles are specialized tissues that enable movement, maintain posture, and support bodily functions like circulation and respiration. ",
         "briefInfoFun": "Muscles move, flex, and power your body like champs.",
-        "fruits": [],
-        "vegetables": [],
-        "vitamins": [],
+        "fruits": [
+          {
+            "name": "Banana",
+            "normalModeDescription": " 🍌 Bananas are rich in potassium! \n \n 🍌 Potassium is essential for muscle contraction and preventing cramps. \n \n 🍌 They provide natural sugars for quick energy and contain vitamin B6, which aids in protein metabolism. \n \n 🍌 Their magnesium content supports: \n  1. Muscle relaxation \n  2. Muscle Recovery \n \n 🍌 This makes them an excellent pre- or post-workout snack.",
+            'funModeDescription': " 🍌 Bananas are your gym buddy's bestie💥. \n \n 🍌 Loaded with potassium to keep cramps at bay and natural sugars for that energy boost. \n \n 🍌 They're like nature's energy bar with B6 and magnesium! \n \n 🍌 Your muscles are saying 'Thanks for the gains!'",
+            'additionalInfo': 'Calories: 89, Carbs: 23g, Fiber: 2.6g, Protein: 1.1g, Potassium: 358mg, Vitamin B6: 0.4mg, Magnesium: 27mg',
+            'image': 'assets/bananas.png',
+            'modelPath': 'assets/models/banana.glb',
+            'shortDescription': 'Potassium-packed fuel',
+          },
+          {
+            "name": "Grapes",
+            "normalModeDescription": " 🍇 Grapes are excellent for post-exercise muscle recovery thanks to their rich supply of antioxidants. \n \n 🍇 They have resveratrol which helps reduce oxidative stress in muscle cells.\n \n 🍇 Their natural sugars restore glycogen levels, aiding energy replenishment after workouts. \n \n 🍇 They help our muscles by: \n  1. Hydrating them \n  2. Supporting blood flow \n  3. Deliver oxygen to sore tissues \n  4. Delivering nutrients to sore tissues. \n \n 🍇 Regular consumption may reduce inflammation and speed up muscle healing. ",
+            'funModeDescription': " 🍇 Grapes are your post-workout homies 💪. \n \n 🍇 Think of them as juicy bite-sized power-ups that: \n  1. Roll in \n  2. Hydrate you \n  3. Bounce that soreness outta your muscles. \n \n 🍇 They’ve got resveratrol! \n \n Resveratrol is a fancy antioxidant that acts like your muscle's personal bodyguard, kicking out stress and inflame vibes. \n \n 🍇 The sugar gives you natural energy which is perfect for recharging after a workout!.",
+            'additionalInfo': 'Calories: 69, Carbs: 18g, Fiber: 0.9g, Protein: 0.7g, Vitamin C: 10.8mg, Resveratrol: Present in skins',
+            'image': 'assets/grape.png',
+            'modelPath': 'assets/models/grape.glb',
+            'shortDescription': 'Antioxidant-rich snack',
+          },
+        ],
+        "vegetables": [
+          {
+            "name": "Onion",
+            "normalModeDescription": " 🧅 Onions are rich in quercetin! \n \n 🧅 Quercetin is a flavonoid antioxidant that: \n  • Reduces inflammation \n  • Boosts recovery in overworked muscles. \n \n 🧅 Their sulfur compounds: \n  ★ Promote collagen production \n  ★ Help detoxify muscle tissue. \n \n 🧅 Onions can: \n  1. Improve blood circulation \n  2. Deliver oxygen more efficiently to muscles \n  3. Deliver nutrients more efficiently to muscles \n \n 🧅 Regular consumption may reduce muscle fatigue and soreness after intense activity.",
+            'funModeDescription': " 🧅 Onions may make you cry, but your muscles are smiling 😢➡️💪.  \n \n 🧅 They’ve got quercetin AKA the OG anti-sore hero! \n \n 🧅 They also have sulfur stuff that keeps tissues fresh and ready to bounce back. \n \n 🧅 Better blood flow = better gains! \n \n 🧅 They add flavor AND function. \n \n 🧅 Grill 'em, caramelize 'em, or toss ‘em raw—your biceps will say “thanks, bro.”🔥",
+            'additionalInfo': 'Calories: 40, Carbs: 9g, Protein: 1.1g, Fiber: 1.7g, Quercetin: High, Vitamin C: 12%, Sulfur Compounds: Present, Water Content: 89%',
+            'image': 'assets/onion.png',
+            'modelPath': 'assets/models/onion.glb',
+            'shortDescription': 'Anti-inflammatory bulb',
+          },
+          {
+            "name": "Mushroom",
+            "normalModeDescription": " 🍄 Mushrooms are a great source of vitamin B like: \n  1. Riboflavin \n  2. Niacin \n  3. Pantothenic acid  \n \n 🍄 These support energy production in muscle cells. \n \n 🍄 They also contain selenium, an antioxidant that protects muscle tissue from oxidative damage during workouts. \n \n 🍄 They offer small but significant protein content and contribute to muscle recovery and metabolic efficiency.",
+            'funModeDescription': " 🍄 Mushrooms = muscle’s secret weapon ⚡. \n \n 🍄 They’re packed with vitamin B to keep your energy on max mode! \n \n They also have some sneaky protein and selenium to fight off leg strains after workout. \n \n 🍄 They’re like the quiet gym rat: \n  • Lowkey \n  • Efficient  \n  • Always boosting performance behind the scenes. \n \n 🍄 Eat ‘em and level up that muscle hustle. 💥🍽️",
+            'additionalInfo': 'Calories: 22, Carbs: 3.3g, Protein: 3.1g, Fiber: 1g, Riboflavin (B2): 24%, Niacin (B3): 17%, Selenium: 13%, Water Content: 92%',
+            'image': 'assets/mushroom.png',
+            'modelPath': 'assets/models/mushroom.glb',
+            'shortDescription': 'Rich in protein and vitamin B',
+          },
+        ],
+        "vitamins": [
+          {
+            "name": "Vitamin D",
+            "normalModeDescription": " ☀️ Vitamin D plays a pivotal role in muscle function! \n \n ☀️ It influences strength and performance. \n \n ☀️ What it helps with: \n  • Aids in calcium absorption \n  • Calcium absorption is essential for muscle contractions \n  • Help reduce the risk of muscle injuries. \n \n ☀️ Sunlight exposure and certain foods can help maintain adequate levels.",
+            'funModeDescription': " ☀️ Vitamin D is your muscle's sunshine buddy 💪. \n \n What Vitamin D bro does: \n  • It boosts strength \n  • Keep contractions smooth \n  • Help prevent injuries. \n \n ☀️ Soak up some sun or munch on D-rich foods for that extra edge.",
+            'additionalInfo': 'Fat-soluble, Daily Value: 600–800 IU, Found in: sunlight, mushrooms, eggs, fortified foods',
+            'image': 'assets/vitamind.png',
+            'modelPath': 'assets/models/vitamin_d.glb',
+            'shortDescription': 'Muscle strength enhancer',
+          },
+          {
+            "name": "Vitamin B12",
+            "normalModeDescription": " 🩸 Vitamin B12 is essential for red blood cell formation! \n \n 🩸 It ensures oxygen delivery to muscles. \n \n 🩸 It supports energy metabolism, aiding in muscle endurance and reducing fatigue. \n \n 🩸 Deficiency can lead to muscle weakness and decreased performance.",
+            'funModeDescription': " 🩸 Vitamin B12 is the energy spark plug ⚡🔋. \n \n 🩸 It keeps your muscles oxygenated and ready to go. \n \n It ensures you don't hit your limit mid-workout. \n \n 🩸 Stay charged and keep pushing.",
+            'additionalInfo': 'Daily Value: 2.4 mcg, Found in: Meat, dairy, eggs, fortified cereal',
+            'image': 'assets/vitaminb12.png',
+            'modelPath': 'assets/models/vitamin_b.glb',
+            'shortDescription': 'Energy metabolism aid',
+          },
+          {
+            "name": "Vitamin C",
+            "normalModeDescription": " 🛡️ Vitamin C is vital for collagen production! \n \n 🛡️ Collagen maintains the integrity of muscles, tendons, and ligaments. \n \n 🛡️ It also acts as an antioxidant, protecting muscles from oxidative damage post-exercise and aiding in recovery.",
+            'funModeDescription': " 🛡️ Vitamin C is your muscle's repair crew 🛠️🍊. \n \n 🛡️ It builds strong connective tissues and shields your gains from oxidative stress. \n \n 🛡️ Keep it in your toolkit for optimal recovery.",
+            'additionalInfo': 'Water-soluble vitamin, Daily Value: 90mg, Found in: Citrus, Kiwi, Guava, Bell Peppers',
+            'image': 'assets/vitaminc.png',
+            'modelPath': 'assets/models/vitamin_c.glb',
+            'shortDescription': 'Collagen synthesis supporter',
+          },
+        ],
         "nfunFact": "Muscles account for approximately 40% of your body weight and can adapt to become stronger and more efficient through regular exercise!",
         "ffunFact": "Muscles are your built-in powerhouses—flexing at 40% of your weight and leveling up with every workout. Stay on the grind, and they’ll keep getting stronger and more efficient.",
         "funFactImage": "assets/gif/muscle_fact.gif"
@@ -436,7 +501,17 @@ class OrganDetailPage extends StatelessWidget {
         "image": "assets/models/leg.glb",
         "briefInfo": "Legs provide essential support, enable movement, and ensure stability and strength for daily activities.",
         "briefInfoFun": "Legs are turbo-charged—speed, flex, and beast-mode strength.",
-        "fruits": [],
+        "fruits": [
+          {
+            "name": "",
+            "normalModeDescription": "",
+            'funModeDescription': "",
+            'additionalInfo': '',
+            'image': 'assets/.png',
+            'modelPath': 'assets/models/.glb',
+            'shortDescription': '',
+          },
+        ],
         "vegetables": [],
         "vitamins": [],
         "nfunFact": "The femur, which is the longest bone in your leg, holds the title of being the longest bone in your entire body, providing the strength and support needed for movement and stability.",
