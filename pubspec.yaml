@@ -17,6 +17,7 @@ dependencies:
   model_viewer_plus: ^1.9.3
   gif_view: ^1.0.2
   carousel_slider: ^5.0.0
+  audioplayers: ^6.4.0
 
 dev_dependencies:
   flutter_test:
@@ -123,6 +124,7 @@ flutter:
     - assets/mushroom.png
     - assets/models/tangerine.glb
     - assets/tangerine.png
+    - assets/FishTestImage.png
 
 
   fonts:
