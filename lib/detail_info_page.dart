@@ -9,7 +9,7 @@ class DetailInfoPage extends StatelessWidget {
   final String title;
   final String mode;
   final String image;
-  final MaterialColor color;
+  final Color color;
   final String organ;
   final String? info;
   final List<Map<String, dynamic>>? items;

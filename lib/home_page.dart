@@ -7,7 +7,7 @@ class HomePage extends StatelessWidget {
   // It's crucial because BodyScreen, which it pushes, needs it.
   final ValueNotifier<ThemeMode> themeModeNotifier;
 
-  const HomePage({super.key, required this.themeModeNotifier});
+  const HomePage({super.key, required this.themeModeNotifier, required void Function(String mode) setMode});
 
   void showModeDialog(BuildContext context) {
     final theme = Theme.of(context);
@@ -76,7 +76,7 @@ class HomePage extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background, // Use theme colorScheme.background for Scaffold
+      backgroundColor: colorScheme.primary, // Use theme colorScheme.background for Scaffold
       body: Center(
         child: Stack(
           alignment: Alignment.center,
