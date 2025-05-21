@@ -1,14 +1,14 @@
 // more_info_page.dart
 import 'package:flutter/material.dart';
-import 'package:ishaan/main.dart';
 import 'detail_info_page.dart';
-import 'custom_button_large.dart'; // Ensure you're importing CustomButtonLarge
+import 'custom_button_large.dart';
+import 'main.dart'; // Import main.dart to access the CustomButtonColors extension
 
 class MoreInfoPage extends StatelessWidget {
   final String organ;
-  final String mode;
-  // This now expects a Map where values are also Maps (containing 'buttonColor' and 'items')
-  final Map<String, Map<String, dynamic>> moreInfoData;
+  final String mode; // <--- This is the mode passed from OrganDetailPage
+  // This type is now Map<String, Map<String, dynamic>> because the values are now maps
+  final Map<String, dynamic> moreInfoData; // Kept as dynamic for flexibility
 
   const MoreInfoPage({
     super.key,
@@ -20,77 +20,72 @@ class MoreInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme; // Access the color scheme
+    final colorScheme = theme.colorScheme;
 
-    // --- NEW: Define the list of colors to cycle through ---
     final List<Color> cycleColors = [
-      colorScheme.buttonColor1, // Access your custom colors via the extension
+      colorScheme.buttonColor1,
       colorScheme.buttonColor2,
       colorScheme.buttonColor3,
       colorScheme.buttonColor4,
     ];
-    int colorIndex = 0; // Initialize an index to cycle through the colors
+    int colorIndex = 0;
 
     return Scaffold(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        title: Text('${mode == 'fun' ? 'More ${organ} Info' : 'More ${organ} Info'}'),
+        title: Text('${mode == 'fun' ? 'More ${organ} Info ✨' : 'More ${organ} Info'}'), // Optional: Add emoji to AppBar title
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: Column( // Column to hold Wrap and SizedBox
           children: [
             Wrap(
-          spacing: 20,
-          runSpacing: 20,
-          alignment: WrapAlignment.center,
-          children: moreInfoData.keys.map((categoryKey) {
-            // Get the specific category's data map (e.g., {'buttonColor': ..., 'items': [...]})
-            final Map<String, dynamic> categoryDetails = moreInfoData[categoryKey]!;
-            final Color buttonColor = cycleColors[colorIndex % cycleColors.length];
-            colorIndex++; // Increment for the next button
+              spacing: 20,
+              runSpacing: 20,
+              alignment: WrapAlignment.center,
+              children: moreInfoData.keys.map((categoryKey) {
+                // <--- NEW: Get the category data map (e.g., 'funFacts' map) ---
+                final Map<String, dynamic> categoryConfig = moreInfoData[categoryKey] as Map<String, dynamic>;
 
+                // <--- NEW: Determine the button title based on the current mode ---
+                final String buttonTitle = mode == 'fun'
+                    ? categoryConfig['funModeTitle'] as String? ?? categoryKey // Fallback to key if funModeTitle is missing
+                    : categoryConfig['normalModeTitle'] as String? ?? categoryKey; // Fallback to key if normalModeTitle is missing
 
-            // Extract the buttonColor. Default to a fallback if not found.
+                // <--- NEW: Get the actual list of items from the 'items' key ---
+                final List<Map<String, dynamic>> categoryItems =
+                    categoryConfig['items'] as List<Map<String, dynamic>>? ?? [];
 
-            // Extract the list of items for this category
-            final List<Map<String, dynamic>> categoryItems =
-                categoryDetails['items'] as List<Map<String, dynamic>>? ?? [];
+                final Color buttonColor = cycleColors[colorIndex % cycleColors.length];
+                colorIndex++;
 
-            // Format the category key into a readable title
-            String categoryTitle = categoryKey.replaceAllMapped(
-              RegExp(r'([A-Z])'),
-                  (match) => ' ${match.group(0)}',
-            ).trim();
-            categoryTitle =
-                categoryTitle[0].toUpperCase() + categoryTitle.substring(1);
-
-            return CustomButtonLarge(
-              text: categoryTitle,
-              backgroundColor: buttonColor, // --- USES THE DYNAMIC COLOR ---
-              textColor: Colors.white,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailInfoPage(
-                      title: categoryTitle,
-                      mode: mode,
-                      image: '',
-                      color: buttonColor, // Pass the dynamic color to DetailInfoPage
-                      organ: organ,
-                      items: categoryItems, // Pass the extracted items
-                    ),
-                  ),
+                return CustomButtonLarge(
+                  text: buttonTitle, // Use the mode-specific title
+                  backgroundColor: buttonColor,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailInfoPage(
+                          title: buttonTitle, // Pass the mode-specific title to DetailInfoPage
+                          mode: mode, // Pass the mode along
+                          image: '', // Still not used here
+                          color: buttonColor,
+                          organ: organ,
+                          items: categoryItems, // Pass the nested items list
+                        ),
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-          }).toList(),
+              }).toList(),
+            ),
+            const SizedBox(height: 150), // Added SizedBox for extra scrolling
+          ],
         ),
-    const SizedBox(height: 100, width: double.infinity),
-  ]),
-    ),
+      ),
     );
   }
 }

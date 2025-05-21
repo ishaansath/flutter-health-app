@@ -110,18 +110,34 @@ class DetailInfoPage extends StatelessWidget {
                           final String? modelPath = item['modelPath'];
                           return GestureDetector(
                             onTap: () {
+                              // Extract all necessary individual pieces of data from the current item
+                              final String itemName = item['name'] as String? ?? item['title'] as String? ?? 'Item Name';
+                              final String itemModelPath = item['modelPath'] as String? ?? '';
+                              final String itemImagePath = item['image'] as String? ?? '';
+
+                              // Pass BOTH normal and fun descriptions, and let ItemDetailPage handle the display
+                              final String normalDescription = item['normalModeDescription'] as String? ?? item['description'] as String? ?? 'No description available.';
+                              final String funDescription = item['funModeDescription'] as String? ?? normalDescription;
+
+                              // Get the audio paths (can be null if not defined for an item)
+                              final String? normalAudioPath = item['normalModeAudioPath'] as String?;
+                              final String? funAudioPath = item['funModeAudioPath'] as String?;
+
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => ItemDetailPage(
-                                    name: item['name']!,
-                                    modelPath: modelPath ??
-                                        '', // Pass empty string if null
-                                    description: mode == 'fun'
-                                        ? item['funModeDescription']!
-                                        : item['normalModeDescription']!,
-                                    additionalInfo: item['additionalInfo']!,
-                                    image: item['image']!, additionalInfoExtra: item['additionalInfoExtra']!,
+                                    name: itemName,
+                                    modelPath: itemModelPath,
+                                    image: itemImagePath,
+                                    // Pass all required parameters, ensuring they match ItemDetailPage's constructor
+                                    description: mode == 'fun' ? funDescription : normalDescription, // Pass the already chosen description
+                                    additionalInfo: item['additionalInfo'] as String? ?? '',
+                                    additionalInfoExtra: item['additionalInfoExtra'] as String? ?? '', // Pass the already chosen extra info
+                                    normalModeAudioPath: normalAudioPath, // <--- Pass the normal audio path
+                                    funModeAudioPath: funAudioPath,       // <--- Pass the fun audio path
+                                    mode: mode, // <--- Pass the current mode string ('normal' or 'fun')
                                   ),
                                 ),
                               );

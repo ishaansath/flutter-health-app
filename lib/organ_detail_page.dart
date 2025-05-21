@@ -27,7 +27,9 @@ class OrganDetailPage extends StatelessWidget {
             'additionalInfo': 'additionalInfo test',
             'image': 'assets/bananas.png',
             'modelPath': 'assets/models/banana.glb',
-            'shortDescription': "Fuel for focus and memory"
+            'shortDescription': "Fuel for focus and memory",
+            'funModeAudioPath': 'assets/audio/fun/Banana.mp3',
+            'normalModeAudioPath': 'audio/normal/Banana.mp3'
           },
           {
             "name": "Blueberries",
@@ -116,7 +118,56 @@ class OrganDetailPage extends StatelessWidget {
           },
         ],
         'moreInfoCategories': {
+          'dairy': {
+            'normalModeTitle': 'Dairy',
+            'funModeTitle': 'Dairy 🧀',
+            'items': [
+              {
+                'name': 'dairy',
+                'normalModeDescription': 'normal dairy',
+                'funModeDescription': 'fun dairy',
+                'image': 'assets/FishTestImage.png',
+                'additionalInfo': '',
+                'additionalInfoExtra': '',
+                'modelPath': '',
+                'shortDescription': '',
+              }
+            ],
+          },
+          'cereals &Grains': {
+            'normalModeTitle': 'Cereals & Grains',
+            'funModeTitle': 'Cereals & Grains 🌾',
+            'items': [
+              {
+                'name': 'grain',
+                'normalModeDescription': 'normal grain',
+                'funModeDescription': 'fun grain',
+                'image': 'assets/FishTestImage.png',
+                'additionalInfo': '',
+                'additionalInfoExtra': '',
+                'modelPath': '',
+                'shortDescription': '',
+              }
+            ],
+          },
+          'protein': {
+            'normalModeTitle': 'Protein',
+            'funModeTitle': 'Protein 🥚',
+            'items': [
+              {'name': 'pulses',
+                'normalModeDescription': 'normal pulses',
+                'funModeDescription': 'fun pulses',
+                'image': 'assets/FishTestImage.png',
+                'additionalInfo': '',
+                'additionalInfoExtra': '',
+                'modelPath': '',
+                'shortDescription': '',
+              },
+            ],
+          },
           'funFacts': {
+            'normalModeTitle': 'Fun Facts',
+            'funModeTitle': 'Fun Facts 🎈',
     'items'
     : [
     {'name': 'Brain Power',
@@ -139,7 +190,34 @@ class OrganDetailPage extends StatelessWidget {
       },
     ],
     },
+          'symptoms': {
+            'normalModeTitle': 'Symptoms',
+            'funModeTitle': 'Symptoms 🤒',
+            'items'
+                : [
+              {'name': 'Headache',
+                'normalModeDescription': ' 🧠 The human brain contains approximately 86 billion neurons. \n \n 🧠 These tiny nerve cells transmit signals that control every thought, action, and feeling. \n \n 🧠 They form complex networks that power everything your body does.',
+                'funModeDescription': " 🧠 Your brain’s rockin’ like 86 billion neurons—yeah, billion with a B. \n \n 🧠 These tiny signal-sending MVPs are basically running the whole show: every thought, move, and vibe you catch. \n \n 🧠 They're all linked up in crazy complex networks, low-key powering everything your body’s got goin’ on!",
+                'additionalInfo': '',
+                'additionalInfoExtra': '',
+                'image': 'assets/gif/brain_fact.gif',
+                'modelPath': '',
+                'shortDescription': 'OUCH! MY HEAD IS PAINING!'
+              },
+              {'name': 'Dizzy',
+                'normalModeDescription': " 🧠 When you're dehydrated, your brain actually shrinks a little. \n \n 🧠 That’s why you might feel lightheaded, get headaches, or have trouble concentrating when you haven’t had enough water. \n \n 🧠 Even a small drop in hydration can affect your mood and memory.",
+                'funModeDescription': " 🧠 No cap—if you don’t drink water, your brain literally shrivels up like a raisin.  \n \n 🧠 That’s why you feel dizzy, forget stuff, or just vibe like a zombie. \n \n 🧠 Hydration = brain fuel, fr.",
+                'additionalInfo': '',
+                'additionalInfoExtra': '',
+                'image': 'assets/gif/brain_fact2.png',
+                'modelPath': '',
+                'shortDescription': 'Wait! Why am I dizzy?'
+              },
+            ],
+          },
           'diseases': {
+            'normalModeTitle': 'Diseases',
+            'funModeTitle': 'Diseases 😵',
             'items': [
               {
                 'name': 'Alzheimer\'s Disease',
@@ -157,34 +235,9 @@ class OrganDetailPage extends StatelessWidget {
               },
             ],
           },
-          'grains': {
-            'items': [
-              {
-                'name': 'grain',
-                'normalModeDescription': 'normal grain',
-                'funModeDescription': 'fun grain',
-                'image': 'assets/FishTestImage.png',
-                'additionalInfo': '',
-                'additionalInfoExtra': '',
-                'modelPath': '',
-                'shortDescription': '',
-              }
-            ],
-          },
-          'pulses': {
-            'items': [
-              {'name': 'pulses',
-                'normalModeDescription': 'normal pulses',
-                'funModeDescription': 'fun pulses',
-                'image': 'assets/FishTestImage.png',
-                'additionalInfo': '',
-                'additionalInfoExtra': '',
-                'modelPath': '',
-                'shortDescription': '',
-              },
-            ],
-          },
           'food': {
+            'normalModeTitle': 'Food',
+            'funModeTitle': 'Food 😋',
             'items': [
               {'name': 'food item',
               'normalModeDescription': 'normal food',
@@ -197,7 +250,9 @@ class OrganDetailPage extends StatelessWidget {
               }
             ]
           },
-          'weekly Diet': {
+          'weeklyDiet': {
+            'normalModeTitle': 'Weekly Diet',
+            'funModeTitle': 'Weekly Diet 🥗',
             'items': [
               {
                 'name': 'Monday',
@@ -212,8 +267,6 @@ class OrganDetailPage extends StatelessWidget {
             ]
           }
         },
-        "ffunFact": "Big brain flex: 86 billion neuron homies in the squad",
-        "funFactImage": "assets/gif/brain_fact.gif"
       },
       "Heart": {
         "image": "assets/models/heart.glb",
@@ -729,7 +782,6 @@ class OrganDetailPage extends StatelessWidget {
     final organName = organ;
     final briefInfoText = mode == 'fun' ? data['briefInfoFun']! as String : data['briefInfo']! as String;
     final modelPath = data['image']! as String;
-    final String? funFactImage = data['funFactImage'] as String?;
     final Map<String, Map<String, dynamic>>? moreInfoCategories =
     data['moreInfoCategories'] as Map<String, Map<String, dynamic>>?;
 
@@ -836,28 +888,11 @@ class OrganDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              CustomButton(
-                text: mode == 'fun' ? "Dairy 🧀" : "Dairy",
-                backgroundColor: Color(0xFF93B6EA),
-                textColor: Colors.white,
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DetailInfoPage(
-                      title: mode == 'fun' ? "Dairy" : "Dairy",
-                      items: data['dairy'] as List<Map<String, dynamic>>? ?? [],
-                      color: Colors.deepPurple,
-                      organ: organName,
-                      mode: mode, image: '',
-                    ),
-                  ),
-                ),
-              ),
               if (moreInfoCategories != null && moreInfoCategories.isNotEmpty)
                 CustomButton(
                   text: mode == 'fun' ? "More ➕" : "More",
                   // Using your specified fixed color for consistency
-                  backgroundColor: const Color(0xFF8D8D8D), // Fixed color (your specified grey)
+                  backgroundColor: const Color(0xFF93B6EA), // Fixed color (your specified grey)
                   textColor: Colors.white,        // Fixed color
                   onPressed: () => Navigator.push(
                     context,

@@ -126,6 +126,9 @@ flutter:
     - assets/models/tangerine.glb
     - assets/tangerine.png
     - assets/FishTestImage.png
+    - assets/audio/normal/Banana.mp3
+    - assets/gif/mascot_talking.gif
+    - assets/mascot.png
 
 
   fonts:
