@@ -120,8 +120,7 @@ class DetailInfoPage extends StatelessWidget {
                               final String funDescription = item['funModeDescription'] as String? ?? normalDescription;
 
                               // Get the audio paths (can be null if not defined for an item)
-                              final String? normalAudioPath = item['normalModeAudioPath'] as String?;
-                              final String? funAudioPath = item['funModeAudioPath'] as String?;
+
 
 
                               Navigator.push(
@@ -135,8 +134,7 @@ class DetailInfoPage extends StatelessWidget {
                                     description: mode == 'fun' ? funDescription : normalDescription, // Pass the already chosen description
                                     additionalInfo: item['additionalInfo'] as String? ?? '',
                                     additionalInfoExtra: item['additionalInfoExtra'] as String? ?? '', // Pass the already chosen extra info
-                                    normalModeAudioPath: normalAudioPath, // <--- Pass the normal audio path
-                                    funModeAudioPath: funAudioPath,       // <--- Pass the fun audio path
+                                     // <--- Pass the fun audio path
                                     mode: mode, // <--- Pass the current mode string ('normal' or 'fun')
                                   ),
                                 ),

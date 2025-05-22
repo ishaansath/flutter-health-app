@@ -21,15 +21,13 @@ class OrganDetailPage extends StatelessWidget {
         "fruits": [
           {
             "name": "Banana",
-            "normalModeDescription": "🍌 Bananas are a top-tier brain food because they’re rich in vitamin B6. \n \n 🍌 They help in the creation of neurotransmitters :- \n ★ Serotonin \n ★ Dopamine \n \n 🍌 Dopamine is critical for mood regulation and clear thinking. \n \n 🍌 They also supply natural sugars and potassium. \n \n 🍌 It gives your brain steady energy and helps maintain electrical conductivity between nerve cells. \n \n 🍌 Eating a banana in the morning can: \n • Improve learning capacity \n • Improve cognitive function \n • Help in the regulation of your mood throughout the day.",
+            "normalModeDescription": "🍌 Bananas are a top-tier brain food because they’re rich in vitamin B6. \n \n 🍌 They help in the creation of neurotransmitters :- \n ★ Serotonin \n ★ Dopamine. \n \n 🍌 Dopamine is critical for mood regulation and clear thinking. \n \n 🍌 They also supply natural sugars and potassium. \n \n 🍌 It gives your brain steady energy and helps maintain electrical conductivity between nerve cells. \n \n 🍌 Eating a banana in the morning can: \n • Improve learning capacity \n • Improve cognitive function \n • Help in the regulation of your mood throughout the day.",
             'funModeDescription': '🍌 Bananas are basically mood boosters with WiFi for your brain.💡\n \n 🍌 They drop that vitamin B6 to: \n ★ Charge your thoughts \n ★ Boost your vibes \n ★ Help you stay focused \n ★ Stop the "bruhhh" moments. \n \n 🍌 Eat one and you might just go from sleepy monkey to Einstein mode. 🧠⚡🐵',
             'additionalInfoExtra': 'ℹ️ Calories: 89 \nℹ️ Carbohydrates: 23g \nℹ️ Protein: 1.1g \nℹ️ Vitamin B6: 33% \nℹ️ Potassium: 358mg',
             'additionalInfo': 'additionalInfo test',
             'image': 'assets/bananas.png',
             'modelPath': 'assets/models/banana.glb',
             'shortDescription': "Fuel for focus and memory",
-            'funModeAudioPath': 'assets/audio/fun/Banana.mp3',
-            'normalModeAudioPath': 'audio/normal/Banana.mp3'
           },
           {
             "name": "Blueberries",
@@ -44,7 +42,7 @@ class OrganDetailPage extends StatelessWidget {
           {
             "name": "Apple",
             "normalModeDescription": "🍎 Apples are rich in antioxidants like quercetin. \n \n 🍎 Quercetin defends brain cells from oxidative damage. \n \n 🍎 Their skin holds most of this power, so eat them whole. \n \n 🍎 Apples also contain soluble fiber and natural sugars that: \n ★ Enhance concentration and focus \n ★ Provide slow and stable energy \n \n 🍎 Apples are a perfect snack for long study sessions or focused work.",
-            'funModeDescription': "🍎 Apples = brain snacks that slap ⚡ \n \n 🍎 Eat the skin and unlock quercetin XP to: \n ★ Stop your body from lagging \n ★ Fuel up your body 🚀⛽ \n ★ Protect your mental game. \n \n 🍎 Sweet, crunchy, and straight-up smart fuel. Core power activated! 💥📚",
+            'funModeDescription': "🍎 Apples = brain snacks that slap. ⚡ \n \n 🍎 Eat the skin and unlock quercetin XP to: \n ★ Stop your body from lagging, \n ★ Fuel up your body, 🚀⛽ \n ★ Protect your mental game. \n \n 🍎 Sweet, crunchy, and straight-up smart fuel. Core power activated! 💥📚",
             'additionalInfoExtra': 'Calories (per 100gm): 52, Carbs: 13.8g, Fiber: 2.4g, Vitamin C: 7% DV, Quercetin: 4.42 mg/100g',
             'additionalInfo': '',
             'image': 'assets/apples.png',
@@ -181,7 +179,7 @@ class OrganDetailPage extends StatelessWidget {
     },
       {'name': 'Dehydrated',
         'normalModeDescription': " 🧠 When you're dehydrated, your brain actually shrinks a little. \n \n 🧠 That’s why you might feel lightheaded, get headaches, or have trouble concentrating when you haven’t had enough water. \n \n 🧠 Even a small drop in hydration can affect your mood and memory.",
-        'funModeDescription': " 🧠 No cap—if you don’t drink water, your brain literally shrivels up like a raisin.  \n \n 🧠 That’s why you feel dizzy, forget stuff, or just vibe like a zombie. \n \n 🧠 Hydration = brain fuel, fr.",
+        'funModeDescription': " 🧠 No cap—if you don’t drink water, your brain literally shrivels up like a raisin.  \n \n 🧠 That’s why you feel dizzy, forget stuff, or just vibe like a zombie. \n \n 🧠 Hydration = brain fuel, for real.",
         'additionalInfo': '',
         'additionalInfoExtra': '',
         'image': 'assets/gif/brain_fact2.png',
@@ -206,7 +204,7 @@ class OrganDetailPage extends StatelessWidget {
               },
               {'name': 'Dizzy',
                 'normalModeDescription': " 🧠 When you're dehydrated, your brain actually shrinks a little. \n \n 🧠 That’s why you might feel lightheaded, get headaches, or have trouble concentrating when you haven’t had enough water. \n \n 🧠 Even a small drop in hydration can affect your mood and memory.",
-                'funModeDescription': " 🧠 No cap—if you don’t drink water, your brain literally shrivels up like a raisin.  \n \n 🧠 That’s why you feel dizzy, forget stuff, or just vibe like a zombie. \n \n 🧠 Hydration = brain fuel, fr.",
+                'funModeDescription': " 🧠 No cap—if you don’t drink water, your brain literally shrivels up like a raisin.  \n \n 🧠 That’s why you feel dizzy, forget stuff, or just vibe like a zombie. \n \n 🧠 Hydration = brain fuel, for real.",
                 'additionalInfo': '',
                 'additionalInfoExtra': '',
                 'image': 'assets/gif/brain_fact2.png',
@@ -415,7 +413,7 @@ class OrganDetailPage extends StatelessWidget {
           {
             "name": "Carrot",
             "normalModeDescription": " 🥕 Carrots are loaded with beta-carotene! \n \n 🥕 Beta-carotene is a precursor to vitamin A, which is essential for good vision and eye surface health. \n \n 🥕 They help prevent xerophthalmia (dry eye) and night blindness. \n \n 🥕 Carrots support the immune function of the eyes.",
-            'funModeDescription': " 🥕 Carrots are the OG vision guardians 🧡. \n \n 🥕 They’ve been rocking the eye-care throne forever! \n \n 🥕 It's all thanks to beta-carotene turning into vitamin A! \n \n 🥕 It then starts defending your peepers from \n  1. Dryness \n  2. Blurriness \n  3. Night blindness. \n \n 🥕 Want laser eyes? Crunch a few of these and prepare to see like a hawk. 🦅💥",
+            'funModeDescription': " 🥕 Carrots are the vision guardians 🧡. \n \n 🥕 They’ve been rocking the eye-care throne forever! \n \n 🥕 It's all thanks to beta-carotene turning into vitamin A! \n \n 🥕 It then starts defending your peepers from \n  1. Dryness \n  2. Blurriness \n  3. Night blindness. \n \n 🥕 Want laser eyes? Crunch a few of these and prepare to see like a hawk. 🦅💥",
             'additionalInfoExtra': 'Calories (per 100gm): 41, Carbs: 10g, Fiber: 2.8g, Vitamin A: 334%, Beta-carotene: High',
             'additionalInfo': '',
             'image': 'assets/carrots.png',
@@ -497,7 +495,7 @@ class OrganDetailPage extends StatelessWidget {
           {
             "name": "Apple",
             "normalModeDescription": " 🍎 Apples are rich in quercetin! \n \n 🍎 Quercetin is an antioxidant flavonoid that helps: \n  • Reduce asthma symptoms \n  • Lung inflammation \n \n 🍎 Long-term apple consumption is linked to improved lung capacity and lower risk of respiratory diseases.",
-            'funModeDescription': " 🍎 Apples are the OG clean freaks 🫧. \n \n 🍎 They’re like:- \n “Yo lungs! let’s sweep up this inflammation mess and freshen the airways real quick.” \n \n 🍎 With quercetin as their secret weapon, they block out the bad vibes from: \n  • Smoke \n  • Dust \n  • City air \n \n 🍎 Basically, every crunch is a mic-drop moment for your breathing game. Clean lungs? Say less.",
+            'funModeDescription': " 🍎 Apples are the  clean freaks 🫧. \n \n 🍎 They’re like:- \n “Yo lungs! let’s sweep up this inflammation mess and freshen the airways real quick.” \n \n 🍎 With quercetin as their secret weapon, they block out the bad vibes from: \n  • Smoke \n  • Dust \n  • City air \n \n 🍎 Basically, every crunch is a mic-drop moment for your breathing game. Clean lungs? Say less.",
             'additionalInfoExtra': 'Calories (per 100gm): 52, Carbs: 13.8g, Fiber: 2.4g, Vitamin C: 7% DV, Quercetin: 4.42 mg/100g',
             'additionalInfo': '',
             'image': 'assets/apples.png',
@@ -637,7 +635,7 @@ class OrganDetailPage extends StatelessWidget {
           {
             "name": "Onion",
             "normalModeDescription": " 🧅 Onions are rich in quercetin! \n \n 🧅 Quercetin is a flavonoid antioxidant that: \n  • Reduces inflammation \n  • Boosts recovery in overworked muscles. \n \n 🧅 Their sulfur compounds: \n  ★ Promote collagen production \n  ★ Help detoxify muscle tissue. \n \n 🧅 Onions can: \n  1. Improve blood circulation \n  2. Deliver oxygen more efficiently to muscles \n  3. Deliver nutrients more efficiently to muscles \n \n 🧅 Regular consumption may reduce muscle fatigue and soreness after intense activity.",
-            'funModeDescription': " 🧅 Onions may make you cry, but your muscles are smiling 😢➡️💪.  \n \n 🧅 They’ve got quercetin AKA the OG anti-sore hero! \n \n 🧅 They also have sulfur stuff that keeps tissues fresh and ready to bounce back. \n \n 🧅 Better blood flow = better gains! \n \n 🧅 They add flavor AND function. \n \n 🧅 Grill 'em, caramelize 'em, or toss ‘em raw—your biceps will say “thanks, bro.”🔥",
+            'funModeDescription': " 🧅 Onions may make you cry, but your muscles are smiling 😢➡️💪.  \n \n 🧅 They’ve got quercetin AKA the  anti-sore hero! \n \n 🧅 They also have sulfur stuff that keeps tissues fresh and ready to bounce back. \n \n 🧅 Better blood flow = better gains! \n \n 🧅 They add flavor AND function. \n \n 🧅 Grill 'em, caramelize 'em, or toss ‘em raw—your biceps will say “thanks, bro.”🔥",
             'additionalInfoExtra': 'Calories (per 100gm): 40, Carbs: 9g, Protein: 1.1g, Fiber: 1.7g, Quercetin: High, Vitamin C: 12%, Sulfur Compounds: Present, Water Content: 89%',
             'image': 'assets/onion.png',
             'additionalInfo': '',
@@ -772,7 +770,7 @@ class OrganDetailPage extends StatelessWidget {
           },
         ],
         "nfunFact": "The femur, which is the longest bone in your leg, holds the title of being the longest bone in your entire body, providing the strength and support needed for movement and stability.",
-        "ffunFact": "The femur’s the OG of bones—longest one in your body, built for strength and stability so you can move like a boss!",
+        "ffunFact": "The femur’s one of the coolest bones—longest one in your body, built for strength and stability so you can move like a boss!",
         "funFactImage": "assets/gif/leg_fact.gif"
       },
     }[organ]!;
