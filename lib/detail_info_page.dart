@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'item_detail_page.dart';
 
 class DetailInfoPage extends StatelessWidget {
@@ -56,41 +55,23 @@ class DetailInfoPage extends StatelessWidget {
                 )
                     : Image.asset(image, width: 200, height: 200),
               if (info != null && info!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surface, // Use theme's surface color for container background
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          info!,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface, // Text color on this surface
-                          ),
-                        ),
-                      ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface, // Use theme's surface color for container background
+                      borderRadius: BorderRadius.circular(10),
                     ),
-              if (info != null && info!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface, // Use theme's surface color
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    info!,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface, // Text color on this surface
+                    child: Text(
+                      info!,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface, // Text color on this surface
+                      ),
                     ),
                   ),
                 ),
-              ),
               if (items != null && items!.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 50),
@@ -106,22 +87,15 @@ class DetailInfoPage extends StatelessWidget {
                     items: items!.map((item) {
                       return Builder(
                         builder: (BuildContext context) {
-                          // Check for modelPath before displaying ModelView
-                          final String? modelPath = item['modelPath'];
+                          final String? modelPath = item['modelPath']; // Still extract, but not for display here.
                           return GestureDetector(
                             onTap: () {
-                              // Extract all necessary individual pieces of data from the current item
                               final String itemName = item['name'] as String? ?? item['title'] as String? ?? 'Item Name';
                               final String itemModelPath = item['modelPath'] as String? ?? '';
                               final String itemImagePath = item['image'] as String? ?? '';
 
-                              // Pass BOTH normal and fun descriptions, and let ItemDetailPage handle the display
                               final String normalDescription = item['normalModeDescription'] as String? ?? item['description'] as String? ?? 'No description available.';
                               final String funDescription = item['funModeDescription'] as String? ?? normalDescription;
-
-                              // Get the audio paths (can be null if not defined for an item)
-
-
 
                               Navigator.push(
                                 context,
@@ -130,19 +104,16 @@ class DetailInfoPage extends StatelessWidget {
                                     name: itemName,
                                     modelPath: itemModelPath,
                                     image: itemImagePath,
-                                    // Pass all required parameters, ensuring they match ItemDetailPage's constructor
-                                    description: mode == 'fun' ? funDescription : normalDescription, // Pass the already chosen description
+                                    description: mode == 'fun' ? funDescription : normalDescription,
                                     additionalInfo: item['additionalInfo'] as String? ?? '',
-                                    additionalInfoExtra: item['additionalInfoExtra'] as String? ?? '', // Pass the already chosen extra info
-                                     // <--- Pass the fun audio path
-                                    mode: mode, // <--- Pass the current mode string ('normal' or 'fun')
+                                    additionalInfoExtra: item['additionalInfoExtra'] as String? ?? '',
+                                    mode: mode,
                                   ),
                                 ),
                               );
                             },
                             child: Container(
-                              margin:
-                              const EdgeInsets.symmetric(horizontal: 8.0),
+                              margin: const EdgeInsets.symmetric(horizontal: 8.0),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: colorScheme.surface,
@@ -153,38 +124,20 @@ class DetailInfoPage extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  if (modelPath != null &&
-                                      modelPath.isNotEmpty) // Conditionally show model
-                                    SizedBox(
-                                      height: 250,
-                                      child: ModelView(
-                                        modelPath: modelPath,
-                                      ),
-                                    )
-                                  else if (item['image'] !=
-                                      null) // Show image if no model
-                                    Container(
-                                      height: 225,
-                                      width: 225,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: colorScheme.onSurface,
-                                          width: 2,
-                                        ),
-                                        borderRadius:
-                                        BorderRadius.circular(12),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                        BorderRadius.circular(12),
-                                        child: Image.asset(item['image']!,
-                                            fit: BoxFit.contain),
-                                      ),
+                                  // --- SIMPLIFIED IMAGE DISPLAY ---
+                                  // Just show the image, no extra decorations, ClipRRect, or errorBuilder.
+                                  // It's assumed item['image'] will always be valid for simplicity as requested.
+                                  if (item['image'] != null && item['image']!.isNotEmpty)
+                                    Image.asset(
+                                      item['image']!,
+                                      height: 250, // Height for the image
+                                      fit: BoxFit.contain,
                                     ),
+                                  // --- END OF SIMPLIFIED IMAGE DISPLAY ---
                                   const SizedBox(height: 10),
                                   Text(
                                     item['name']!,
-                                    style: theme.textTheme.titleLarge, // Adjusted font size
+                                    style: theme.textTheme.titleLarge,
                                     textAlign: TextAlign.center,
                                   ),
                                   if (item['shortDescription'] != null)
@@ -211,7 +164,7 @@ class DetailInfoPage extends StatelessWidget {
                           );
                         },
                       );
-                    }).toList(), // Added .toList() here
+                    }).toList(),
                   ),
                 ),
             ],
@@ -222,6 +175,9 @@ class DetailInfoPage extends StatelessWidget {
   }
 }
 
+// Keep ModelView class here if it's used elsewhere, otherwise remove it too.
+// If it's *only* used for ModelViewerPlus, and you've removed all calls to it,
+// you can delete this class definition entirely.
 class ModelView extends StatelessWidget {
   final String modelPath;
 
@@ -238,14 +194,19 @@ class ModelView extends StatelessWidget {
         border: Border.all(color: colorScheme.onSurface, width: 2),
         borderRadius: BorderRadius.circular(7),
       ),
-      child: ModelViewer(
-        src: modelPath,
-        alt: "",
-        ar: false,
-        autoRotate: true,
-        cameraControls: true,
-        backgroundColor: colorScheme.surface,
-      ),
+      // This ModelViewer here will only be rendered if ModelView is explicitly called.
+      // Since we removed its call from the carousel, it won't be used for the carousel items.
+      // If you're not using ModelView anywhere else, you can remove this class.
+      // The `ModelViewerPlus` import at the top can also be removed if not used.
+      // child: ModelViewer(
+      //   src: modelPath,
+      //   alt: "",
+      //   ar: false,
+      //   autoRotate: true,
+      //   cameraControls: true,
+      //   backgroundColor: colorScheme.surface,
+      // ),
+      child: Center(child: Text("Model view disabled for performance.")), // Placeholder if ModelView is somehow called
     );
   }
 }

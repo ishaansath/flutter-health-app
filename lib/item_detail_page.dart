@@ -122,12 +122,35 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       }
     });
   }
+  Future<void> _initTts() async { // Make it async
+    // await flutterTts.setLanguage("en-US");
+    // await flutterTts.setSpeechRate(0.4);
+    // await flutterTts.setPitch(1.1);
 
-  void _initTts() {
-    flutterTts.setLanguage("en-US");
-    flutterTts.setSpeechRate(0.4);
-    flutterTts.setPitch(1.1);
+    // Get available voices
+    var voices = await flutterTts.getVoices;
+    // print(voices); // Optional: print voices to see what's available
 
+    String? desiredVoiceName = "en-US-Studio-Q"; // Or another voice name you prefer
+    Map<String, String>? selectedVoice;
+
+    if (voices is List) {
+      for (var voice in voices) {
+        if (voice is Map && voice['name'] == desiredVoiceName) {
+          selectedVoice = Map<String, String>.from(voice);
+          break;
+        }
+      }
+    }
+
+    if (selectedVoice != null) {
+      await flutterTts.setVoice(selectedVoice);
+      debugPrint("TTS Voice set to: ${selectedVoice['name']}");
+    } else {
+      debugPrint("TTS Voice '$desiredVoiceName' not found. Using default.");
+    }
+
+    // ... rest of your handlers ...
     flutterTts.setStartHandler(() {
       if (mounted) {
         setState(() {
@@ -136,7 +159,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
         });
       }
     });
-
     flutterTts.setCompletionHandler(() {
       if (mounted) {
         setState(() {
@@ -174,6 +196,59 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       }
     });
   }
+  // void _initTts () {
+  //   flutterTts.setLanguage("en-US");
+  //   flutterTts.setSpeechRate(0.4);
+  //   flutterTts.setPitch(1.1);
+  //   flutterTts.getVoices("en-US-Standard-J");
+  //
+  //
+  //   flutterTts.setStartHandler(() {
+  //     if (mounted) {
+  //       setState(() {
+  //         ttsState = TtsState.playing;
+  //         _updateMascotPositionAndSize();
+  //       });
+  //     }
+  //   });
+  //
+  //   flutterTts.setCompletionHandler(() {
+  //     if (mounted) {
+  //       setState(() {
+  //         ttsState = TtsState.stopped;
+  //         _updateMascotPositionAndSize();
+  //       });
+  //     }
+  //   });
+  //
+  //   flutterTts.setErrorHandler((msg) {
+  //     if (mounted) {
+  //       setState(() {
+  //         ttsState = TtsState.stopped;
+  //         _updateMascotPositionAndSize();
+  //       });
+  //     }
+  //     debugPrint("TTS Error: $msg"); // Changed to debugPrint
+  //   });
+  //
+  //   flutterTts.setPauseHandler(() {
+  //     if (mounted) {
+  //       setState(() {
+  //         ttsState = TtsState.paused;
+  //         _updateMascotPositionAndSize(); // Mascot goes down when paused
+  //       });
+  //     }
+  //   });
+  //
+  //   flutterTts.setContinueHandler(() {
+  //     if (mounted) {
+  //       setState(() {
+  //         ttsState = TtsState.continued;
+  //         _updateMascotPositionAndSize(); // Mascot goes up when continuing
+  //       });
+  //     }
+  //   });
+  // }
 
   String _cleanTextForTts(String text) {
     String cleanedText = text.replaceAll('\n', ' ');

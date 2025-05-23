@@ -1,21 +1,19 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // This is now your Welcome/Initial screen
-import 'body_screen.dart'; // Still need this import
+import 'package:ishaan/body_screen.dart'; // Correctly import BodyScreen
+import 'package:ishaan/app_data.dart'; // Ensure app_data.dart is imported
 
 void main() {
+  // Ensure Flutter services are initialized before calling runApp
+  WidgetsFlutterBinding.ensureInitialized();
+  // Call initializeAppData to populate your data structures
+  initializeAppData();
   runApp(const HealthApp());
 }
 
-// --- FIX START: Define the extension for ColorScheme ---
 // This extension adds your custom button colors as getters to ColorScheme.
 extension CustomButtonColors on ColorScheme {
-  // Define your custom button colors as getters.
-  // These getters will return the specific color based on the current brightness (light/dark mode).
-  // DO NOT define these inside the lightColorScheme/darkColorScheme constants.
   Color get buttonColor1 {
-    // You might want to define separate hex codes for light and dark modes explicitly
-    // or infer from the current brightness if you put the actual colors in a map.
-    // For now, I'm using placeholder colors. Replace with your desired button colors.
     return brightness == Brightness.light ? const Color(0xFFFFE5B4) : const Color(0xFFADD8E6); // Light Blue / Cyan
   }
   Color get buttonColor2 {
@@ -28,7 +26,6 @@ extension CustomButtonColors on ColorScheme {
     return brightness == Brightness.light ? const Color(0xFFCC5500) : const Color(0xFF0000FF); // Purple / Blue
   }
 }
-// --- FIX END ---
 
 
 class HealthApp extends StatefulWidget {
@@ -39,20 +36,12 @@ class HealthApp extends StatefulWidget {
 }
 
 class _HealthAppState extends State<HealthApp> {
+  // This ValueNotifier controls the overall app theme (light/dark)
   final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
-  String _currentMode = 'normal'; // Added to pass to HomePage if needed by its setMode
 
-  // --- FIX START: Define a setMode function to pass to HomePage ---
-  void _setMode(String mode) {
-    setState(() {
-      _currentMode = mode; // Update the mode state if HomePage needs to change it
-    });
-    // In a real app, if setMode from HomePage is meant to change themeMode,
-    // you might update _themeModeNotifier here based on the mode.
-    // For now, it just updates _currentMode.
-  }
-  // --- FIX END ---
-
+  // --- REMOVED: _currentMode and _setMode from here ---
+  // These were associated with HomePage, which is now deleted.
+  // BodyScreen will manage its own 'normal'/'fun' mode internally.
 
   @override
   void dispose() {
@@ -68,6 +57,7 @@ class _HealthAppState extends State<HealthApp> {
         return MaterialApp(
           title: 'Health App',
           debugShowCheckedModeBanner: false,
+          themeMode: currentThemeMode, // This controls the active theme
 
           // --- LIGHT THEME DEFINITION ---
           theme: ThemeData(
@@ -85,12 +75,12 @@ class _HealthAppState extends State<HealthApp> {
                 tertiary: Colors.cyan.shade400
             ),
             scaffoldBackgroundColor: Colors.white,
-            dialogTheme: const DialogTheme( // Preferred way to set dialog background
+            dialogTheme: const DialogTheme(
               backgroundColor: Colors.white,
             ),
             appBarTheme: AppBarTheme(
               backgroundColor: Colors.transparent,
-              foregroundColor: Colors.transparent,
+              foregroundColor: Colors.black, // Explicitly set foreground color for icons/text
               elevation: 0,
               iconTheme: const IconThemeData(color: Colors.black),
               titleTextStyle: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
@@ -111,7 +101,7 @@ class _HealthAppState extends State<HealthApp> {
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700,
+                backgroundColor: Colors.amber.shade700,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -126,6 +116,26 @@ class _HealthAppState extends State<HealthApp> {
             dividerTheme: const DividerThemeData(
               color: Colors.grey,
               thickness: 1,
+            ),
+            tabBarTheme: TabBarTheme(
+              labelColor: Colors.black, // Color of the selected tab's text/icon
+              unselectedLabelColor: Colors.black, // Color of unselected tab's text/icon
+              indicatorSize: TabBarIndicatorSize.tab, // Makes indicator span the tab width
+              indicator: UnderlineTabIndicator( // Customize the underline indicator
+                borderSide: BorderSide(
+                  color: Colors.amber.shade700, // Color of the underline indicator
+                  width: 3.0, // Thickness of the underline
+                ),
+                insets: EdgeInsets.symmetric(horizontal: 16.0), // Padding for the underline
+              ),
+              labelStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
 
@@ -143,20 +153,14 @@ class _HealthAppState extends State<HealthApp> {
               error: Colors.red.shade400,
               onError: Colors.orange,
               tertiary: Colors.amber.shade700,
-              // --- FIX START: REMOVE these buttonColor properties from here ---
-              // buttonColor1: Color(0xFF00FFFF), // REMOVE
-              // buttonColor2: Color(0xFF89CFF0), // REMOVE
-              // buttonColor3: Color(0xFF0096FF), // REMOVE
-              // buttonColor4: Color(0xFF0000FF)  // REMOVE
-              // --- FIX END ---
             ),
             scaffoldBackgroundColor: Colors.grey.shade900,
-            dialogTheme: DialogTheme( // Preferred way to set dialog background
+            dialogTheme: DialogTheme(
               backgroundColor: Colors.grey[900],
             ),
             appBarTheme: AppBarTheme(
               backgroundColor: Colors.transparent,
-              foregroundColor: Colors.transparent,
+              foregroundColor: Colors.white, // Explicitly set foreground color for icons/text
               elevation: 0,
               iconTheme: const IconThemeData(color: Colors.white),
               titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
@@ -177,7 +181,7 @@ class _HealthAppState extends State<HealthApp> {
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo.shade400,
+                backgroundColor: Colors.cyanAccent.shade400,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -193,12 +197,31 @@ class _HealthAppState extends State<HealthApp> {
               color: Colors.grey,
               thickness: 1,
             ),
+            tabBarTheme: TabBarTheme(
+              labelColor: Colors.deepPurple, // Color of the selected tab's text/icon
+              unselectedLabelColor: Colors.grey[600], // Color of unselected tab's text/icon
+              indicatorSize: TabBarIndicatorSize.tab, // Makes indicator span the tab width
+              indicator: UnderlineTabIndicator( // Customize the underline indicator
+                borderSide: BorderSide(
+                  color: Colors.cyanAccent.shade400, // Color of the underline indicator
+                  width: 3.0, // Thickness of the underline
+                ),
+                insets: EdgeInsets.symmetric(horizontal: 16.0), // Padding for the underline
+              ),
+              labelStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
           ),
-          themeMode: currentThemeMode,
-          // Now, main.dart's home is just HomePage (the welcome screen)
-          home: HomePage(
-            themeModeNotifier: _themeModeNotifier,
-            setMode: _setMode, // --- FIX: Pass the setMode function here ---
+          // --- FIX: Directly set home to BodyScreen and pass required parameters ---
+          home: BodyScreen(
+            mode: 'normal', // Set initial mode (e.g., 'normal' or 'fun')
+            themeModeNotifier: _themeModeNotifier, // Pass the theme notifier
           ),
         );
       },
