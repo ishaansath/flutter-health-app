@@ -11,7 +11,7 @@ class OrganDetailPage extends StatelessWidget {
   final String organ;
   final String mode;
 
-  const OrganDetailPage({super.key, required this.organ, required this.mode});
+  const OrganDetailPage({super.key, required this.organ, required this.mode, required String organName, required Map<String, dynamic> organData});
 
   @override
   Widget build(BuildContext context) {

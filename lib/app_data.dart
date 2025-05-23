@@ -6,8 +6,8 @@ final Map<String, Map<String, dynamic>> organData = {
     "fruits": [
       {
         "name": "Banana",
-        "normalModeDescription": "🍌 Bananas are a top-tier brain food because they’re rich in vitamin B6. \n \n 🍌 They help in the creation of neurotransmitters :- \n ★ Serotonin \n ★ Dopamine. \n \n 🍌 Dopamine is critical for mood regulation and clear thinking. \n \n 🍌 They also supply natural sugars and potassium. \n \n 🍌 It gives your brain steady energy and helps maintain electrical conductivity between nerve cells. \n \n 🍌 Eating a banana in the morning can: \n • Improve learning capacity \n • Improve cognitive function \n • Help in the regulation of your mood throughout the day.",
-        'funModeDescription': '🍌 Bananas are basically mood boosters with WiFi for your brain.💡\n \n 🍌 They drop that vitamin B6 to: \n ★ Charge your thoughts \n ★ Boost your vibes \n ★ Help you stay focused \n ★ Stop the "bruhhh" moments. \n \n 🍌 Eat one and you might just go from sleepy monkey to Einstein mode. 🧠⚡🐵',
+        "normalModeDescription": "🍌 Bananas are a top-tier brain food because they’re rich in vitamin B6. \n \n 🍌 They help in the creation of neurotransmitters :- \n ★ Serotonin, \n ★ Dopamine. \n \n 🍌 Dopamine is critical for mood regulation and clear thinking. \n \n 🍌 They also supply natural sugars and potassium. \n \n 🍌 It gives your brain steady energy and helps maintain electrical conductivity between nerve cells. \n \n 🍌 Eating a banana in the morning can: \n • Improve learning capacity, \n • Improve cognitive function, \n • Help in the regulation of your mood throughout the day.",
+        'funModeDescription': '🍌 Bananas are basically mood boosters with WiFi for your brain.💡\n \n 🍌 They drop that vitamin B6 to: \n ★ Charge your thoughts, \n ★ Boost your vibes, \n ★ Help you stay focused, \n ★ Stop the "bruhhh" moments. \n \n 🍌 Eat one and you might just go from sleepy monkey to Einstein mode. 🧠⚡🐵',
         'additionalInfoExtra': 'ℹ️ Calories: 89 \nℹ️ Carbohydrates: 23g \nℹ️ Protein: 1.1g \nℹ️ Vitamin B6: 33% \nℹ️ Potassium: 358mg',
         'additionalInfo': 'additionalInfo test',
         'image': 'assets/bananas.png',
@@ -16,8 +16,8 @@ final Map<String, Map<String, dynamic>> organData = {
       },
       {
         "name": "Blueberries",
-        "normalModeDescription": "🫐 Blueberries contain powerful antioxidants known as anthocyanins. \n \n 🫐 This helps to:\n  ★ Lower bad cholesterol \n  ★ Support blood vessel function \n  ★ Reduce inflammation in the cardiovascular system  \n \n 🫐 Regular consumption improves circulation, strengthens blood vessels, and reduces risk of heart attacks.\n \n 🫐 They are low in calories but high in fiber and vitamin C—great for long-term heart health.",
-        'funModeDescription': "🫐 Blueberries are heart ninjas in disguise! 🥷 \n \n 🫐 These bite-sized blue buddies: \n  1. Sneak through your bloodstream \n  2. Block the bad stuff \n  3. Gives your heart a hug. \n \n 🫐 They're so good, even your arteries do a happy dance when you munch on them. \n \n 🫐 Eat 'em fresh, frozen, or in your smoothie—your heart will totally thank you! 🫐💓✨",
+        "normalModeDescription": "🫐 Blueberries contain powerful antioxidants known as anthocyanins. \n \n 🫐 This helps to:\n  ★ Lower bad cholesterol, \n  ★ Support blood vessel function, \n  ★ Reduce inflammation in the cardiovascular system.  \n \n 🫐 Regular consumption improves circulation, strengthens blood vessels, and reduces risk of heart attacks.\n \n 🫐 They are low in calories but high in fiber and vitamin C—great for long-term heart health.",
+        'funModeDescription': "🫐 Blueberries are heart ninjas in disguise! 🥷 \n \n 🫐 These bite-sized blue buddies: \n  1. Sneak through your bloodstream, \n  2. Block the bad stuff, \n  3. Gives your heart a hug. \n \n 🫐 They're so good, even your arteries do a happy dance when you munch on them. \n \n 🫐 Eat 'em fresh, frozen, or in your smoothie—your heart will totally thank you! 🫐💓✨",
         'additionalInfoExtra': 'Calories (per 100gm): 57, Carbs: 14g, Fiber: 2.4g, Vitamin C: 16%',
         'additionalInfo': '',
         'image': 'assets/Blueberries.png',

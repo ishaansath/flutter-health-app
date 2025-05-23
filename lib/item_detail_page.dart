@@ -123,34 +123,14 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     });
   }
   Future<void> _initTts() async { // Make it async
-    // await flutterTts.setLanguage("en-US");
-    // await flutterTts.setSpeechRate(0.4);
-    // await flutterTts.setPitch(1.1);
+     await flutterTts.setLanguage("en-IN");
+     await flutterTts.setSpeechRate(0.4);
+     await flutterTts.setPitch(1.0);
+    // await flutterTts.setVoice({"name": "ja-jp-x-htm-network", "locale": "ja-JP"});
 
-    // Get available voices
-    var voices = await flutterTts.getVoices;
-    // print(voices); // Optional: print voices to see what's available
+    List<dynamic> voices = await flutterTts.getVoices;
+    print("Available Voices: $voices");
 
-    String? desiredVoiceName = "en-US-Studio-Q"; // Or another voice name you prefer
-    Map<String, String>? selectedVoice;
-
-    if (voices is List) {
-      for (var voice in voices) {
-        if (voice is Map && voice['name'] == desiredVoiceName) {
-          selectedVoice = Map<String, String>.from(voice);
-          break;
-        }
-      }
-    }
-
-    if (selectedVoice != null) {
-      await flutterTts.setVoice(selectedVoice);
-      debugPrint("TTS Voice set to: ${selectedVoice['name']}");
-    } else {
-      debugPrint("TTS Voice '$desiredVoiceName' not found. Using default.");
-    }
-
-    // ... rest of your handlers ...
     flutterTts.setStartHandler(() {
       if (mounted) {
         setState(() {

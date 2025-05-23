@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'organ_detail_page.dart';
+import 'package:ishaan/mascot_page.dart';
 import 'package:ishaan/app_data.dart'; // Keep this as is
 import 'package:ishaan/item_detail_page.dart'; // Keep this as is for ItemDetailPage
 import 'package:ishaan/nutrition_item_model.dart'; // Import your custom NutritionItem class
+import 'package:flutter_tts/flutter_tts.dart'; // Import flutter_tts for general TTS if needed
+
 
 class BodyScreen extends StatefulWidget {
   final String mode; // Initial mode received from main.dart
@@ -24,9 +27,10 @@ class BodyScreen extends StatefulWidget {
 class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateMixin {
   late String _currentMode; // Internal state for the current interaction mode ('normal'/'fun')
   late TabController _tabController; // Declare TabController
+  late FlutterTts flutterTts; // Declare FlutterTts for general usage in BodyScreen
 
   // Define your top-level tabs
-  final List<String> _topTabs = ['Body', 'Nutrition'];
+  final List<String> _topTabs = ['Body', 'Nutrition', 'Mascot'];
 
   // Define your nutrition subcategories, make sure these keys match those in generalNutritionData
   // These should match the top-level keys in generalNutritionData map
@@ -48,12 +52,33 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
     // Initialize TabController
     _tabController = TabController(length: _topTabs.length, vsync: this);
+    flutterTts = FlutterTts(); // Initialize FlutterTts
+    _initializeTtsGeneral(); // Initialize general TTS for BodyScreen
+
+    // Add listener to stop TTS when tab changes
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        flutterTts.stop(); // Stop any ongoing TTS when changing tabs
+      }
+    });
   }
+
+  // General TTS Initialization for BodyScreen (if you use TTS outside MascotPage)
+  Future<void> _initializeTtsGeneral() async {
+    // You can set a default language and parameters here for general TTS in BodyScreen
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setSpeechRate(0.5);
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setPitch(1.0);
+    print("BodyScreen TTS initialized.");
+  }
+
 
   @override
   void dispose() {
     widget.themeModeNotifier.removeListener(_updateThemeIcon); // Stop listening
     _tabController.dispose(); // Dispose TabController
+    flutterTts.stop(); // Stop general TTS in BodyScreen
     super.dispose();
   }
 
@@ -139,7 +164,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                 MaterialPageRoute(
                   builder: (context) => ItemDetailPage(
                     name: item.name,
-                    modelPath: item.modelPath, // Will be empty string if not provided in app_data
+                    modelPath: item.modelPath ?? '', // Ensure non-null string
                     description: descriptionForDetailPage,
                     additionalInfo: item.additionalInfo, // Will be empty string if not provided in app_data
                     image: item.image,
@@ -170,7 +195,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.transparent, // Consistent transparent app bar
         elevation: 0, // No shadow
         automaticallyImplyLeading: false,
-        // --- TabBar in the AppBar's bottom property ---
+        title: const Text(''), // Added a title for the AppBar
+        centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
           labelColor: colorScheme.onPrimary, // Color of selected tab label
@@ -182,8 +208,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       body: TabBarView( // TabBarView now takes up the entire body
         controller: _tabController,
         children: [
-          // --- Tab 1: Body Outline Content (Your existing Stack) ---
-          Stack( // This is the original Stack for the body outline, emojis, and buttons
+          // --- Tab 1: Body Outline Content (Original Stack) ---
+          Stack( // This is the Stack for the body outline and emojis
             children: [
               Center(
                 child: Container(
@@ -241,7 +267,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                                   child: const Text("🫁", style: emojiStyle),
                                 ),
                               ),
-                              // Muscles
+                              // Muscles - Assuming Muscles are a category in your organData
                               Positioned(
                                 top: height * 0.39,
                                 left: width * 0.23,
@@ -259,7 +285,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                                   child: const Text("🍽️", style: emojiStyle),
                                 ),
                               ),
-                              // Legs
+                              // Legs - Assuming Legs are a category in your organData
                               Positioned(
                                 top: height * 0.62,
                                 left: width * 0.30,
@@ -277,20 +303,20 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                 ),
               ),
 
-              // --- Theme Toggle Button (Bottom Left) ---
+              // Floating Action Buttons for Theme and Mode Toggle
+              // Moved them directly into the Stack so they are part of the 'Body' tab's content
               Positioned(
                 bottom: 20,
                 left: 20,
                 child: FloatingActionButton(
-                  heroTag: 'theme_toggle', // Unique tag for multiple FABs
-                  onPressed: _toggleTheme, // Calls BodyScreen's own toggle
+                  heroTag: 'theme_toggle',
+                  onPressed: _toggleTheme,
                   backgroundColor: colorScheme.secondary,
                   foregroundColor: colorScheme.onSecondary,
                   child: Icon(widget.themeModeNotifier.value == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
                 ),
               ),
 
-              // --- Mode Toggle Switch (Bottom Right) ---
               Positioned(
                 bottom: 20,
                 right: 20,
@@ -309,7 +335,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     ],
                   ),
                   child: GestureDetector(
-                    onTap: _toggleMode, // Calls BodyScreen's own toggle
+                    onTap: _toggleMode,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -320,7 +346,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                         const SizedBox(width: 8),
                         Switch(
                           value: _currentMode == 'fun',
-                          onChanged: (newValue) => _toggleMode(), // Calls BodyScreen's own toggle
+                          onChanged: (newValue) => _toggleMode(),
                           activeColor: colorScheme.secondary,
                           inactiveThumbColor: colorScheme.secondary,
                           inactiveTrackColor: colorScheme.onSurface.withOpacity(0.3),
@@ -381,28 +407,31 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
               }).toList(),
             ),
           ),
+
+          // --- Tab 3: Mascot Content ---
+          const MascotPage(), // This is the new tab for your mascot
         ],
       ),
     );
   }
 
-  void showOrganDialog(BuildContext context, String organ) {
+  void showOrganDialog(BuildContext context, String organName) { // Renamed parameter for clarity
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     String dialogContent;
     // Get organ info from app_data.dart
-    final Map<String, dynamic>? organInfo = organData[organ]?.cast<String, dynamic>();
+    final Map<String, dynamic>? organInfo = organData[organName]?.cast<String, dynamic>();
 
     if (organInfo != null) {
       if (_currentMode == 'fun') {
-        dialogContent =  "Wanna learn more about $organ?";
+        dialogContent =  "Wanna learn more about $organName?";
       } else {
-        dialogContent =  "Would you like to learn more about the $organ?";
+        dialogContent =  "Would you like to learn more about the $organName?";
       }
     } else {
       // Fallback if organ data is not found
-      dialogContent = "No information available for $organ yet.";
+      dialogContent = "No information available for $organName yet.";
     }
 
 
@@ -411,7 +440,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       builder: (_) => AlertDialog(
         backgroundColor: colorScheme.surface,
         title: Text(
-          organ,
+          organName, // Use organName for title
           style: theme.textTheme.titleLarge,
         ),
         content: Text(
@@ -428,13 +457,16 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // Pop the dialog first
+              // Pass the entire organInfo map to OrganDetailPage
+              // Ensure organData[organName] is not null before passing
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => OrganDetailPage(
-                    organ: organ,
+                    organName: organName, // Pass the organName string
                     mode: _currentMode, // Pass the current mode to OrganDetailPage
+                    organData: organData[organName]!, organ: organName, // Pass the full map!
                   ),
                 ),
               );
