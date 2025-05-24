@@ -48,7 +48,7 @@ class _MascotPageState extends State<MascotPage> {
     // Initialize chat with a system instruction for Coco's persona and health focus
     _chat = _model.startChat(history: [
       Content.text(
-          "You are Coco, a friendly health and nutrition assistant. You are a blue and amber colored bunny-sort of creature who wears space boots and a space suit. Your goal is to help users learn about health, their body, and nutrition. Please keep your responses focused on these topics and always refer to yourself as Coco. Never speak about anything other than health and nutrition! You can also speak about the history of health, nutrition and food items. Be fun and playful!  You can tell fun facts if they ask you about it!"
+          "You are Coco, a friendly health and nutrition assistant. You are a blue and amber colored bunny-sort of creature who wears space boots and a space suit. Your goal is to help users learn about health, their body, and nutrition. Please keep your responses focused on these topics and always refer to yourself as Coco. Never speak about anything other than health and nutrition! You can also speak about the history of health, nutrition and food items. Be fun and playful!  You can tell fun facts if they ask you about it! Even if they talk to you about nutrition or health within games, cinemas or anything other than what this app contains, try to avert the topic. This app is called Flutter Health App, don't mention it when you are introducing yourself. If they ask about this app, say the name and this app has information about your body and healthy fruits, vegetables, vitamins, nutrients, dairy, meat products, cereals and grains, fun facts, diseases, symptoms and so many more. It even features you, coco. It has a nutrition and a body tab. You can see all the food items in the nutrition tab and see about the body and it's organs in the body tab. It has a normal and a fun mode, light and dark theme. Fun mode is basically a Gen Z version of normal mode, suited to the younger kids of this generation. If they ask something in Gen Z/ Alpha slang, try to decipher the meaning and answer them. Also don't tell fun facts all the time, if there is no proper topic about food and nutrition don't tell it. If they specifically ask for fun facts or they talk about something unrelated to food and nutrition and health, then say fun facts. If they ask how sports is good for your body, elaborate. If they ask how to learn about organs, tell them to click on body tab on your top left and then they will see ton of organs displayed, if they click on it, it will take them to details of the specific organ. If they ask about how any food item is good for health, elaborate a lot and the last step is ask them to check the nutrition tab which is in the top center and then search for it to learn a lot more. If they ask, how do I learn about symptoms, diseases, fun facts, weekly diet, diary, pulses, cereals and grains about a specific organ, tell them to navigate to the body tab on the top left and click on the organ that they want to know and then under More button, all of these information will be present. If they ask about fruits, vegetables, meats and nutrients, tell them to navigate to the body tab on the top left and click on the organ that they want to know and then under whatever fruits, vegetables, meat products, nutrients are good for that specific organ will be displayed."
       )
     ]);
 
@@ -179,11 +179,11 @@ class _MascotPageState extends State<MascotPage> {
         });
       }
 
+
       await _speechToText.listen(
         onResult: _onSpeechResult,
-        listenFor: const Duration(seconds: 20), // Max duration to listen
-        pauseFor: const Duration(seconds: 5), // Pause and stop if no speech for this duration
-
+        listenFor: const Duration(seconds: 20), // Max duration to listen (as per your current code)
+        pauseFor: const Duration(seconds: 10), // Pause and stop if no speech for this duration (as per your current code)
         localeId: 'en_US', // Specify locale for better accuracy
         // Get updates as speech is recognized
       );
@@ -216,6 +216,20 @@ class _MascotPageState extends State<MascotPage> {
     }
   }
 
+  // --- NEW FUNCTION: Stop TTS immediately ---
+  Future<void> _stopSpeaking() async {
+    if (_isSpeaking) {
+      await flutterTts.stop();
+      if (mounted) {
+        setState(() {
+          _isSpeaking = false; // Manually update state as completion handler might not fire instantly
+          _isLoading = false; // Also ensure loading is off
+        });
+      }
+      print("TTS stopped by user.");
+    }
+  }
+
   // Send message to Gemini (called by automatic STT or manual text bar)
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) {
@@ -237,7 +251,7 @@ class _MascotPageState extends State<MascotPage> {
       _isLoading = true; // Set loading true when sending to Gemini
     });
     _textController.clear(); // Clear the text field after sending
-    _scrollToBottom();
+
 
     try {
       final response = await _chat.sendMessage(Content.text(text));
@@ -258,7 +272,7 @@ class _MascotPageState extends State<MascotPage> {
           // _isLoading will be set to false by TTS setStartHandler or if no text to speak
         });
       }
-      _scrollToBottom();
+
 
       if (geminiResponse != null && geminiResponse.isNotEmpty) {
         _speakResponse(geminiResponse);
@@ -274,12 +288,12 @@ class _MascotPageState extends State<MascotPage> {
       print('Gemini API Error: $e');
       if (mounted) {
         setState(() {
-          _messages.add(Message(text: 'Error contacting Coco: $e', isUser: false));
+          _messages.add(Message(text: 'Error contacting Coco!', isUser: false));
           _isLoading = false; // Ensure loading is off even on error
           _isSpeaking = false; // Ensure speaking is off on error
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error contacting Coco: $e')),
+          SnackBar(content: Text('Coco couldn\'t be contacted')),
         );
       }
       // Re-enable STT if it was the cause of the error or speech has stopped
@@ -297,17 +311,6 @@ class _MascotPageState extends State<MascotPage> {
   }
 
   // Scrolls the chat messages to the bottom
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -341,7 +344,7 @@ class _MascotPageState extends State<MascotPage> {
                   margin: const EdgeInsets.symmetric(vertical: 4.0),
                   decoration: BoxDecoration(
                     color: message.isUser ? colorScheme.secondary : colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(15.0),
                   ),
                   child: Text(
                     message.text,
@@ -390,7 +393,7 @@ class _MascotPageState extends State<MascotPage> {
                   label: Text(
                     _isListening
                         ? 'Listening... Tap to Stop'
-                        : (_speechToText.isAvailable ? 'Speak to Mascot' : 'Speech Not Available'),
+                        : (_speechToText.isAvailable ? 'Speak' : 'Speech Not Available'),
                     style: TextStyle(
                       color: _speechToText.isAvailable ? colorScheme.onSecondary : colorScheme.onSecondary.withOpacity(0.5),
                     ),
@@ -410,7 +413,7 @@ class _MascotPageState extends State<MascotPage> {
                     ),
                   ),
                 const SizedBox(height: 10), // Spacing before the text input
-                // Text Input and Send Button
+                // Text Input and Send/Stop Button (MODIFIED BLOCK)
                 Row(
                   children: [
                     Expanded(
@@ -429,12 +432,22 @@ class _MascotPageState extends State<MascotPage> {
                       ),
                     ),
                     const SizedBox(width: 8.0),
-                    // Send Button: Disabled if loading or speaking
-                    (_isLoading || _isSpeaking)
-                        ? const CircularProgressIndicator() // Show progress indicator if loading
-                        : IconButton(
+                    // Conditional Button for Send/Stop
+                    // If speaking, show a stop button. Otherwise, show send/loading.
+                    _isSpeaking
+                        ? IconButton( // Stop button
+                      icon: Icon(Icons.stop_circle, color: colorScheme.secondary), // Use error color for stop
+                      onPressed: _stopSpeaking, // Call the new _stopSpeaking function
+                    )
+                        : (_isLoading // If not speaking, check if loading
+                        ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: CircularProgressIndicator(color: colorScheme.secondary),
+                    )
+                        : IconButton( // Send button
                       icon: Icon(Icons.send, color: colorScheme.secondary),
-                      onPressed: () => _sendMessage(_textController.text), // Send message on button press
+                      onPressed: () => _sendMessage(_textController.text),
+                    )
                     ),
                   ],
                 ),

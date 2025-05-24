@@ -759,49 +759,52 @@ final Map<String, Map<String, dynamic>> organData = {
 final Map<String, Map<String, dynamic>> generalNutritionData = {
   "Fruits": {
     "normalModeTitle": "Fruits",
-    "funModeTitle": "Fruits 🍎", // Ensure you have this icon
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "funModeTitle": "Fruits 🍎",
+    "items": <Map<String, dynamic>>[],
   },
   "Vegetables": {
     "normalModeTitle": "Vegetables",
-    "funModeTitle": "Vegetables 🥦", // Ensure you have this icon
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "funModeTitle": "Vegetables 🥦",
+    "items": <Map<String, dynamic>>[],
   },
   "Nutrients": {
     "normalModeTitle": "Nutrients",
-    "funModeTitle": "Nutrients 💊", // Ensure you have this icon
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "funModeTitle": "Nutrients 💊",
+    "items": <Map<String, dynamic>>[],
   },
   "Meat Products": {
     "normalModeTitle": "Meat Products",
     "funModeTitle": "Meat Products 🍖",
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "items": <Map<String, dynamic>>[],
   },
   "Dairy": {
     "normalModeTitle": "Dairy",
     "funModeTitle": "Dairy 🥛",
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "items": <Map<String, dynamic>>[],
   },
   "Cereals & Grains": {
     "normalModeTitle": "Cereals & Grains",
     "funModeTitle": "Cereals & Grains 🍞",
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "items": <Map<String, dynamic>>[],
   },
   "Protein": {
     "normalModeTitle": "Protein",
     "funModeTitle": "Protein 💪",
-    "items": <Map<String, dynamic>>[], // Initialize as empty list
+    "items": <Map<String, dynamic>>[],
   },
 };
 
 // Function to populate generalNutritionData from organData
 void initializeAppData() {
+  // Clear previous data before re-populating to prevent duplicates on hot restart
+  generalNutritionData.forEach((key, value) {
+    value['items'] = <Map<String, dynamic>>[];
+  });
   final Set<String> processedItemNames = {}; // To prevent duplicates
 
   void addItemsToCategory(List<Map<String, dynamic>> items, String categoryKey) {
     for (var item in items) {
       if (item['name'] != null && !processedItemNames.contains(item['name'])) {
-        // Ensure the item has all required fields for ItemDetailPage
         final Map<String, dynamic> completeItem = {
           'name': item['name'],
           'normalModeDescription': item['normalModeDescription'] ?? '',
@@ -820,7 +823,6 @@ void initializeAppData() {
 
   // Iterate through each organ's data
   organData.forEach((organName, organInfo) {
-    // Add items from top-level lists
     if (organInfo.containsKey('fruits')) {
       addItemsToCategory(List<Map<String, dynamic>>.from(organInfo['fruits']!), "Fruits");
     }
@@ -830,13 +832,13 @@ void initializeAppData() {
     if (organInfo.containsKey('nutrients')) {
       addItemsToCategory(List<Map<String, dynamic>>.from(organInfo['nutrients']!), "Nutrients");
     }
-    if (organInfo.containsKey('meat')) { // Assuming 'meat' is a top-level key like fruits/vegetables
+    if (organInfo.containsKey('meat')) { // Assuming 'meat' key might exist at top level for some organs
       addItemsToCategory(List<Map<String, dynamic>>.from(organInfo['meat']!), "Meat Products");
     }
 
     // Add items from moreInfoCategories
     if (organInfo.containsKey('moreInfoCategories')) {
-      Map<String, Map<String, dynamic>> moreInfo = organInfo['moreInfoCategories'];
+      Map<String, dynamic> moreInfo = organInfo['moreInfoCategories'];
 
       if (moreInfo.containsKey('dairy') && moreInfo['dairy']!['items'] != null) {
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['dairy']!['items']!), "Dairy");
@@ -847,8 +849,11 @@ void initializeAppData() {
       if (moreInfo.containsKey('protein') && moreInfo['protein']!['items'] != null) {
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['protein']!['items']!), "Protein");
       }
-      // You can add logic for other moreInfoCategories here if you want to pull them into
-      // general nutrition, but based on your request, I've focused on the specified ones.
+      if (moreInfo.containsKey('food') && moreInfo['food']!['items'] != null) { // Add 'food' if you want it included
+        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['food']!['items']!), "Meat Products"); // Or a new "General Food" category
+      }
+      // Note: "funFacts", "symptoms", "diseases", "weeklyDiet" typically aren't nutrition items
+      // so they are not added to generalNutritionData here.
     }
   });
 }

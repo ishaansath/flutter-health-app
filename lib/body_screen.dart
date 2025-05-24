@@ -1,18 +1,23 @@
-// lib/body_screen.dart (UPDATED)
+// lib/body_screen.dart (FIXED - line 261)
 
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'organ_detail_page.dart';
+import 'package:ishaan/organ_detail_page.dart';
 import 'package:ishaan/mascot_page.dart';
-import 'package:ishaan/app_data.dart'; // Keep this as is
-import 'package:ishaan/item_detail_page.dart'; // Keep this as is for ItemDetailPage
-import 'package:ishaan/nutrition_item_model.dart'; // Import your custom NutritionItem class
-import 'package:flutter_tts/flutter_tts.dart'; // Import flutter_tts for general TTS if needed
+import 'package:ishaan/app_data.dart';
+import 'package:ishaan/item_detail_page.dart';
+import 'package:ishaan/nutrition_item_model.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+
+// NEW: Import the NutritionTabContent from its correct path
+import 'package:ishaan/nutrition_tab_content.dart';
+
+import 'app_data.dart' as AppData;
 
 
 class BodyScreen extends StatefulWidget {
-  final String mode; // Initial mode received from main.dart
-  final ValueNotifier<ThemeMode> themeModeNotifier; // Theme notifier received from main.dart
+  final String mode;
+  final ValueNotifier<ThemeMode> themeModeNotifier;
 
   const BodyScreen({
     super.key,
@@ -25,47 +30,30 @@ class BodyScreen extends StatefulWidget {
 }
 
 class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateMixin {
-  late String _currentMode; // Internal state for the current interaction mode ('normal'/'fun')
-  late TabController _tabController; // Declare TabController
-  late FlutterTts flutterTts; // Declare FlutterTts for general usage in BodyScreen
+  late String _currentMode;
+  late TabController _tabController;
+  late FlutterTts flutterTts;
 
-  // Define your top-level tabs
   final List<String> _topTabs = ['Body', 'Nutrition', 'Mascot'];
-
-  // Define your nutrition subcategories, make sure these keys match those in generalNutritionData
-  // These should match the top-level keys in generalNutritionData map
-  final List<String> _nutritionSubcategories = [
-    'Fruits',
-    'Vegetables',
-    'Nutrients',
-    'Dairy',
-    'Meat Products', // Corrected from 'Meat'
-    'Cereals & Grains', // Corrected from 'Grains & Cereals'
-    'Protein', // Corrected from 'Protein Foods'
-  ];
 
   @override
   void initState() {
     super.initState();
-    _currentMode = widget.mode; // Initialize internal mode from the widget's constructor parameter
-    widget.themeModeNotifier.addListener(_updateThemeIcon); // Listen for theme changes
+    _currentMode = widget.mode;
+    widget.themeModeNotifier.addListener(_updateThemeIcon);
 
-    // Initialize TabController
     _tabController = TabController(length: _topTabs.length, vsync: this);
-    flutterTts = FlutterTts(); // Initialize FlutterTts
-    _initializeTtsGeneral(); // Initialize general TTS for BodyScreen
+    flutterTts = FlutterTts();
+    _initializeTtsGeneral();
 
-    // Add listener to stop TTS when tab changes
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
-        flutterTts.stop(); // Stop any ongoing TTS when changing tabs
+        flutterTts.stop();
       }
     });
   }
 
-  // General TTS Initialization for BodyScreen (if you use TTS outside MascotPage)
   Future<void> _initializeTtsGeneral() async {
-    // You can set a default language and parameters here for general TTS in BodyScreen
     await flutterTts.setLanguage("en-US");
     await flutterTts.setSpeechRate(0.5);
     await flutterTts.setVolume(1.0);
@@ -73,12 +61,11 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     print("BodyScreen TTS initialized.");
   }
 
-
   @override
   void dispose() {
-    widget.themeModeNotifier.removeListener(_updateThemeIcon); // Stop listening
-    _tabController.dispose(); // Dispose TabController
-    flutterTts.stop(); // Stop general TTS in BodyScreen
+    widget.themeModeNotifier.removeListener(_updateThemeIcon);
+    _tabController.dispose();
+    flutterTts.stop();
     super.dispose();
   }
 
@@ -91,7 +78,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   }
 
   void _toggleTheme() {
-    // Toggle the theme via the ValueNotifier provided by main.dart
     widget.themeModeNotifier.value =
     widget.themeModeNotifier.value == ThemeMode.dark
         ? ThemeMode.light
@@ -99,87 +85,9 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   }
 
   void _toggleMode() {
-    // Toggle the internal interaction mode
     setState(() {
       _currentMode = _currentMode == 'normal' ? 'fun' : 'normal';
     });
-  }
-
-  // --- Helper to get NutritionItems for Carousel from app_data.dart ---
-  // This now expects the new generalNutritionData structure
-  List<NutritionItem> _getNutritionItemsForCategory(String category) {
-    // Access the 'items' list within the category map
-    final List<Map<String, dynamic>>? itemsDataRaw = generalNutritionData[category]?['items']
-        ?.cast<Map<String, dynamic>>();
-
-    if (itemsDataRaw == null) {
-      return []; // Return empty list if category or 'items' list not found
-    }
-
-    return itemsDataRaw
-        .map((itemMap) => NutritionItem.fromMap(itemMap))
-        .toList();
-  }
-
-  // --- Helper to build individual carousel item UI for the Nutrition tab ---
-  // This now takes your custom 'NutritionItem' object
-  Widget _buildNutritionCarouselItemUI(BuildContext context, NutritionItem item) {
-    final theme = Theme.of(context);
-
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (item.image.isNotEmpty)
-            Image.asset(
-              item.image,
-              height: 100, // Adjust image size as needed
-              width: 100,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.broken_image, size: 100);
-              },
-            ),
-          const SizedBox(height: 10),
-          Text(
-            item.name,
-            style: theme.textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Now, extract data from the 'NutritionItem' object and map to ItemDetailPage's parameters
-              final String descriptionForDetailPage = _currentMode == 'fun'
-                  ? (item.funModeDescription.isNotEmpty ? item.funModeDescription : item.normalModeDescription)
-                  : item.normalModeDescription;
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ItemDetailPage(
-                    name: item.name,
-                    modelPath: item.modelPath ?? '', // Ensure non-null string
-                    description: descriptionForDetailPage,
-                    additionalInfo: item.additionalInfo, // Will be empty string if not provided in app_data
-                    image: item.image,
-                    additionalInfoExtra: item.additionalInfoExtra, // Will be empty string if not provided in app_data
-                    mode: _currentMode, // Pass current mode
-                  ),
-                ),
-              );
-            },
-            child: Text('View Details', style: theme.textTheme.bodyLarge,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -192,24 +100,24 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: colorScheme.primary,
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Consistent transparent app bar
-        elevation: 0, // No shadow
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text(''), // Added a title for the AppBar
+        title: const Text(''),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: colorScheme.onPrimary, // Color of selected tab label
-          unselectedLabelColor: colorScheme.onPrimary.withOpacity(0.7), // Color of unselected tab labels
-          indicatorColor: colorScheme.secondary, // Color of the underline indicator
+          labelColor: colorScheme.onPrimary,
+          unselectedLabelColor: colorScheme.onPrimary.withOpacity(0.7),
+          indicatorColor: colorScheme.secondary,
           tabs: _topTabs.map((tabName) => Tab(text: tabName)).toList(),
         ),
       ),
-      body: TabBarView( // TabBarView now takes up the entire body
+      body: TabBarView(
         controller: _tabController,
         children: [
           // --- Tab 1: Body Outline Content (Original Stack) ---
-          Stack( // This is the Stack for the body outline and emojis
+          Stack(
             children: [
               Center(
                 child: Container(
@@ -220,8 +128,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final height = constraints.maxHeight;
-                      // Adjusted width calculation for better proportion
-                      final width = height * 0.55; // Roughly 1:1.8 ratio for typical body outline
+                      final width = height * 0.55;
 
                       return Center(
                         child: SizedBox(
@@ -303,8 +210,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                 ),
               ),
 
-              // Floating Action Buttons for Theme and Mode Toggle
-              // Moved them directly into the Stack so they are part of the 'Body' tab's content
               Positioned(
                 bottom: 20,
                 left: 20,
@@ -326,7 +231,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
-                      BoxShadow(
+                      BoxShadow( // Corrected from BoxBoxShadow
                         color: Colors.black.withOpacity(0.2),
                         spreadRadius: 2,
                         blurRadius: 5,
@@ -359,69 +264,23 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
             ],
           ),
 
-          // --- Tab 2: Nutrition Content ---
-          SingleChildScrollView( // Make the nutrition content scrollable
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: _nutritionSubcategories.map((category) {
-                // Fetch the list of NutritionItem objects for the current category
-                final List<NutritionItem> items = _getNutritionItemsForCategory(category);
-
-                // Get category titles based on mode
-                final String categoryTitle = _currentMode == 'fun'
-                    ? (generalNutritionData[category]?['funModeTitle'] as String? ?? category)
-                    : (generalNutritionData[category]?['normalModeTitle'] as String? ?? category);
-
-
-                // Only build the category section if there are items
-                if (items.isEmpty) {
-                  return const SizedBox.shrink(); // Hide if no items
-                }
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        categoryTitle, // Use the mode-dependent title
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 10),
-                      CarouselSlider(
-                        options: CarouselOptions(
-                          height: 250.0, // Height of the carousel
-                          enlargeCenterPage: false,
-                          autoPlay: true,
-                          aspectRatio: 16 / 9,
-                          autoPlayCurve: Curves.fastOutSlowIn,
-                          enableInfiniteScroll: true,
-                          autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                          viewportFraction: 0.6, // How much of the item is visible
-                        ),
-                        items: items.map((item) => _buildNutritionCarouselItemUI(context, item)).toList(),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+          // --- Tab 2: Nutrition Content (Now using NutritionTabContent) ---
+          // FIX: Add 'const' keyword and pass currentMode
+          NutritionTabContent(currentMode: _currentMode), // Line 261
 
           // --- Tab 3: Mascot Content ---
-          const MascotPage(), // This is the new tab for your mascot
+          const MascotPage(),
         ],
       ),
     );
   }
 
-  void showOrganDialog(BuildContext context, String organName) { // Renamed parameter for clarity
+  void showOrganDialog(BuildContext context, String organName) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     String dialogContent;
-    // Get organ info from app_data.dart
-    final Map<String, dynamic>? organInfo = organData[organName]?.cast<String, dynamic>();
+    final Map<String, dynamic>? organInfo = AppData.organData[organName]?.cast<String, dynamic>();
 
     if (organInfo != null) {
       if (_currentMode == 'fun') {
@@ -430,17 +289,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
         dialogContent =  "Would you like to learn more about the $organName?";
       }
     } else {
-      // Fallback if organ data is not found
       dialogContent = "No information available for $organName yet.";
     }
-
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: colorScheme.surface,
         title: Text(
-          organName, // Use organName for title
+          organName,
           style: theme.textTheme.titleLarge,
         ),
         content: Text(
@@ -457,16 +314,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Pop the dialog first
-              // Pass the entire organInfo map to OrganDetailPage
-              // Ensure organData[organName] is not null before passing
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => OrganDetailPage(
-                    organName: organName, // Pass the organName string
-                    mode: _currentMode, // Pass the current mode to OrganDetailPage
-                    organData: organData[organName]!, organ: organName, // Pass the full map!
+                    organName: organName,
+                    mode: _currentMode,
+                    organData: AppData.organData[organName]!,
+                    organ: organName,
                   ),
                 ),
               );
