@@ -13,7 +13,7 @@ const String apikey = 'AIzaSyB4q1yRNvlg0MRSImTbbzYddO6jpLTCMds'; // <<< REPLACE 
 
 class MascotPage extends StatefulWidget {
   // REMOVED: final String? userName;
-  const MascotPage({super.key}); // REMOVED: userName from constructor
+  const MascotPage({super.key, required String mode}); // REMOVED: userName from constructor
 
   @override
   State<MascotPage> createState() => _MascotPageState();
@@ -151,11 +151,6 @@ class _MascotPageState extends State<MascotPage> {
       print("Speech-to-Text initialized and available.");
     } else {
       print("Speech-to-Text not available on this device.");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Speech recognition is not available on this device.')),
-        );
-      }
     }
     if (mounted) {
       setState(() {}); // Rebuild to show microphone status on UI
@@ -166,9 +161,6 @@ class _MascotPageState extends State<MascotPage> {
   void _startListening() async {
     if (!_speechToText.isAvailable) {
       print("Speech-to-Text is not available.");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Speech recognition not available.')),
-      );
       return;
     }
 
@@ -296,9 +288,6 @@ class _MascotPageState extends State<MascotPage> {
           _isLoading = false; // Ensure loading is off even on error
           _isSpeaking = false; // Ensure speaking is off on error
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Coco couldn\'t be contacted')),
-        );
       }
     }
   }

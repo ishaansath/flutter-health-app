@@ -1,4 +1,4 @@
-// lib/body_screen.dart (FIXED - line 261)
+// lib/body_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -8,10 +8,9 @@ import 'package:ishaan/app_data.dart';
 import 'package:ishaan/item_detail_page.dart';
 import 'package:ishaan/nutrition_item_model.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'settings_page.dart';
 
-// NEW: Import the NutritionTabContent from its correct path
 import 'package:ishaan/nutrition_tab_content.dart';
+import 'package:ishaan/settings_page.dart';
 
 import 'app_data.dart' as AppData;
 
@@ -37,21 +36,31 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
   final List<String> _topTabs = ['Body', 'Nutrition', 'Mascot'];
 
+  // This variable correctly holds the currently selected index for the BottomNavigationBar
+  int _selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
     _currentMode = widget.mode;
-    widget.themeModeNotifier.addListener(_updateThemeIcon);
-
     _tabController = TabController(length: _topTabs.length, vsync: this);
     flutterTts = FlutterTts();
     _initializeTtsGeneral();
 
+    // The key fix is here: listen directly to `_tabController.index` changes
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
+      // Only update if the index has actually changed to avoid unnecessary setState calls
+      if (_selectedIndex != _tabController.index) {
+        setState(() {
+          _selectedIndex = _tabController.index;
+        });
+        // Stop TTS when the tab changes, regardless of whether it was a tap or swipe
         flutterTts.stop();
       }
     });
+
+    // Initialize _selectedIndex with the initial tab controller index
+    _selectedIndex = _tabController.index;
   }
 
   Future<void> _initializeTtsGeneral() async {
@@ -64,25 +73,9 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    widget.themeModeNotifier.removeListener(_updateThemeIcon);
     _tabController.dispose();
     flutterTts.stop();
     super.dispose();
-  }
-
-  void _updateThemeIcon() {
-    if (mounted) {
-      setState(() {
-        // Force a rebuild for the theme icon when theme changes.
-      });
-    }
-  }
-
-  void _toggleTheme() {
-    widget.themeModeNotifier.value =
-    widget.themeModeNotifier.value == ThemeMode.dark
-        ? ThemeMode.light
-        : ThemeMode.dark;
   }
 
   void _toggleMode() {
@@ -104,33 +97,71 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
-        toolbarHeight: kToolbarHeight * 0.65,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: colorScheme.onPrimary,
-          unselectedLabelColor: colorScheme.onPrimary.withOpacity(0.7),
-          indicatorColor: colorScheme.secondary,
-          tabs: _topTabs.map((tabName) => Tab(text: tabName)).toList(),
-        ),
-          actions: [
-      Padding(
-      padding: const EdgeInsets.only(right: 16.0), // Adjust padding as needed
-      child: IconButton( // Using IconButton for better tap feedback
-        icon: Icon(Icons.settings, color: colorScheme.onSecondary),
-        onPressed: () {Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SettingsPage(), // <--- NAVIGATE HERE
+        toolbarHeight: kToolbarHeight,
+        title: const Text(''),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: GestureDetector(
+              onTap: _toggleMode,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _currentMode == 'normal' ? colorScheme.tertiary : colorScheme.secondary,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _currentMode == 'normal' ? Icons.school : Icons.mood_rounded,
+                      color: _currentMode == 'normal' ? colorScheme.onSecondary : colorScheme.onSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _currentMode == 'normal' ? 'Normal' : 'Fun',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: _currentMode == 'normal' ? colorScheme.onSecondary : colorScheme.onSecondary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        );
-        }
-         ),
-      )],
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              icon: Icon(Icons.settings, color: colorScheme.onSecondary),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(themeModeNotifier: widget.themeModeNotifier),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // --- Tab 1: Body Outline Content (Original Stack) ---
           Stack(
             children: [
               Center(
@@ -223,68 +254,50 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                   ),
                 ),
               ),
-
-              Positioned(
-                bottom: 20,
-                left: 20,
-                child: FloatingActionButton(
-                  heroTag: 'theme_toggle',
-                  onPressed: _toggleTheme,
-                  backgroundColor: colorScheme.secondary,
-                  foregroundColor: colorScheme.onSecondary,
-                  child: Icon(widget.themeModeNotifier.value == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
-                ),
-              ),
-
-              Positioned(
-                bottom: 20,
-                right: 20,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow( // Corrected from BoxBoxShadow
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: GestureDetector(
-                    onTap: _toggleMode,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _currentMode == 'normal' ? 'Normal' : 'Fun',
-                          style: theme.textTheme.labelLarge,
-                        ),
-                        const SizedBox(width: 8),
-                        Switch(
-                          value: _currentMode == 'fun',
-                          onChanged: (newValue) => _toggleMode(),
-                          activeColor: colorScheme.secondary,
-                          inactiveThumbColor: colorScheme.secondary,
-                          inactiveTrackColor: colorScheme.onSurface.withOpacity(0.3),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
 
-          // --- Tab 2: Nutrition Content (Now using NutritionTabContent) ---
-          // FIX: Add 'const' keyword and pass currentMode
-          NutritionTabContent(currentMode: _currentMode), // Line 261
+          NutritionTabContent(currentMode: _currentMode),
 
-          // --- Tab 3: Mascot Content ---
-          const MascotPage(),
+          MascotPage(mode: _currentMode),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        // The currentIndex must be updated to match the TabController's index
+        currentIndex: _selectedIndex, // Now correctly uses _selectedIndex
+        onTap: (index) {
+          // Update both _selectedIndex and TabController's index
+          setState(() {
+            _selectedIndex = index;
+          });
+          _tabController.animateTo(index); // This will animate the TabBarView
+        },
+        items: _topTabs.map((tabName) {
+          IconData icon;
+          switch (tabName) {
+            case 'Body':
+              icon = Icons.accessibility_new;
+              break;
+            case 'Nutrition':
+              icon = Icons.fastfood;
+              break;
+            case 'Mascot':
+              icon = Icons.pets;
+              break;
+            default:
+              icon = Icons.help_outline;
+          }
+          return BottomNavigationBarItem(
+            icon: Icon(icon),
+            label: tabName,
+          );
+        }).toList(),
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.secondary,
+        unselectedItemColor: colorScheme.onSecondary.withOpacity(0.6),
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: theme.textTheme.labelSmall,
       ),
     );
   }

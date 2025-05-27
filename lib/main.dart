@@ -2,11 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:ishaan/body_screen.dart'; // Correctly import BodyScreen
 import 'package:ishaan/app_data.dart'; // Ensure app_data.dart is imported
+import 'package:shared_preferences/shared_preferences.dart'; // <--- NEW: Import SharedPreferences
 
-void main() {
-  // Ensure Flutter services are initialized before calling runApp
+void main() async { // <--- MAKE main() ASYNC
   WidgetsFlutterBinding.ensureInitialized();
-  // Call initializeAppData to populate your data structures
   initializeAppData();
   runApp(const HealthApp());
 }
@@ -36,12 +35,49 @@ class HealthApp extends StatefulWidget {
 }
 
 class _HealthAppState extends State<HealthApp> {
-  // This ValueNotifier controls the overall app theme (light/dark)
   final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
+  static const String _themeModeKey = 'appThemeMode'; // Key for SharedPreferences
 
-  // --- REMOVED: _currentMode and _setMode from here ---
-  // These were associated with HomePage, which is now deleted.
-  // BodyScreen will manage its own 'normal'/'fun' mode internally.
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeMode(); // <--- NEW: Load theme on app start
+  }
+
+  // NEW: Function to load theme from SharedPreferences
+  Future<void> _loadThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? themeModeString = prefs.getString(_themeModeKey);
+
+    ThemeMode loadedMode;
+    if (themeModeString == 'light') {
+      loadedMode = ThemeMode.light;
+    } else if (themeModeString == 'dark') {
+      loadedMode = ThemeMode.dark;
+    } else {
+      loadedMode = ThemeMode.system; // Default to system if not found or invalid
+    }
+
+    _themeModeNotifier.value = loadedMode; // Update the ValueNotifier
+  }
+
+  // NEW: Function to save theme to SharedPreferences
+  Future<void> _saveThemeMode(ThemeMode mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    String themeModeString;
+    switch (mode) {
+      case ThemeMode.light:
+        themeModeString = 'light';
+        break;
+      case ThemeMode.dark:
+        themeModeString = 'dark';
+        break;
+      case ThemeMode.system:
+        themeModeString = 'system';
+        break;
+    }
+    await prefs.setString(_themeModeKey, themeModeString);
+  }
 
   @override
   void dispose() {
@@ -59,7 +95,7 @@ class _HealthAppState extends State<HealthApp> {
           debugShowCheckedModeBanner: false,
           themeMode: currentThemeMode, // This controls the active theme
 
-          // --- LIGHT THEME DEFINITION ---
+          // --- LIGHT THEME DEFINITION (NO CHANGES) ---
           theme: ThemeData(
             brightness: Brightness.light,
             fontFamily: 'NotoSerif',
@@ -80,25 +116,25 @@ class _HealthAppState extends State<HealthApp> {
             ),
             appBarTheme: AppBarTheme(
               backgroundColor: Colors.transparent,
-              foregroundColor: Colors.black, // Explicitly set foreground color for icons/text
+              foregroundColor: Colors.black,
               elevation: 0,
               iconTheme: const IconThemeData(color: Colors.black),
               titleTextStyle: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             textTheme: const TextTheme(
-                bodyLarge: TextStyle(color: Colors.black, fontSize: 14),
-                headlineMedium: TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w400),
-                bodyMedium: TextStyle(color: Colors.black54, fontSize: 12),
-                titleLarge: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
-                titleMedium: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
-                labelLarge: TextStyle(color: Colors.black),
-                titleSmall: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w300),
-                bodySmall: TextStyle(color: Colors.black54, fontSize: 9, fontWeight: FontWeight.w200),
-                displaySmall: TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
-            displayMedium: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w400),
-            displayLarge: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-            headlineSmall: TextStyle(color: Colors.black38, fontSize: 10, fontWeight: FontWeight.w500),
-          ),
+              bodyLarge: TextStyle(color: Colors.black, fontSize: 14),
+              headlineMedium: TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w400),
+              bodyMedium: TextStyle(color: Colors.black54, fontSize: 12),
+              titleLarge: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+              titleMedium: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+              labelLarge: TextStyle(color: Colors.black),
+              titleSmall: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w300),
+              bodySmall: TextStyle(color: Colors.black54, fontSize: 9, fontWeight: FontWeight.w200),
+              displaySmall: TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+              displayMedium: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w400),
+              displayLarge: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+              headlineSmall: TextStyle(color: Colors.black38, fontSize: 10, fontWeight: FontWeight.w500),
+            ),
             cardTheme: CardTheme(
               color: Colors.grey[100],
               elevation: 2,
@@ -123,15 +159,15 @@ class _HealthAppState extends State<HealthApp> {
               thickness: 1,
             ),
             tabBarTheme: TabBarTheme(
-              labelColor: Colors.black, // Color of the selected tab's text/icon
-              unselectedLabelColor: Colors.black, // Color of unselected tab's text/icon
-              indicatorSize: TabBarIndicatorSize.tab, // Makes indicator span the tab width
-              indicator: UnderlineTabIndicator( // Customize the underline indicator
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.black,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: UnderlineTabIndicator(
                 borderSide: BorderSide(
-                  color: Colors.amber.shade700, // Color of the underline indicator
-                  width: 3.0, // Thickness of the underline
+                  color: Colors.amber.shade700,
+                  width: 3.0,
                 ),
-                insets: EdgeInsets.symmetric(horizontal: 16.0), // Padding for the underline
+                insets: EdgeInsets.symmetric(horizontal: 16.0),
               ),
               labelStyle: TextStyle(
                 fontSize: 16,
@@ -144,7 +180,8 @@ class _HealthAppState extends State<HealthApp> {
             ),
           ),
 
-          // --- DARK THEME DEFINITION ---
+
+          // --- DARK THEME DEFINITION (NO CHANGES) ---
           darkTheme: ThemeData(
             brightness: Brightness.dark,
             fontFamily: 'NotoSerif',
@@ -165,21 +202,21 @@ class _HealthAppState extends State<HealthApp> {
             ),
             appBarTheme: AppBarTheme(
               backgroundColor: Colors.transparent,
-              foregroundColor: Colors.white, // Explicitly set foreground color for icons/text
+              foregroundColor: Colors.white,
               elevation: 0,
               iconTheme: const IconThemeData(color: Colors.white),
               titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             textTheme: const TextTheme(
-                bodyLarge: TextStyle(color: Colors.white, fontSize: 14),
-                bodyMedium: TextStyle(color: Colors.white70, fontSize: 12),
-                titleLarge: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                titleMedium: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
-                labelLarge: TextStyle(color: Colors.white),
-                bodySmall: TextStyle(color: Colors.white54, fontSize: 9, fontWeight: FontWeight.w200),
-                titleSmall: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300),
-                displaySmall: TextStyle(color: Colors.white38, fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
-                displayMedium: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w400),
+              bodyLarge: TextStyle(color: Colors.white, fontSize: 14),
+              bodyMedium: TextStyle(color: Colors.white70, fontSize: 12),
+              titleLarge: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              titleMedium: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+              labelLarge: TextStyle(color: Colors.white),
+              bodySmall: TextStyle(color: Colors.white54, fontSize: 9, fontWeight: FontWeight.w200),
+              titleSmall: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300),
+              displaySmall: TextStyle(color: Colors.white38, fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+              displayMedium: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w400),
               displayLarge: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
               headlineSmall: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.w300),
               headlineMedium: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w400),
@@ -208,15 +245,15 @@ class _HealthAppState extends State<HealthApp> {
               thickness: 1,
             ),
             tabBarTheme: TabBarTheme(
-              labelColor: Colors.deepPurple, // Color of the selected tab's text/icon
-              unselectedLabelColor: Colors.grey[600], // Color of unselected tab's text/icon
-              indicatorSize: TabBarIndicatorSize.tab, // Makes indicator span the tab width
-              indicator: UnderlineTabIndicator( // Customize the underline indicator
+              labelColor: Colors.deepPurple,
+              unselectedLabelColor: Colors.grey[600],
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: UnderlineTabIndicator(
                 borderSide: BorderSide(
-                  color: Colors.cyanAccent.shade400, // Color of the underline indicator
-                  width: 3.0, // Thickness of the underline
+                  color: Colors.cyanAccent.shade400,
+                  width: 3.0,
                 ),
-                insets: EdgeInsets.symmetric(horizontal: 16.0), // Padding for the underline
+                insets: EdgeInsets.symmetric(horizontal: 16.0),
               ),
               labelStyle: TextStyle(
                 fontSize: 16,
@@ -228,9 +265,8 @@ class _HealthAppState extends State<HealthApp> {
               ),
             ),
           ),
-          // --- FIX: Directly set home to BodyScreen and pass required parameters ---
           home: BodyScreen(
-            mode: 'normal', // Set initial mode (e.g., 'normal' or 'fun')
+            mode: 'normal',
             themeModeNotifier: _themeModeNotifier, // Pass the theme notifier
           ),
         );

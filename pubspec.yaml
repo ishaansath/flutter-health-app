@@ -22,6 +22,8 @@ dependencies:
   speech_to_text: ^7.0.0
   string_similarity: ^2.1.1
   rename: ^3.1.0
+  shared_preferences: ^2.5.3
+  video_player: ^2.9.5
 
 dev_dependencies:
   flutter_test:
@@ -138,6 +140,8 @@ flutter:
     - assets/models/peach.glb
     - assets/peach.png
     - assets/chickenbreast.png
+    - assets/welcome page.png
+    - assets/videos/body_screen_help.mp4
 
 
   fonts:
