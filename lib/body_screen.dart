@@ -8,6 +8,7 @@ import 'package:ishaan/app_data.dart';
 import 'package:ishaan/item_detail_page.dart';
 import 'package:ishaan/nutrition_item_model.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'settings_page.dart';
 
 // NEW: Import the NutritionTabContent from its correct path
 import 'package:ishaan/nutrition_tab_content.dart';
@@ -103,8 +104,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text(''),
-        centerTitle: true,
+        toolbarHeight: kToolbarHeight * 0.65,
         bottom: TabBar(
           controller: _tabController,
           labelColor: colorScheme.onPrimary,
@@ -112,6 +112,20 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           indicatorColor: colorScheme.secondary,
           tabs: _topTabs.map((tabName) => Tab(text: tabName)).toList(),
         ),
+          actions: [
+      Padding(
+      padding: const EdgeInsets.only(right: 16.0), // Adjust padding as needed
+      child: IconButton( // Using IconButton for better tap feedback
+        icon: Icon(Icons.settings, color: colorScheme.onSecondary),
+        onPressed: () {Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SettingsPage(), // <--- NAVIGATE HERE
+          ),
+        );
+        }
+         ),
+      )],
       ),
       body: TabBarView(
         controller: _tabController,

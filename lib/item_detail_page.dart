@@ -123,7 +123,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     });
   }
   Future<void> _initTts() async { // Make it async
-     await flutterTts.setLanguage("en-IN");
+     await flutterTts.setLanguage("en-US");
      await flutterTts.setSpeechRate(0.4);
      await flutterTts.setPitch(1.0);
     // await flutterTts.setVoice({"name": "ja-jp-x-htm-network", "locale": "ja-JP"});
@@ -237,13 +237,24 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     // Simplified regex: removes most non-alphanumeric, non-space characters
     // If you need specific emojis removed, you can keep parts of your long regex,
     // but this is often sufficient for TTS.
-    cleanedText = cleanedText.replaceAll(RegExp(r'[\🍌\🥷\💡\🧠\⚡\🐵\🫐\💓\✨\🍎\🚀\⛽\💥\📚\🥬\💚\🧅\💧\⚔️\🥒\💊\🚦\🚓\🫀\🩸\📶\🚫\🌻\🛡️\🕹️\🧀\🌾\🥚\🎈\🤒\😵\😋\🥗\🍷\💃\🥑\💪\🟣\🌳\💨\🍅\🔥\🧯\🛠️\🍊\💉\🎧\🎶\😎\🥭\🍇\🪄\👓\🥝\🕶️\🥕\🧡\🦅\👑\🌶️\👁️\🌌\☀️\🌿\🧴\🍍\🧼\🫧\🧄\🫁\🍐\🧸\🍠\🕊️\🚗\🍽️\💦\🦿\🦴\🔐\🧖‍♂️\🦵\💪🏽]'),
+    cleanedText = cleanedText.replaceAll(RegExp(r'[🍌🥷💡🧠⚡🐵🫐💓✨🍎🚀⛽💥📚🥬💚🧅💧⚔️🥒💊🚦🚓🫀🩸📶🚫🌻🛡️🕹️🧀🌾🥚🎈🤒😵😋🥗🍷💃🥑💪🟣🌳💨🍅🔥🧯🛠️🍊💉🎧🎶😎🥭🍇🪄👓🥝🕶️🥕🧡🦅👑🌶️👁️🌌☀️🌿🧴🍍🧼🫧🧄🫁🍐🧸🍠🕊️🚗🍽️💦🦿🦴🔐🧖‍♂️🦵💪🏽]'),
         '');
 
 
 
     return cleanedText.trim();
   }
+
+  Future _handleMascotTap() async {
+    if (ttsState == TtsState.playing || ttsState == TtsState.continued) {
+      await _pause();
+    } else if (ttsState == TtsState.paused) {
+      await _speak(); // Continue from paused state
+    } else { // TtsState.stopped
+      await _speak(); // Start speaking
+    }
+  }
+
 
   Future _speak() async {
     String textToSpeak = _cleanTextForTts(widget.description);
@@ -352,7 +363,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
                     const SizedBox(height: 20),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 1),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -393,31 +404,16 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             right: _currentMascotRight,
             height: _currentMascotHeight,
             width: _currentMascotWidth,
-            child: Image.asset(
-              currentMascotGif,
-              fit: BoxFit.contain, // Ensures image scales within its animated box
-              gaplessPlayback: true,
-            ),
-          ),
-
-          // --- ANIMATED BUTTON (Separate) ---
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 700),
-            curve: Curves.easeOut,
-            bottom: _currentButtonBottom,
-            right: _currentButtonRight,
-            child: ElevatedButton.icon(
-              onPressed: onPressedAction,
-              icon: Icon(buttonIcon, color: colorScheme.secondary),
-              label: Text(buttonText, style: TextStyle(color: colorScheme.onSecondary)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            child: GestureDetector( // <--- WRAP WITH GESTUREDETECTOR
+              onTap: _handleMascotTap, // <--- CALL THE NEW HANDLER
+              child: Image.asset(
+                currentMascotGif,
+                fit: BoxFit.contain,
+                gaplessPlayback: true,
               ),
             ),
           ),
+          // --- ANIMATED BUTTON (Separate) ---
         ],
       ),
     );

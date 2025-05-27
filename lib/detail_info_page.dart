@@ -77,12 +77,13 @@ class DetailInfoPage extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 50),
                   child: CarouselSlider(
                     options: CarouselOptions(
+                      aspectRatio: 16 / 9,
                       height: 500.0,
                       enlargeCenterPage: true,
                       autoPlay: true,
                       enableInfiniteScroll: false,
                       autoPlayInterval: const Duration(seconds: 10),
-                      viewportFraction: 0.8,
+                      viewportFraction: 0.775
                     ),
                     items: items!.map((item) {
                       return Builder(

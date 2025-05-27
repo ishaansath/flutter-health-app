@@ -195,7 +195,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
           width: 60,
           height: 60,
           fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+          errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image, color: colorScheme.onSecondary),
         )
             : const Icon(Icons.fastfood, size: 60),
         title: Text(
@@ -216,14 +216,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.headlineMedium),
-            if (item.additionalInfoExtra.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Text(
-                  item.additionalInfoExtra,
-                  style: theme.textTheme.headlineSmall
-                ),
-              ),
+
           ],
         ),
         onTap: () {
