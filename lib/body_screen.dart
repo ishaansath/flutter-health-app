@@ -11,6 +11,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:ishaan/nutrition_tab_content.dart';
 import 'package:ishaan/settings_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'app_data.dart' as AppData;
 
@@ -63,6 +64,17 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     _selectedIndex = _tabController.index;
   }
 
+  void _navigateToSettingsPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SettingsPage(
+          themeModeNotifier: widget.themeModeNotifier,
+        ),
+      ),
+    );
+  }
+
   Future<void> _initializeTtsGeneral() async {
     await flutterTts.setLanguage("en-US");
     await flutterTts.setSpeechRate(0.5);
@@ -88,6 +100,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final User? currentUser = FirebaseAuth.instance.currentUser;
 
     const TextStyle emojiStyle = TextStyle(fontSize: 20);
 
@@ -145,18 +158,34 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: Icon(Icons.settings, color: colorScheme.onSecondary),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsPage(themeModeNotifier: widget.themeModeNotifier),
+            child: GestureDetector(
+              onTap: _navigateToSettingsPage,
+              // --- MODIFIED: Added Container for the border ---
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colorScheme.secondary, // Choose your border color
+                    width: 2.0, // Choose your border width
                   ),
-                );
-              },
+                ),
+                child: CircleAvatar(
+                  radius: 20, // Keep the radius for the avatar content
+                  backgroundColor: colorScheme.surface,
+                  backgroundImage: currentUser?.photoURL != null
+                      ? NetworkImage(currentUser!.photoURL!)
+                      : null,
+                  child: currentUser?.photoURL == null
+                      ? Icon(
+                    Icons.person,
+                    color: colorScheme.primary,
+                    size: 25,
+                  )
+                      : null,
+                ),
+              ),
+              ),
             ),
-          ),
         ],
       ),
       body: TabBarView(

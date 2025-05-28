@@ -1,14 +1,17 @@
-// lib/help_page.dart
+// lib/help_page.dart (MODIFIED to act as tour page)
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:video_player/video_player.dart'; // Import video_player
+import 'package:video_player/video_player.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // NEW: For tour completion tracking
+import 'package:ishaan/body_screen.dart'; // NEW: Import your main app screen
 
-// Data model for your carousel items
+// Data model for your carousel items (unchanged)
 class HelpCarouselItem {
   final String title;
   final String description;
   final String? imageUrl;
-  final String? videoUrl; // Optional video URL/path
+  final String? videoUrl;
   final IconData? icon;
 
   HelpCarouselItem({
@@ -20,7 +23,7 @@ class HelpCarouselItem {
   });
 }
 
-// Dedicated Widget for Video Player within the Carousel
+// Dedicated Widget for Video Player within the Carousel (unchanged)
 class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
   final bool autoPlay;
@@ -64,7 +67,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         print("Error initializing video player: $error");
         if (mounted) {
           setState(() {
-            _controllerInitialized = false; // Mark as not initialized on error
+            _controllerInitialized = false;
           });
         }
       });
@@ -168,9 +171,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 }
 
-// Main HelpPage Widget
+// Main HelpPage Widget - NOW ALSO SERVES AS THE TOUR PAGE
 class HelpPage extends StatefulWidget {
-  const HelpPage({super.key});
+  // NEW: Add themeModeNotifier as a required parameter
+  final ValueNotifier<ThemeMode> themeModeNotifier;
+
+  const HelpPage({super.key, required this.themeModeNotifier});
 
   @override
   State<HelpPage> createState() => _HelpPageState();
@@ -179,16 +185,16 @@ class HelpPage extends StatefulWidget {
 class _HelpPageState extends State<HelpPage> {
   final List<HelpCarouselItem> _carouselItems = [
     HelpCarouselItem(
-      title: 'Welcome to Help!',
-      description: 'This section provides guidance on how to use the app and its features. Swipe through for more tips!',
-      icon: Icons.info_outline,
-      imageUrl: 'assets/welcome page.png'
+        title: 'Welcome to the App!',
+        description: 'Take a quick tour to understand its key features and get started easily.',
+        icon: Icons.info_outline,
+        imageUrl: 'assets/welcome page.png' // Make sure this asset exists
     ),
     HelpCarouselItem(
-      title: 'Understanding the Body Tab',
-      description: 'Tap on different organs to learn about their functions and importance for your health.',
-      icon: Icons.accessibility_new,
-      videoUrl: 'assets/videos/body_screen_help.mp4'
+        title: 'Understanding the Body Tab',
+        description: 'Tap on different organs to learn about their functions and importance for your health.',
+        icon: Icons.accessibility_new,
+        videoUrl: 'assets/videos/body_screen_help.mp4' // Make sure this asset exists
     ),
     HelpCarouselItem(
       title: 'Watch a Quick Demo',
@@ -222,110 +228,141 @@ class _HelpPageState extends State<HelpPage> {
     ),
   ];
 
+  // NEW: Function to mark tour as completed and navigate
+  Future<void> _markTourCompletedAndNavigate() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasCompletedTour', true); // Mark as completed
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => BodyScreen(themeModeNotifier: widget.themeModeNotifier, mode: 'mode',),
+      ),
+          (Route<dynamic> route) => false, // Clear all previous routes
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.primary, // AppBar background color will be transparent
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent, // Make AppBar transparent to show body background
         elevation: 0,
         title: Text(
-          'Help & Support',
+          'App Tour', // Changed title to reflect its tour purpose
           style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
         ),
         centerTitle: true,
-        iconTheme: IconThemeData(color: colorScheme.onSecondary),
+        iconTheme: IconThemeData(color: colorScheme.onPrimary), // Changed to onPrimary for contrast
+        // You might want to remove the back button during the initial tour
+        // automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Expanded(
-              child: CarouselSlider.builder(
-                itemCount: _carouselItems.length,
-                itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-                  final item = _carouselItems[itemIndex];
-                  return Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(15.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+      body: Column( // Use Column to place Carousel above buttons
+        children: [
+          Expanded(
+            child: CarouselSlider.builder(
+              itemCount: _carouselItems.length,
+              itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+                final item = _carouselItems[itemIndex];
+                return Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (item.videoUrl != null)
+                          Container(
+                            height: 325,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.black,
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: VideoPlayerWidget(videoUrl: item.videoUrl!),
+                          )
+                        else if (item.imageUrl != null)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Image.asset(
+                              item.imageUrl!,
+                              height: 150,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        else if (item.icon != null)
+                            Icon(item.icon, size: 50, color: colorScheme.secondary),
+                        const SizedBox(height: 15.0),
+                        Text(
+                          item.title,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: colorScheme.onSecondary, // Changed to onSurface for better contrast on surface color
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10.0),
+                        Text(
+                          item.description,
+                          style: theme.textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          if (item.videoUrl != null)
-                            Container( // Container to give the video a defined space
-                              height: 325, // Adjust height as needed
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: Colors.black, // Placeholder background while loading
-                              ),
-                              clipBehavior: Clip.antiAlias, // Clip video to rounded corners
-                              child: VideoPlayerWidget(videoUrl: item.videoUrl!),
-                            )
-                          else if (item.imageUrl != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image.asset(
-                                item.imageUrl!,
-                                height: 150, // Adjust image height as needed
-                                fit: BoxFit.contain,
-                              ),
-                            )
-                          else if (item.icon != null)
-                              Icon(item.icon, size: 50, color: colorScheme.secondary),
-                          const SizedBox(height: 15.0),
-                          Text(
-                            item.title,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              color: colorScheme.onSecondary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10.0),
-                          Text(
-                            item.description,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: colorScheme.onSecondary.withOpacity(0.8),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                options: CarouselOptions(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  enlargeCenterPage: true,
-                  autoPlay: false,
-                  aspectRatio: 9/16,
-                  viewportFraction: 0.85,
-                  enableInfiniteScroll: false,
-                  scrollDirection: Axis.horizontal,
-                ),
+                  ),
+                );
+              },
+              options: CarouselOptions(
+                height: MediaQuery.of(context).size.height * 0.7, // Adjust height
+                enlargeCenterPage: true,
+                autoPlay: false,
+                aspectRatio: 9/16,
+                viewportFraction: 0.85,
+                enableInfiniteScroll: false,
+                scrollDirection: Axis.horizontal,
               ),
             ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          ),
+          // NEW: Skip Tour / Continue Buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: _markTourCompletedAndNavigate, // Skip also marks as completed
+                  style: TextButton.styleFrom(
+                    foregroundColor: colorScheme.onPrimary, // Text color matches AppBar's onPrimary
+                  ),
+                  child: Text(
+                    'Skip Tour',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

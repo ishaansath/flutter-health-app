@@ -24,6 +24,11 @@ dependencies:
   rename: ^3.1.0
   shared_preferences: ^2.5.3
   video_player: ^2.9.5
+  google_sign_in: ^6.3.0
+  flutter_secure_storage: ^9.2.4
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.15.10
 
 dev_dependencies:
   flutter_test:
@@ -142,6 +147,7 @@ flutter:
     - assets/chickenbreast.png
     - assets/welcome page.png
     - assets/videos/body_screen_help.mp4
+    - assets/google logo.png
 
 
   fonts:

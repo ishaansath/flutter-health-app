@@ -1,12 +1,24 @@
-// lib/main.dart
+// lib/main.dart (MODIFIED FOR AUTHENTICATION FLOW)
+
 import 'package:flutter/material.dart';
 import 'package:ishaan/body_screen.dart'; // Correctly import BodyScreen
 import 'package:ishaan/app_data.dart'; // Ensure app_data.dart is imported
-import 'package:shared_preferences/shared_preferences.dart'; // <--- NEW: Import SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ishaan/firebase_options.dart'; // Assuming firebase_options.dart is directly in lib/
+import 'package:ishaan/login_screen.dart'; // <--- NEW: Import your LoginScreen
+import 'help_page.dart';
 
-void main() async { // <--- MAKE main() ASYNC
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  initializeAppData();
+
+  // --- NEW: Initialize Firebase FIRST ---
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // Ensure app_data is initialized after Firebase, if it depends on Firebase
+  initializeAppData(); // Keep this if it's not Firebase-dependent, otherwise adjust order
   runApp(const HealthApp());
 }
 
@@ -26,7 +38,6 @@ extension CustomButtonColors on ColorScheme {
   }
 }
 
-
 class HealthApp extends StatefulWidget {
   const HealthApp({super.key});
 
@@ -41,13 +52,13 @@ class _HealthAppState extends State<HealthApp> {
   @override
   void initState() {
     super.initState();
-    _loadThemeMode(); // <--- NEW: Load theme on app start
+    _loadThemeMode();
   }
 
-  // NEW: Function to load theme from SharedPreferences
   Future<void> _loadThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
     final String? themeModeString = prefs.getString(_themeModeKey);
+    final bool hasCompletedTour = prefs.getBool('hasCompletedTour') ?? false;
 
     ThemeMode loadedMode;
     if (themeModeString == 'light') {
@@ -58,10 +69,9 @@ class _HealthAppState extends State<HealthApp> {
       loadedMode = ThemeMode.system; // Default to system if not found or invalid
     }
 
-    _themeModeNotifier.value = loadedMode; // Update the ValueNotifier
+    _themeModeNotifier.value = loadedMode;
   }
 
-  // NEW: Function to save theme to SharedPreferences
   Future<void> _saveThemeMode(ThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();
     String themeModeString;
@@ -111,9 +121,6 @@ class _HealthAppState extends State<HealthApp> {
                 tertiary: Colors.cyan.shade400
             ),
             scaffoldBackgroundColor: Colors.white,
-            dialogTheme: const DialogTheme(
-              backgroundColor: Colors.white,
-            ),
             appBarTheme: AppBarTheme(
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.black,
@@ -135,11 +142,6 @@ class _HealthAppState extends State<HealthApp> {
               displayLarge: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
               headlineSmall: TextStyle(color: Colors.black38, fontSize: 10, fontWeight: FontWeight.w500),
             ),
-            cardTheme: CardTheme(
-              color: Colors.grey[100],
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber.shade700,
@@ -158,28 +160,7 @@ class _HealthAppState extends State<HealthApp> {
               color: Colors.grey,
               thickness: 1,
             ),
-            tabBarTheme: TabBarTheme(
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  color: Colors.amber.shade700,
-                  width: 3.0,
-                ),
-                insets: EdgeInsets.symmetric(horizontal: 16.0),
-              ),
-              labelStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              unselectedLabelStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
           ),
-
 
           // --- DARK THEME DEFINITION (NO CHANGES) ---
           darkTheme: ThemeData(
@@ -197,9 +178,6 @@ class _HealthAppState extends State<HealthApp> {
               tertiary: Colors.amber.shade700,
             ),
             scaffoldBackgroundColor: Colors.grey.shade900,
-            dialogTheme: DialogTheme(
-              backgroundColor: Colors.grey[900],
-            ),
             appBarTheme: AppBarTheme(
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.white,
@@ -218,13 +196,8 @@ class _HealthAppState extends State<HealthApp> {
               displaySmall: TextStyle(color: Colors.white38, fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
               displayMedium: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w400),
               displayLarge: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-              headlineSmall: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.w300),
+              headlineSmall: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.w500),
               headlineMedium: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w400),
-            ),
-            cardTheme: CardTheme(
-              color: Colors.grey[850],
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
@@ -244,30 +217,29 @@ class _HealthAppState extends State<HealthApp> {
               color: Colors.grey,
               thickness: 1,
             ),
-            tabBarTheme: TabBarTheme(
-              labelColor: Colors.deepPurple,
-              unselectedLabelColor: Colors.grey[600],
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  color: Colors.cyanAccent.shade400,
-                  width: 3.0,
-                ),
-                insets: EdgeInsets.symmetric(horizontal: 16.0),
-              ),
-              labelStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              unselectedLabelStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
           ),
-          home: BodyScreen(
-            mode: 'normal',
-            themeModeNotifier: _themeModeNotifier, // Pass the theme notifier
+          // --- HOME WIDGET BASED ON AUTH STATE ---
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(), // Listen to authentication state changes
+            builder: (context, snapshot) {
+              // Show a loading indicator while checking authentication state
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+              // If there's a user logged in, show BodyScreen
+              if (snapshot.hasData && snapshot.data != null) {
+                print('User is logged in: ${snapshot.data!.email}');
+                return BodyScreen(
+                  mode: 'normal', // Pass the mode you need
+                  themeModeNotifier: _themeModeNotifier, // Pass the theme notifier
+                );
+              }
+              // If no user is logged in, show LoginScreen
+              print('No user logged in. Redirecting to LoginScreen.');
+              return LoginScreen(
+                themeModeNotifier: _themeModeNotifier, // You might need to pass this to your LoginScreen too
+              );
+            },
           ),
         );
       },
