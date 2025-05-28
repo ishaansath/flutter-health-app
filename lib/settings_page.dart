@@ -191,7 +191,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: () async { // <--- ADD 'async' HERE
               await Navigator.push( // <--- ADD 'await' HERE
                 context,
-                MaterialPageRoute(builder: (context) => const AccountSettingsPage()),
+                MaterialPageRoute(builder: (context) => AccountSettingsPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system))),
               );
               // This block will execute AFTER you pop back from AccountSettingsPage
               if (mounted) {

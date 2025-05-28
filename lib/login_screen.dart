@@ -1,14 +1,11 @@
-// lib/login_screen.dart (MODIFIED to include Google Sign-In again)
+// lib/login_screen.dart (MODIFIED for First Name, Last Name, Gender, Age in Sign Up)
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart'; // <--- RE-ADD: Import Google Sign-In
-import 'package:ishaan/help_page.dart'; // Import HelpPage for navigation
-import 'package:shared_preferences/shared_preferences.dart'; // To set guest status
-import 'package:ishaan/body_screen.dart'; // Assuming BodyScreen is in lib/
-
-// Assuming your custom button colors extension is defined elsewhere or in main.dart
-// extension CustomButtonColors on ColorScheme { ... }
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// Note: Removed direct imports for HelpPage and BodyScreen, as main.dart manages navigation.
+import 'package:ishaan/auth_firebase_data.dart'; // Ensure this is imported
 
 class LoginScreen extends StatefulWidget {
   final ValueNotifier<ThemeMode> themeModeNotifier;
@@ -22,21 +19,31 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final GoogleSignIn _googleSignIn = GoogleSignIn(); // <--- RE-ADD: GoogleSignIn instance
-  bool _isLogin = true; // To toggle between login and signup
-  bool _isLoading = false; // To show loading state
-  // String? _errorMessage; // Removed, using _showSnackBar directly
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  String? _selectedGender; // Male, Female, or Not Specified
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  bool _isLogin = true;
+  bool _isLoading = false;
+  String? _errorMessage; // For local error display
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthFirebaseDataSource _authService = AuthFirebaseDataSourceImpl(); // Instantiate your service
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
-  // Helper to show snackbar messages
   void _showSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -45,8 +52,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // --- Existing Email/Password Submit Form ---
+  void _clearError() {
+    setState(() {
+      _errorMessage = null;
+    });
+  }
+
   Future<void> _submitAuthForm() async {
+    _clearError();
+
     setState(() {
       _isLoading = true;
     });
@@ -57,18 +71,53 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        // StreamBuilder in main.dart will handle navigation on successful login
       } else {
-        await _auth.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+        // Sign Up Flow
+        if (_passwordController.text != _confirmPasswordController.text) {
+          _showSnackBar('Passwords do not match!');
+          setState(() { _isLoading = false; });
+          return;
+        }
+        if (_firstNameController.text.isEmpty ||
+            _lastNameController.text.isEmpty ||
+            _selectedGender == null ||
+            _ageController.text.isEmpty) {
+          _showSnackBar('Please fill in all required fields.');
+          setState(() { _isLoading = false; });
+          return;
+        }
+
+        final int? age = int.tryParse(_ageController.text.trim());
+        if (age == null || age <= 0 || age > 120) { // Added age validation
+          _showSnackBar('Please enter a valid age (1-120).');
+          setState(() { _isLoading = false; });
+          return;
+        }
+
+        await _authService.signUpWithEmailAndPassword(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+          _firstNameController.text.trim(),
+          _lastNameController.text.trim(),
+          _selectedGender!,
+          age,
         );
-        // For new user, set hasCompletedTour to false to show the tour
+
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('hasCompletedTour', false);
+        if (!prefs.containsKey('hasCompletedTour')) {
+          await prefs.setBool('hasCompletedTour', false);
+        }
         _showSnackBar('Account created successfully! Please log in.');
         setState(() {
           _isLogin = true; // Switch to login mode after successful sign-up
+          // Clear all fields after successful sign-up
+          _emailController.clear();
+          _passwordController.clear();
+          _confirmPasswordController.clear();
+          _firstNameController.clear();
+          _lastNameController.clear();
+          _ageController.clear();
+          _selectedGender = null;
         });
       }
     } on FirebaseAuthException catch (e) {
@@ -76,9 +125,13 @@ class _LoginScreenState extends State<LoginScreen> {
       if (e.message != null) {
         message = e.message!;
       }
-      _showSnackBar(message); // Show specific Firebase Auth error
+      setState(() {
+        _errorMessage = message;
+      });
     } catch (e) {
-      _showSnackBar('An unexpected error occurred.'); // Show general error
+      setState(() {
+        _errorMessage = 'An unexpected error occurred.';
+      });
     } finally {
       setState(() {
         _isLoading = false;
@@ -86,8 +139,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // --- RE-ADD: Google Sign-In Function ---
   Future<void> _handleGoogleSignIn() async {
+    _clearError();
     setState(() {
       _isLoading = true;
     });
@@ -105,12 +158,20 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
-      // If we reach here, signInWithCredential was successful.
-      // The StreamBuilder in main.dart will handle navigation.
-      // So, we do NOT show a success snackbar here.
-      // We only show error snackbars if an exception is caught.
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
 
+      if (user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        if (!prefs.containsKey('hasCompletedTour')) {
+          await prefs.setBool('hasCompletedTour', false);
+        }
+        // No direct navigation here. main.dart's StreamBuilder handles it.
+      } else {
+        setState(() {
+          _errorMessage = 'Google Sign-In failed: No user found.';
+        });
+      }
     } on FirebaseAuthException catch (e) {
       print('Firebase Auth Error: ${e.code} - ${e.message}');
       String errorMessage = 'Sign-In Error: ${e.message ?? 'Unknown error'}';
@@ -119,10 +180,14 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (e.code == 'network-request-failed') {
         errorMessage = 'Network error. Please check your internet connection.';
       }
-      _showSnackBar(errorMessage); // Only show error snackbar
+      setState(() {
+        _errorMessage = errorMessage;
+      });
     } catch (e) {
       print('Google Sign-In Error: $e');
-      _showSnackBar('An unexpected error occurred. Please try again.'); // Only show error snackbar
+      setState(() {
+        _errorMessage = 'An unexpected error occurred.';
+      });
     } finally {
       if (mounted) {
         setState(() {
@@ -131,36 +196,48 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
-  // --- Existing Guest Login Function ---
+
+  // CRITICAL CHANGE: _signInAsGuest now signs in anonymously with Firebase
   Future<void> _signInAsGuest() async {
+    _clearError();
     setState(() {
       _isLoading = true;
     });
     try {
+      // Perform anonymous sign-in with Firebase Authentication
+      await _auth.signInAnonymously(); // THIS IS THE KEY CHANGE
+
+      // The 'isGuest' SharedPreferences flag is no longer strictly needed
+      // because Firebase Authentication will now track the anonymous user.
+      // You can keep it if you have other app logic that specifically relies
+      // on this flag, but for basic authentication, it's redundant.
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isGuest', true); // Mark as guest in SharedPreferences
-      await prefs.setBool('hasCompletedTour', prefs.getBool('hasCompletedTour') ?? false); // Preserve existing tour status
-
-      bool hasCompletedTour = prefs.getBool('hasCompletedTour') ?? false;
-
-      // Navigate directly for guest. Note: This bypasses the main.dart StreamBuilder
-      // for authentication state, as guest users are not Firebase authenticated.
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => hasCompletedTour
-              ? HelpPage(themeModeNotifier: widget.themeModeNotifier)
-              : HelpPage(themeModeNotifier: widget.themeModeNotifier),
-        ),
-            (Route<dynamic> route) => false,
-      );
-
-    } catch (e) {
-      _showSnackBar('Failed to sign in as guest: $e');
-    } finally {
+      if (!prefs.containsKey('hasCompletedTour')) {
+        await prefs.setBool('hasCompletedTour', false);
+      }
+      // No direct navigation here. main.dart will now pick this up
+      // because Firebase Auth state will change (user is now anonymously logged in).
+    } on FirebaseAuthException catch (e) {
+      String message = 'Failed to sign in as guest.';
+      if (e.code == 'operation-not-allowed') {
+        message = 'Anonymous sign-in is not enabled for your Firebase project. Please enable it in Firebase Console.';
+      } else if (e.message != null) {
+        message = e.message!;
+      }
       setState(() {
-        _isLoading = false;
+        _errorMessage = message;
       });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to sign in as guest: $e';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -186,7 +263,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo/App Title
               Text(
                 'Health App',
                 style: theme.textTheme.displayLarge?.copyWith(
@@ -196,6 +272,94 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 40),
+
+              // --- NEW: First Name, Last Name, Gender, Age fields for Sign Up ---
+              if (!_isLogin) ...[
+                TextField(
+                  controller: _firstNameController,
+                  keyboardType: TextInputType.name,
+                  decoration: InputDecoration(
+                    labelText: 'First Name',
+                    hintText: 'Enter your first name',
+                    labelStyle: theme.textTheme.headlineSmall,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: Icon(Icons.person, color: colorScheme.secondary),
+                  ),
+                  style: theme.textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _lastNameController,
+                  keyboardType: TextInputType.name,
+                  decoration: InputDecoration(
+                    labelText: 'Last Name',
+                    hintText: 'Enter your last name',
+                    labelStyle: theme.textTheme.headlineSmall,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: Icon(Icons.person_outline, color: colorScheme.secondary),
+                  ),
+                  style: theme.textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 16),
+                // Gender Selection
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                      child: Text(
+                        'Gender:',
+                        style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onSecondary),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text('Male', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary)),
+                            value: 'Male',
+                            groupValue: _selectedGender,
+                            onChanged: (String? value) {
+                              setState(() {
+                                _selectedGender = value;
+                              });
+                            },
+                            activeColor: colorScheme.secondary,
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text('Female', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary)),
+                            value: 'Female',
+                            groupValue: _selectedGender,
+                            onChanged: (String? value) {
+                              setState(() {
+                                _selectedGender = value;
+                              });
+                            },
+                            activeColor: colorScheme.secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _ageController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Age',
+                    hintText: 'Enter your age',
+                    labelStyle: theme.textTheme.headlineSmall,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: Icon(Icons.cake, color: colorScheme.secondary), // Cake icon for age
+                  ),
+                  style: theme.textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 16),
+              ], // End of new fields for sign-up
+
               // Email Field
               TextField(
                 controller: _emailController,
@@ -221,7 +385,35 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 style: theme.textTheme.bodyLarge,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16), // Adjusted spacing
+
+              // Confirm Password Field (only for Sign Up mode)
+              if (!_isLogin) ...[
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    hintText: 'Re-enter your password',
+                    labelStyle: theme.textTheme.headlineSmall,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: Icon(Icons.lock_reset, color: colorScheme.secondary),
+                  ),
+                  style: theme.textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 24), // Spacing after confirm password
+              ] else ...[
+                const SizedBox(height: 24), // Maintain spacing if not in sign-up mode
+              ],
+
+              // Error Message
+              if (_errorMessage != null)
+                Text(
+                  _errorMessage!,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+                  textAlign: TextAlign.center,
+                ),
+              if (_errorMessage != null) const SizedBox(height: 16),
 
               // Login/Signup Button
               _isLoading
@@ -249,29 +441,29 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
               _isLoading
-                  ? const SizedBox.shrink() // Hide if loading any auth method
+                  ? const SizedBox.shrink()
                   : SizedBox(
-                width: double.infinity, // Make it full width
+                width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: _handleGoogleSignIn,
                   icon: Image.asset(
-                    'assets/google logo.png', // Ensure this asset exists
+                    'assets/google logo.png', // Corrected asset path
                     height: 24,
                   ),
                   label: Text(
                     'Sign in with Google',
                     style: theme.textTheme.titleMedium?.copyWith(
                         fontSize: 18,
-                        color: colorScheme.onPrimary // Adjusted for white background
+                        color: colorScheme.onPrimary
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary, // Typically white/light for Google button
+                    backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12), // Match other buttons
-                      side: BorderSide(color: colorScheme.onPrimary.withOpacity(0.2)), // Light border
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: colorScheme.onPrimary.withOpacity(0.2)),
                     ),
                     elevation: 3,
                   ),
@@ -283,8 +475,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {
                   setState(() {
                     _isLogin = !_isLogin;
-                    _emailController.clear(); // Clear fields on toggle
+                    // Clear all fields when toggling mode
+                    _emailController.clear();
                     _passwordController.clear();
+                    _confirmPasswordController.clear(); // Clear confirm password
+                    _firstNameController.clear();
+                    _lastNameController.clear();
+                    _ageController.clear();
+                    _selectedGender = null; // Clear gender selection
+                    _clearError(); // Clear error on toggle
                   });
                 },
                 style: TextButton.styleFrom(
@@ -298,18 +497,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10), // Space before OR
+              const SizedBox(height: 10),
 
-              // --- OR Divider ---
               Text(
                 'OR',
                 style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
               ),
               const SizedBox(height: 10),
 
-              // --- RE-ADD: Google Sign-In Button ---
-
-              // --- Existing "Continue as Guest" Button ---
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -332,8 +527,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-
-              // Optional: Theme toggle button on login screen
             ],
           ),
         ),

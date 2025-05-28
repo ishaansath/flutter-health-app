@@ -1,11 +1,15 @@
+// lib/account_settings_page.dart (MODIFIED to include Age & Radio Buttons)
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ishaan/auth_firebase_data.dart'; // Make sure this is imported
+import 'package:cloud_firestore/cloud_firestore.dart'; // Ensure this is imported
+import 'package:ishaan/auth_firebase_data.dart'; // Make sure this is imported (adjust path if different)
 import 'package:ishaan/login_screen.dart'; // Import your LoginScreen
 
 class AccountSettingsPage extends StatefulWidget {
-  const AccountSettingsPage({super.key});
+  final ValueNotifier<ThemeMode> themeModeNotifier; // Add themeModeNotifier here
+
+  const AccountSettingsPage({super.key, required this.themeModeNotifier}); // Update constructor
 
   @override
   State<AccountSettingsPage> createState() => _AccountSettingsPageState();
@@ -13,12 +17,17 @@ class AccountSettingsPage extends StatefulWidget {
 
 class _AccountSettingsPageState extends State<AccountSettingsPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // We'll use AuthFirebaseDataSourceImpl directly for profile operations
+  final AuthFirebaseDataSource _authService = AuthFirebaseDataSourceImpl();
+
   User? _currentUser;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  String? _selectedGender;
+  final TextEditingController _ageController = TextEditingController(); // NEW: Age controller
+  String? _selectedGender; // Changed to String? for radio buttons
+
   bool _isLoading = false;
+  String? _errorMessage; // To display specific errors
 
   @override
   void initState() {
@@ -31,38 +40,60 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _ageController.dispose(); // Dispose age controller
     super.dispose();
   }
 
-  Future<void> _loadUserData() async {
-    if (_currentUser == null) return;
+  void _showSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
 
+  void _clearError() {
+    setState(() {
+      _errorMessage = null;
+    });
+  }
+
+  Future<void> _loadUserData() async {
+    if (_currentUser == null) {
+      _showSnackBar('User not logged in.');
+      return;
+    }
+
+    _clearError();
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final userDoc = await _firestore.collection('users').doc(_currentUser!.uid).get();
-      if (userDoc.exists) {
-        final data = userDoc.data();
-        _firstNameController.text = data?['firstName'] ?? '';
-        _lastNameController.text = data?['lastName'] ?? '';
-        _selectedGender = data?['gender'];
+      // Use the getUserProfile method from your auth service
+      final userProfile = await _authService.getUserProfile(_currentUser!.uid);
+
+      if (userProfile != null) {
+        _firstNameController.text = userProfile.firstName;
+        _lastNameController.text = userProfile.lastName;
+        _selectedGender = userProfile.gender;
+        _ageController.text = userProfile.age?.toString() ?? ''; // Set age controller
       } else {
-        // Corrected null-safety for displayName and splitting
-        // This was likely the source of "The operator '>' can't be unconditionally invoked because the receiver can be 'null'."
+        // If profile not found in Firestore, try to pre-fill from Firebase Auth display name
         final String? displayName = _currentUser?.displayName;
         List<String> nameParts = displayName?.split(' ') ?? [];
 
         _firstNameController.text = nameParts.isNotEmpty ? nameParts[0] : '';
         _lastNameController.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
         _selectedGender = 'Prefer not to say'; // Default if not found
+        _ageController.text = ''; // Default empty
       }
+    } on FirebaseException catch (e) {
+      _errorMessage = 'Failed to load user data: ${e.message}';
+      print('Firebase Error loading user data: $e');
     } catch (e) {
-      print('Error loading user data: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load user data: $e')),
-      );
+      _errorMessage = 'Failed to load user data: $e';
+      print('General Error loading user data: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -71,8 +102,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   Future<void> _saveChanges() async {
-    if (_currentUser == null) return;
+    if (_currentUser == null) {
+      _showSnackBar('User not logged in.');
+      return;
+    }
 
+    _clearError();
     setState(() {
       _isLoading = true;
     });
@@ -81,48 +116,46 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       final String newFirstName = _firstNameController.text.trim();
       final String newLastName = _lastNameController.text.trim();
       final String newGender = _selectedGender ?? 'Prefer not to say';
+      final int? newAge = int.tryParse(_ageController.text.trim());
 
-      // 1. Update Firebase Auth profile (displayName)
-      String newDisplayName = '';
-      if (newFirstName.isNotEmpty) newDisplayName += newFirstName;
-      if (newLastName.isNotEmpty) {
-        if (newDisplayName.isNotEmpty) newDisplayName += ' ';
-        newDisplayName += newLastName;
+      // Basic validation
+      if (newFirstName.isEmpty || newLastName.isEmpty || _selectedGender == null || _ageController.text.isEmpty) {
+        _showSnackBar('Please fill in all required fields.');
+        setState(() { _isLoading = false; });
+        return;
       }
 
-      if (newDisplayName.isNotEmpty && _currentUser!.displayName != newDisplayName) {
-        await _currentUser!.updateDisplayName(newDisplayName);
-        print('Updated Firebase Auth display name: $newDisplayName');
+      if (newAge == null || newAge <= 0 || newAge > 120) {
+        _showSnackBar('Please enter a valid age (1-120).');
+        setState(() { _isLoading = false; });
+        return;
       }
 
-      // 2. Save data to Firestore
-      await _firestore.collection('users').doc(_currentUser!.uid).set({
-        'firstName': newFirstName,
-        'lastName': newLastName,
-        'gender': newGender,
-        'email': _currentUser!.email,
-        'lastUpdated': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      // Use the updateUserData method from your auth service
+      await _authService.updateUserData(
+        _currentUser!.uid,
+        newFirstName,
+        newLastName,
+        newGender,
+        newAge,
+      );
 
-      // 3. Reload current user to reflect latest changes locally
+      // Reload current user object to reflect latest changes from Firebase Auth (displayName)
       await _currentUser!.reload();
       _currentUser = _auth.currentUser; // Update the local _currentUser instance
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Changes saved successfully!')),
-      );
+      _showSnackBar('Changes saved successfully!');
       print('User details saved to Firestore and Firebase Auth updated.');
 
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error saving changes: ${e.code} - ${e.message}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save changes: ${e.message}')),
-      );
+      _errorMessage = 'Failed to save changes: ${e.message}';
+      print('Firebase Auth Error saving changes: $e');
+    } on FirebaseException catch (e) {
+      _errorMessage = 'Failed to save changes: ${e.message}';
+      print('Firebase Error saving changes: $e');
     } catch (e) {
+      _errorMessage = 'Failed to save changes: $e';
       print('General Error saving changes: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save changes: $e')),
-      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -130,28 +163,28 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     }
   }
 
-  // --- LOGOUT BUTTON IMPLEMENTATION ---
   Future<void> _logout() async {
+    _clearError();
     setState(() {
       _isLoading = true;
     });
     try {
-      final AuthFirebaseDataSourceImpl authDataSource = AuthFirebaseDataSourceImpl();
-      await authDataSource.logout();
+      await _authService.logout();
 
       if (mounted) {
         // Navigate to LoginScreen and remove all previous routes
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => LoginScreen(themeModeNotifier: ValueNotifier(ThemeMode.system))),
+          MaterialPageRoute(builder: (context) => LoginScreen(themeModeNotifier: widget.themeModeNotifier)),
               (Route<dynamic> route) => false, // This predicate ensures all previous routes are removed
         );
       }
       print('Successfully logged out and navigated to login screen.');
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = 'Logout failed: ${e.message}';
+      print('Firebase Auth Error during logout: $e');
     } catch (e) {
-      print('Error during logout: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Logout failed: $e')),
-      );
+      _errorMessage = 'Logout failed: $e';
+      print('General Error during logout: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -167,7 +200,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.primary, // Changed to primary for consistency with LoginScreen
       appBar: AppBar(
         title: Text(
           'Account Settings',
@@ -189,55 +222,106 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onBackground),
             ),
             const SizedBox(height: 20),
+
             TextField(
               controller: _firstNameController,
+              keyboardType: TextInputType.name,
               decoration: InputDecoration(
                 labelText: 'First Name',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                prefixIcon: Icon(Icons.person, color: colorScheme.onSurfaceVariant),
+                prefixIcon: Icon(Icons.person, color: colorScheme.secondary), // Changed color
               ),
-              style: TextStyle(color: colorScheme.onBackground),
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground), // Ensure text color is readable
             ),
             const SizedBox(height: 16),
+
             TextField(
               controller: _lastNameController,
+              keyboardType: TextInputType.name,
               decoration: InputDecoration(
                 labelText: 'Last Name',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                prefixIcon: Icon(Icons.person, color: colorScheme.onSurfaceVariant),
+                prefixIcon: Icon(Icons.person, color: colorScheme.secondary), // Changed color
               ),
-              style: TextStyle(color: colorScheme.onSecondary),
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground), // Ensure text color is readable
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedGender,
+
+            // NEW: Gender Radio Buttons (consistent with LoginScreen)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                  child: Text(
+                    'Gender:',
+                    style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onBackground),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: Text('Male', style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground)),
+                        value: 'Male',
+                        groupValue: _selectedGender,
+                        onChanged: (String? value) {
+                          setState(() {
+                            _selectedGender = value;
+                          });
+                        },
+                        activeColor: colorScheme.secondary,
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: Text('Female', style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground)),
+                        value: 'Female',
+                        groupValue: _selectedGender,
+                        onChanged: (String? value) {
+                          setState(() {
+                            _selectedGender = value;
+                          });
+                        },
+                        activeColor: colorScheme.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // NEW: Age TextField
+            TextField(
+              controller: _ageController,
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: 'Gender',
+                labelText: 'Age',
+                hintText: 'Enter your age',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                prefixIcon: Icon(Icons.transgender, color: colorScheme.onSurfaceVariant),
+                prefixIcon: Icon(Icons.cake, color: colorScheme.secondary), // Cake icon for age
               ),
-              items: <String>['Male', 'Female', 'None']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedGender = newValue;
-                });
-              },
-              style: TextStyle(color: colorScheme.onBackground),
-              dropdownColor: colorScheme.surface,
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground), // Ensure text color is readable
             ),
             const SizedBox(height: 32),
+
+            // Error Message Display
+            if (_errorMessage != null)
+              Text(
+                _errorMessage!,
+                style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+                textAlign: TextAlign.center,
+              ),
+            if (_errorMessage != null) const SizedBox(height: 16),
+
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -264,6 +348,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               ),
             ),
             const SizedBox(height: 24),
+
             // --- LOGOUT BUTTON ---
             SizedBox(
               width: double.infinity,
