@@ -1,12 +1,14 @@
-// lib/settings_page.dart (UPDATED - Removed AccountSettingsPage definition)
+// lib/settings_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ishaan/help_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// NEW: Import the new AccountSettingsPage file
 import 'package:ishaan/account_settings.dart';
-// import 'package:ishaan/data/auth_firebase_data.dart'; // No longer needed here as logout is in AccountSettingsPage
+
+// NEW: Import provider and your MascotProvider
+import 'package:provider/provider.dart';
+import 'package:ishaan/mascot_provider.dart';
 
 // Placeholder for future About Page (kept simple)
 class AboutPage extends StatelessWidget {
@@ -21,10 +23,10 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'About App',
-          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
+          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onSecondary),
         ),
         backgroundColor: colorScheme.primary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        iconTheme: IconThemeData(color: colorScheme.onSecondary),
       ),
       body: Center(
         child: Text(
@@ -95,6 +97,8 @@ class _SettingsPageState extends State<SettingsPage> {
         return 'Light Theme';
       case ThemeMode.dark:
         return 'Dark Theme';
+      default: // Fallback for safety, though exhaustive
+        return 'Unknown';
     }
   }
 
@@ -117,131 +121,135 @@ class _SettingsPageState extends State<SettingsPage> {
     final colorScheme = theme.colorScheme;
     final User? currentUser = FirebaseAuth.instance.currentUser;
 
-    return Scaffold(
-      backgroundColor: colorScheme.primary,
-      appBar: AppBar(
-        backgroundColor: colorScheme.primary,
-        elevation: 0,
-        title: Text(
-          'Settings',
-          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
-        ),
-        centerTitle: true,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-        children: [
-          // --- Profile Picture and Name (Top Center) ---
-          Center(
-            child: Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: colorScheme.secondary,
-                      width: 3.0,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: colorScheme.surface,
-                    backgroundImage: currentUser?.photoURL != null
-                        ? NetworkImage(currentUser!.photoURL!)
-                        : null,
-                    child: currentUser?.photoURL == null
-                        ? Icon(
-                      Icons.person,
-                      color: colorScheme.onSurface,
-                      size: 60,
-                    )
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  currentUser?.displayName ?? currentUser?.email ?? 'Guest User',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.onBackground,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  currentUser?.email ?? '',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onBackground.withOpacity(0.7),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-              ],
+    // Wrap the Scaffold with Consumer to access MascotProvider
+    return Consumer<MascotProvider>( // <--- NEW: Consumer for MascotProvider
+      builder: (context, mascotProvider, child) {
+        return Scaffold(
+          backgroundColor: colorScheme.primary,
+          appBar: AppBar(
+            backgroundColor: colorScheme.primary,
+            elevation: 0,
+            title: Text(
+              'Settings',
+              style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onSecondary),
             ),
+            centerTitle: true,
+            iconTheme: IconThemeData(color: colorScheme.onSecondary),
           ),
+          body: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+            children: [
+              // --- Profile Picture and Name (Top Center) ---
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.secondary,
+                          width: 3.0,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: colorScheme.surface,
+                        backgroundImage: currentUser?.photoURL != null
+                            ? NetworkImage(currentUser!.photoURL!)
+                            : null,
+                        child: currentUser?.photoURL == null
+                            ? Icon(
+                          Icons.person,
+                          color: colorScheme.onSurface,
+                          size: 60,
+                        )
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      currentUser?.displayName ?? currentUser?.email ?? 'Guest User',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: colorScheme.onBackground,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      currentUser?.email ?? '',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onBackground.withOpacity(0.7),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
 
-          // --- Account Settings Option ---
-          // --- Account Settings Option ---
-          _buildSettingsOption(
-            context,
-            theme,
-            colorScheme,
-            title: 'Account Settings',
-            icon: Icons.account_circle,
-            onTap: () async { // <--- ADD 'async' HERE
-              await Navigator.push( // <--- ADD 'await' HERE
+              // --- Account Settings Option ---
+              _buildSettingsOption(
                 context,
-                MaterialPageRoute(builder: (context) => AccountSettingsPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system))),
-              );
-              // This block will execute AFTER you pop back from AccountSettingsPage
-              if (mounted) {
-                setState(() {
-                  // This tells Flutter to rebuild the SettingsPage,
-                  // which will re-read `FirebaseAuth.instance.currentUser`
-                  // and update the displayed name/email.
-                  print('SettingsPage: Refreshing UI after returning from Account Settings.');
-                });
-              }
-            },
-          ),
-          const SizedBox(height: 16.0),
+                theme,
+                colorScheme,
+                title: 'Account Settings',
+                icon: Icons.account_circle,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AccountSettingsPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system))),
+                  );
+                  if (mounted) {
+                    setState(() {
+                      print('SettingsPage: Refreshing UI after returning from Account Settings.');
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16.0),
 
-          // --- Theme Settings (Existing) ---
-          _buildThemeExpansionTile(context, theme, colorScheme),
-          const SizedBox(height: 16.0),
+              // --- NEW: Mascot Selection Option ---
+              _buildMascotSelectionTile(context, theme, colorScheme, mascotProvider), // <--- NEW
+              const SizedBox(height: 16.0),
 
-          // --- Help Page Link (Existing) ---
-          _buildSettingsOption(
-            context,
-            theme,
-            colorScheme,
-            title: 'Help',
-            icon: Icons.help_outline,
-            onTap: () {
-              Navigator.push(
+              // --- Theme Settings (Existing) ---
+              _buildThemeExpansionTile(context, theme, colorScheme),
+              const SizedBox(height: 16.0),
+
+              // --- Help Page Link (Existing) ---
+              _buildSettingsOption(
                 context,
-                MaterialPageRoute(builder: (context) => HelpPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system),)),
-              );
-            },
-          ),
-          const SizedBox(height: 16.0),
+                theme,
+                colorScheme,
+                title: 'Help',
+                icon: Icons.help_outline,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HelpPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system),)),
+                  );
+                },
+              ),
+              const SizedBox(height: 16.0),
 
-          // --- About Page Link ---
-          _buildSettingsOption(
-            context,
-            theme,
-            colorScheme,
-            title: 'About',
-            icon: Icons.info_outline,
-            onTap: () {
-              Navigator.push(
+              // --- About Page Link ---
+              _buildSettingsOption(
                 context,
-                MaterialPageRoute(builder: (context) => const AboutPage()),
-              );
-            },
+                theme,
+                colorScheme,
+                title: 'About',
+                icon: Icons.info_outline,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutPage()),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -389,6 +397,96 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
         ),
       ),
+    );
+  }
+
+  // --- NEW: Helper method for Selection ---
+  Widget _buildMascotSelectionTile(BuildContext context, ThemeData theme, ColorScheme colorScheme, MascotProvider mascotProvider) {
+    return Card(
+      color: colorScheme.surface,
+      margin: const EdgeInsets.symmetric(vertical: 0.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        leading: Icon(
+          Icons.sentiment_satisfied_alt, // Icon for mascot
+          color: colorScheme.onSecondary,
+          size: 24.0,
+        ),
+        title: Text(
+          'Hero',
+          style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
+        ),
+        subtitle: Text(
+          'Current: ${mascotProvider.currentMascotName}', // Show current mascot
+          style: theme.textTheme.bodyMedium,
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 18,
+          color: colorScheme.onSecondary,
+        ),
+        onTap: () => _showMascotSelectionDialog(context, mascotProvider, theme, colorScheme),
+      ),
+    );
+  }
+
+  // --- NEW: Mascot Selection Dialog ---
+  void _showMascotSelectionDialog(BuildContext context, MascotProvider mascotProvider, ThemeData theme, ColorScheme colorScheme) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) { // Use dialogContext to avoid conflicts
+        return AlertDialog(
+          backgroundColor: colorScheme.surface,
+          title: Text(
+            'Choose your Mascot',
+            style: theme.textTheme.titleLarge,
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: mascotProvider.allMascotStaticPaths.length,
+              itemBuilder: (context, index) {
+                final mascotName = mascotProvider.allMascotStaticPaths.keys.elementAt(index);
+                final mascotImagePath = mascotProvider.allMascotStaticPaths[mascotName];
+
+                return ListTile(
+                  leading: Image.asset(
+                    mascotImagePath!, // Use static image for preview
+                    width: 40,
+                    height: 40,
+                  ),
+                  title: Text(
+                    mascotName,
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                  trailing: mascotProvider.currentMascotName == mascotName
+                      ? Icon(Icons.check, color: colorScheme.secondary)
+                      : null,
+                  onTap: () {
+                    mascotProvider.setMascot(mascotName);
+                    Navigator.pop(dialogContext); // Pop the dialog
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: colorScheme.secondary),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

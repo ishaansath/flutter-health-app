@@ -253,7 +253,7 @@ class _HelpPageState extends State<HelpPage> {
         elevation: 0,
         title: Text(
           'App Tour', // Changed title to reflect its tour purpose
-          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
+          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onSecondary),
         ),
         centerTitle: true,
         iconTheme: IconThemeData(color: colorScheme.onPrimary), // Changed to onPrimary for contrast
@@ -350,7 +350,7 @@ class _HelpPageState extends State<HelpPage> {
                 TextButton(
                   onPressed: _markTourCompletedAndNavigate, // Skip also marks as completed
                   style: TextButton.styleFrom(
-                    foregroundColor: colorScheme.onPrimary, // Text color matches AppBar's onPrimary
+                    foregroundColor: colorScheme.onSecondary, // Text color matches AppBar's onPrimary
                   ),
                   child: Text(
                     'Skip Tour',

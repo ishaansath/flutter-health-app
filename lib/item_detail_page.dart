@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:provider/provider.dart'; // NEW: Import provider
+import 'package:ishaan/mascot_provider.dart'; // NEW: Import your MascotProvider
 
 // Define an enum for clear TTS states
 enum TtsState { playing, stopped, paused, continued }
@@ -34,8 +36,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   FlutterTts flutterTts = FlutterTts();
   TtsState ttsState = TtsState.stopped; // Use the enum for state
 
-  final String _mascotIdle = 'assets/mascot.png';
-  final String _mascotTalkingGif = 'assets/gif/mascot_talking.gif';
+  // REMOVED: _mascotIdle and _mascotTalkingGif will now come from MascotProvider
+
 
   // --- Mascot Sizes & Positions ---
   // Define IDLE state for mascot
@@ -122,10 +124,11 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       }
     });
   }
+
   Future<void> _initTts() async { // Make it async
-     await flutterTts.setLanguage("en-US");
-     await flutterTts.setSpeechRate(0.4);
-     await flutterTts.setPitch(1.0);
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setSpeechRate(0.4);
+    await flutterTts.setPitch(1.0);
     // await flutterTts.setVoice({"name": "ja-jp-x-htm-network", "locale": "ja-JP"});
 
     List<dynamic> voices = await flutterTts.getVoices;
@@ -176,59 +179,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       }
     });
   }
-  // void _initTts () {
-  //   flutterTts.setLanguage("en-US");
-  //   flutterTts.setSpeechRate(0.4);
-  //   flutterTts.setPitch(1.1);
-  //   flutterTts.getVoices("en-US-Standard-J");
-  //
-  //
-  //   flutterTts.setStartHandler(() {
-  //     if (mounted) {
-  //       setState(() {
-  //         ttsState = TtsState.playing;
-  //         _updateMascotPositionAndSize();
-  //       });
-  //     }
-  //   });
-  //
-  //   flutterTts.setCompletionHandler(() {
-  //     if (mounted) {
-  //       setState(() {
-  //         ttsState = TtsState.stopped;
-  //         _updateMascotPositionAndSize();
-  //       });
-  //     }
-  //   });
-  //
-  //   flutterTts.setErrorHandler((msg) {
-  //     if (mounted) {
-  //       setState(() {
-  //         ttsState = TtsState.stopped;
-  //         _updateMascotPositionAndSize();
-  //       });
-  //     }
-  //     debugPrint("TTS Error: $msg"); // Changed to debugPrint
-  //   });
-  //
-  //   flutterTts.setPauseHandler(() {
-  //     if (mounted) {
-  //       setState(() {
-  //         ttsState = TtsState.paused;
-  //         _updateMascotPositionAndSize(); // Mascot goes down when paused
-  //       });
-  //     }
-  //   });
-  //
-  //   flutterTts.setContinueHandler(() {
-  //     if (mounted) {
-  //       setState(() {
-  //         ttsState = TtsState.continued;
-  //         _updateMascotPositionAndSize(); // Mascot goes up when continuing
-  //       });
-  //     }
-  //   });
-  // }
 
   String _cleanTextForTts(String text) {
     String cleanedText = text.replaceAll('\n', ' ');
@@ -239,9 +189,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     // but this is often sufficient for TTS.
     cleanedText = cleanedText.replaceAll(RegExp(r'[🍌🥷💡🧠⚡🐵🫐💓✨🍎🚀⛽💥📚🥬💚🧅💧⚔️🥒💊🚦🚓🫀🩸📶🚫🌻🛡️🕹️🧀🌾🥚🎈🤒😵😋🥗🍷💃🥑💪🟣🌳💨🍅🔥🧯🛠️🍊💉🎧🎶😎🥭🍇🪄👓🥝🕶️🥕🧡🦅👑🌶️👁️🌌☀️🌿🧴🍍🧼🫧🧄🫁🍐🧸🍠🕊️🚗🍽️💦🦿🦴🔐🧖‍♂️🦵💪🏽]'),
         '');
-
-
-
     return cleanedText.trim();
   }
 
@@ -314,108 +261,114 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       onPressedAction = _speak;
     }
 
-    String currentMascotGif = (ttsState == TtsState.playing || ttsState == TtsState.continued)
-        ? _mascotTalkingGif
-        : _mascotIdle;
+    // NEW: Use Consumer to get the MascotProvider and dynamically load mascot paths
+    return Consumer<MascotProvider>(
+      builder: (context, mascotProvider, child) {
+        // Get the current mascot's idle and talking GIF paths from the provider
+        String currentMascotIdle = mascotProvider.currentMascotStaticPath;
+        String currentMascotTalkingGif = mascotProvider.currentMascotSpeakingPath;
 
-    return Scaffold(
-      backgroundColor: colorScheme.primary,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(widget.name, style: theme.textTheme.titleLarge),
-        iconTheme: IconThemeData(color: colorScheme.onSecondary),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            // Crucial: Add padding to the bottom of the scrollable content
-            // to make space for the button and mascot.
-            // Adjust the '200' based on the max height your button/mascot combo takes when animated.
-            child: Padding(
-              padding: EdgeInsets.only(bottom: _mascotTalkingHeight(context) + 200), // Increased buffer
-              child: Center(
-                child: Column(
-                  children: [
-                    if (widget.modelPath.isNotEmpty)
-                      SizedBox(
-                        height: 300,
-                        child: ModelViewer(
-                          src: widget.modelPath,
-                          alt: '3D model of ${widget.name}',
-                          autoRotate: true,
-                          cameraControls: true,
-                          backgroundColor: colorScheme.primary,
-                        ),
-                      )
-                    else if (widget.image.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Image.asset(
-                          widget.image,
-                          height: 300,
-                          fit: BoxFit.contain,
-                        ),
-                      )
-                    else
-                      const SizedBox(height: 20),
+        String displayMascotGif = (ttsState == TtsState.playing || ttsState == TtsState.continued)
+            ? currentMascotTalkingGif
+            : currentMascotIdle;
 
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 1),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface,
-                              borderRadius: BorderRadius.circular(10),
+        return Scaffold(
+          backgroundColor: colorScheme.primary,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Text(widget.name, style: theme.textTheme.titleLarge),
+            iconTheme: IconThemeData(color: colorScheme.onSecondary),
+            centerTitle: true,
+          ),
+          body: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                // Crucial: Add padding to the bottom of the scrollable content
+                // to make space for the button and mascot.
+                // Adjust the '200' based on the max height your button/mascot combo takes when animated.
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: _mascotTalkingHeight(context) + 200), // Increased buffer
+                  child: Center(
+                    child: Column(
+                      children: [
+                        if (widget.modelPath.isNotEmpty)
+                          SizedBox(
+                            height: 300,
+                            child: ModelViewer(
+                              src: widget.modelPath,
+                              alt: '3D model of ${widget.name}',
+                              autoRotate: true,
+                              cameraControls: true,
+                              backgroundColor: colorScheme.primary,
                             ),
-                            child: Text(
-                              widget.description,
-                              style: theme.textTheme.bodyLarge,
-                              textAlign: TextAlign.left,
+                          )
+                        else if (widget.image.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Image.asset(
+                              widget.image,
+                              height: 300,
+                              fit: BoxFit.contain,
                             ),
-                          ),
+                          )
+                        else
                           const SizedBox(height: 20),
-                          Text(
-                            widget.additionalInfoExtra,
-                            style: theme.textTheme.bodyMedium,
-                            textAlign: TextAlign.left,
+
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 1),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  widget.description,
+                                  style: theme.textTheme.bodyLarge,
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Text(
+                                widget.additionalInfoExtra,
+                                style: theme.textTheme.bodyMedium,
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
                           ),
-                          // Removed the last SizedBox(height: 100) here to avoid double padding
-                          // as the parent Padding now handles the overall bottom spacing.
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
 
-          // --- ANIMATED MASCOT (Separate) ---
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 700),
-            curve: Curves.easeOut,
-            bottom: _currentMascotBottom,
-            right: _currentMascotRight,
-            height: _currentMascotHeight,
-            width: _currentMascotWidth,
-            child: GestureDetector( // <--- WRAP WITH GESTUREDETECTOR
-              onTap: _handleMascotTap, // <--- CALL THE NEW HANDLER
-              child: Image.asset(
-                currentMascotGif,
-                fit: BoxFit.contain,
-                gaplessPlayback: true,
+              // --- ANIMATED MASCOT ---
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 700),
+                curve: Curves.easeOut,
+                bottom: _currentMascotBottom,
+                right: _currentMascotRight,
+                height: _currentMascotHeight,
+                width: _currentMascotWidth,
+                child: GestureDetector(
+                  onTap: _handleMascotTap,
+                  child: Image.asset(
+                    displayMascotGif, // Use the dynamically determined mascot path
+                    fit: BoxFit.contain,
+                    gaplessPlayback: true,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-          // --- ANIMATED BUTTON (Separate) ---
-        ],
-      ),
+        );
+      },
     );
   }
 }

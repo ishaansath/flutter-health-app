@@ -1,12 +1,12 @@
 // lib/body_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart'; // Unused import, consider removing
 import 'package:ishaan/organ_detail_page.dart';
 import 'package:ishaan/mascot_page.dart';
-import 'package:ishaan/app_data.dart';
-import 'package:ishaan/item_detail_page.dart';
-import 'package:ishaan/nutrition_item_model.dart';
+import 'package:ishaan/app_data.dart'; // Unused import, consider removing
+import 'package:ishaan/item_detail_page.dart'; // Unused import, consider removing
+import 'package:ishaan/nutrition_item_model.dart'; // Unused import, consider removing
 import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:ishaan/nutrition_tab_content.dart';
@@ -64,13 +64,22 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     _selectedIndex = _tabController.index;
   }
 
+  // --- MODIFIED: Custom transition for navigating to SettingsPage ---
   void _navigateToSettingsPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => SettingsPage(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(
           themeModeNotifier: widget.themeModeNotifier,
         ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          // Use FadeTransition for a smooth fade-in effect
+          return SlideTransition(
+            position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)), // Apply the animated offset
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400), // Duration of the slide
       ),
     );
   }
@@ -160,7 +169,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
               onTap: _navigateToSettingsPage,
-              // --- MODIFIED: Added Container for the border ---
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -184,8 +192,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                       : null,
                 ),
               ),
-              ),
             ),
+          ),
         ],
       ),
       body: TabBarView(
@@ -299,7 +307,12 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           setState(() {
             _selectedIndex = index;
           });
-          _tabController.animateTo(index); // This will animate the TabBarView
+          // Explicitly set duration and curve for smooth animation when tapping tabs
+          _tabController.animateTo(
+            index,
+            duration: const Duration(milliseconds: 400), // Increased duration for smoother feel
+            curve: Curves.easeInOut, // A common smooth curve for navigation
+          );
         },
         items: _topTabs.map((tabName) {
           IconData icon;
@@ -371,15 +384,24 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           TextButton(
             onPressed: () {
               Navigator.pop(context);
+              // --- MODIFIED: Custom transition for navigating to OrganDetailPage ---
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => OrganDetailPage(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => OrganDetailPage(
                     organName: organName,
                     mode: _currentMode,
                     organData: AppData.organData[organName]!,
                     organ: organName,
                   ),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    // Use FadeTransition for a smooth fade-in effect
+                    return SlideTransition(
+                      position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)), // Apply the animated offset
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 400), // Duration of the slide
                 ),
               );
             },

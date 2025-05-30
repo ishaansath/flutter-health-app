@@ -1,11 +1,12 @@
-// lib/nutrition_tab_content.dart (FIXED: _getNutritionItemsForCategory definition)
+// lib/nutrition_tab_content.dart
 
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ishaan/app_data.dart' as AppData; // Alias for clarity and to avoid conflict
+import 'package:ishaan/app_data.dart' as AppData;
 import 'package:ishaan/item_detail_page.dart';
 import 'package:ishaan/nutrition_item_model.dart';
 import 'package:ishaan/searchable_nutrition_items.dart';
+import 'package:string_similarity/string_similarity.dart'; // Import the package
 
 class NutritionTabContent extends StatefulWidget {
   final String currentMode;
@@ -23,6 +24,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
   final TextEditingController _searchController = TextEditingController();
   List<SearchableNutritionItem> _allGeneralNutritionItems = [];
   List<SearchableNutritionItem> _filteredNutritionItems = [];
+  String? _suggestedQuery; // Added for "Did you mean?" functionality
 
   final List<String> _nutritionSubcategories = [
     'Fruits',
@@ -75,15 +77,42 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     print("Loaded ${_allGeneralNutritionItems.length} general nutrition items.");
   }
 
+  // New method for suggesting corrections
+  String? _getCorrectionSuggestion(String query) {
+    if (query.isEmpty) return null;
+
+    final queryLower = query.toLowerCase();
+    String? bestMatch;
+    double highestSimilarity = 0.0;
+    const double similarityThreshold = 0.1; // Adjust this threshold as needed
+
+    for (var item in _allGeneralNutritionItems) {
+      final itemNameLower = item.name.toLowerCase();
+      final similarity = itemNameLower.similarityTo(queryLower);
+
+      if (similarity > highestSimilarity && similarity >= similarityThreshold) {
+        highestSimilarity = similarity;
+        bestMatch = item.name;
+      }
+    }
+    return bestMatch;
+  }
+
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
     setState(() {
+      _suggestedQuery = null; // Clear previous suggestion
+
       if (query.isEmpty) {
         _filteredNutritionItems = List.from(_allGeneralNutritionItems);
       } else {
         _filteredNutritionItems = _allGeneralNutritionItems.where((item) {
           return item.searchableText.contains(query);
         }).toList();
+
+        if (_filteredNutritionItems.isEmpty) {
+          _suggestedQuery = _getCorrectionSuggestion(query);
+        }
 
         _filteredNutritionItems.sort((a, b) {
           final aSearchText = a.searchableText;
@@ -102,21 +131,18 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
   }
 
   // --- Helper to get NutritionItems for Carousel from app_data.dart ---
-  // THIS METHOD IS NOW CORRECTLY DEFINED AND USES AppData.generalNutritionData
   List<NutritionItem> _getNutritionItemsForCategory(String category) {
-    // Access the 'items' list within the category map from AppData
     final List<Map<String, dynamic>>? itemsDataRaw = AppData.generalNutritionData[category]?['items']
         ?.cast<Map<String, dynamic>>();
 
     if (itemsDataRaw == null) {
-      return []; // Return empty list if category or 'items' list not found
+      return [];
     }
 
     return itemsDataRaw
         .map((itemMap) => NutritionItem.fromMap(itemMap))
         .toList();
   }
-
 
   // Helper to build individual carousel item UI for the Nutrition tab
   Widget _buildNutritionCarouselItemUI(BuildContext context, NutritionItem item) {
@@ -199,23 +225,23 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
         )
             : const Icon(Icons.fastfood, size: 60),
         title: Text(
-          '${item.name} (${item.parentCategory})',
-          style: theme.textTheme.displayLarge),
+            '${item.name} (${item.parentCategory})',
+            style: theme.textTheme.displayLarge),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (item.shortDescription.isNotEmpty)
               Text(
-                item.shortDescription,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.displaySmall
+                  item.shortDescription,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.displaySmall
               ),
             Text(
-              widget.currentMode == 'fun' ? item.funModeDescription : item.normalModeDescription,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.headlineMedium),
+                widget.currentMode == 'fun' ? item.funModeDescription : item.normalModeDescription,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.headlineMedium),
 
           ],
         ),
@@ -282,9 +308,40 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             },
           ),
         ),
+        // "Did you mean?" suggestion
+        if (_searchController.text.isNotEmpty && _filteredNutritionItems.isEmpty && _suggestedQuery != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Did you mean ',
+                  style: theme.textTheme.bodyLarge,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _searchController.text = _suggestedQuery!;
+                    _onSearchChanged(); // Re-run search with the suggested query
+                    FocusScope.of(context).unfocus(); // Dismiss keyboard
+                  },
+                  child: Text(
+                    '"$_suggestedQuery"',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      decoration: TextDecoration.underline
+                    ),
+                  ),
+                ),
+                Text(
+                  '?',
+                  style: theme.textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
         Expanded(
           child: _searchController.text.isNotEmpty
-              ? (_filteredNutritionItems.isEmpty
+              ? (_filteredNutritionItems.isEmpty && _suggestedQuery == null
               ? Center(
             child: Text(
               'No results found for "${_searchController.text}"',
@@ -303,7 +360,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: _nutritionSubcategories.map((category) {
-                final List<NutritionItem> items = _getNutritionItemsForCategory(category); // Line 321
+                final List<NutritionItem> items = _getNutritionItemsForCategory(category);
                 final String categoryTitle = widget.currentMode == 'fun'
                     ? (AppData.generalNutritionData[category]?['funModeTitle'] as String? ?? category)
                     : (AppData.generalNutritionData[category]?['normalModeTitle'] as String? ?? category);

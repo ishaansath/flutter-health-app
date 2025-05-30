@@ -204,10 +204,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       appBar: AppBar(
         title: Text(
           'Account Settings',
-          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
+          style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onSecondary),
         ),
         backgroundColor: colorScheme.primary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        iconTheme: IconThemeData(color: colorScheme.onSecondary),
         centerTitle: true,
       ),
       body: _isLoading

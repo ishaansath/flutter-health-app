@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: 6.1.4
+  provider: ^6.1.5
   animations: ^2.0.8
   cupertino_icons: ^1.0.8
   model_viewer_plus: ^1.9.3
@@ -137,8 +137,8 @@ flutter:
     - assets/models/tangerine.glb
     - assets/tangerine.png
     - assets/FishTestImage.png
-    - assets/gif/mascot_talking.gif
-    - assets/mascot.png
+    - assets/mascot/CocoTalking.gif
+    - assets/mascot/Coco.png
     - assets/alzheimerdisease.png
     - assets/headache.png
     - assets/salmon.png
@@ -148,7 +148,8 @@ flutter:
     - assets/welcome page.png
     - assets/videos/body_screen_help.mp4
     - assets/google logo.png
-
+    - assets/mascot/Melonzo.png
+    - assets/mascot/MelonzoTalking.gif
 
   fonts:
     - family: Poppins
