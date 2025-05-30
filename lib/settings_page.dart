@@ -1,12 +1,12 @@
-// lib/settings_page.dart
+// lib/settings_page.dart (MODIFIED - Display First/Last Name from Firestore)
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ishaan/help_page.dart';
+import 'package:ishaan/auth_firebase_data.dart'; // Ensure this is imported correctly
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ishaan/account_settings.dart';
+import 'package:ishaan/account_settings.dart'; // Ensure this import is correct
 
-// NEW: Import provider and your MascotProvider
 import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart';
 
@@ -31,7 +31,7 @@ class AboutPage extends StatelessWidget {
       body: Center(
         child: Text(
           'About Page Content (Coming Soon!)',
-          style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground),
+          style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
         ),
       ),
     );
@@ -41,8 +41,13 @@ class AboutPage extends StatelessWidget {
 
 class SettingsPage extends StatefulWidget {
   final ValueNotifier<ThemeMode> themeModeNotifier;
+  final ValueNotifier<String> bodyModelNotifier;
 
-  const SettingsPage({super.key, required this.themeModeNotifier});
+  const SettingsPage({
+    super.key,
+    required this.themeModeNotifier,
+    required this.bodyModelNotifier,
+  });
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -50,17 +55,30 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   ThemeMode _currentSelectedThemeMode = ThemeMode.system;
+  String _currentSelectedBodyModel = 'male_body'; // Default to male body
+  UserProfile? _userProfile; // NEW: Holds user profile data from Firestore
+  bool _isLoadingProfile = true; // NEW: State to manage profile loading
+
+  // Instantiate your AuthFirebaseDataSource
+  final AuthFirebaseDataSource _authService = AuthFirebaseDataSourceImpl();
 
   @override
   void initState() {
     super.initState();
     _currentSelectedThemeMode = widget.themeModeNotifier.value;
     widget.themeModeNotifier.addListener(_onThemeNotifierChanged);
+
+    _currentSelectedBodyModel = widget.bodyModelNotifier.value;
+    widget.bodyModelNotifier.addListener(_onBodyModelNotifierChanged);
+    print('SettingsPage: Initial bodyModelNotifier value: ${widget.bodyModelNotifier.value}');
+
+    _loadUserProfile(); // NEW: Load user profile on init
   }
 
   @override
   void dispose() {
     widget.themeModeNotifier.removeListener(_onThemeNotifierChanged);
+    widget.bodyModelNotifier.removeListener(_onBodyModelNotifierChanged);
     super.dispose();
   }
 
@@ -71,6 +89,46 @@ class _SettingsPageState extends State<SettingsPage> {
       });
     }
   }
+
+  void _onBodyModelNotifierChanged() {
+    if (mounted) {
+      setState(() {
+        _currentSelectedBodyModel = widget.bodyModelNotifier.value;
+      });
+      print('SettingsPage: _onBodyModelNotifierChanged triggered. New local value: $_currentSelectedBodyModel');
+    }
+  }
+
+  // NEW: Method to load user profile from Firestore
+  Future<void> _loadUserProfile() async {
+    setState(() {
+      _isLoadingProfile = true;
+    });
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        final profile = await _authService.getUserProfile(currentUser.uid);
+        setState(() {
+          _userProfile = profile;
+        });
+        print('SettingsPage: User profile loaded: ${_userProfile?.firstName} ${_userProfile?.lastName}');
+      } catch (e) {
+        print('SettingsPage: Error loading user profile: $e');
+        setState(() {
+          _userProfile = null; // Clear profile on error
+        });
+      }
+    } else {
+      print('SettingsPage: No current user to load profile for.');
+      setState(() {
+        _userProfile = null;
+      });
+    }
+    setState(() {
+      _isLoadingProfile = false;
+    });
+  }
+
 
   Future<void> _saveThemeMode(ThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();
@@ -89,6 +147,13 @@ class _SettingsPageState extends State<SettingsPage> {
     await prefs.setString('appThemeMode', themeModeString);
   }
 
+  Future<void> _saveBodyModel(String modelKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedBodyModel', modelKey);
+    widget.bodyModelNotifier.value = modelKey;
+    print('SettingsPage: bodyModelNotifier updated to "${widget.bodyModelNotifier.value}" and saved to SharedPreferences.');
+  }
+
   String _getThemeModeName(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.system:
@@ -97,7 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return 'Light Theme';
       case ThemeMode.dark:
         return 'Dark Theme';
-      default: // Fallback for safety, though exhaustive
+      default:
         return 'Unknown';
     }
   }
@@ -115,14 +180,24 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  String _getBodyModelDisplayName(String modelKey) {
+    switch (modelKey) {
+      case 'male_body':
+        return 'Male Body';
+      case 'female_body':
+        return 'Female Body';
+      default:
+        return 'Male Body'; // Default to Male Body
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final User? currentUser = FirebaseAuth.instance.currentUser;
+    final User? currentUser = FirebaseAuth.instance.currentUser; // Still need currentUser for photoURL/email
 
-    // Wrap the Scaffold with Consumer to access MascotProvider
-    return Consumer<MascotProvider>( // <--- NEW: Consumer for MascotProvider
+    return Consumer<MascotProvider>(
       builder: (context, mascotProvider, child) {
         return Scaffold(
           backgroundColor: colorScheme.primary,
@@ -136,7 +211,9 @@ class _SettingsPageState extends State<SettingsPage> {
             centerTitle: true,
             iconTheme: IconThemeData(color: colorScheme.onSecondary),
           ),
-          body: ListView(
+          body: _isLoadingProfile // NEW: Show loading indicator if profile is being loaded
+              ? Center(child: CircularProgressIndicator(color: colorScheme.secondary))
+              : ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             children: [
               // --- Profile Picture and Name (Top Center) ---
@@ -167,8 +244,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    // NEW: Display first and last name from _userProfile
                     Text(
-                      currentUser?.displayName ?? currentUser?.email ?? 'Guest User',
+                      (_userProfile?.firstName?.isNotEmpty == true && _userProfile?.lastName?.isNotEmpty == true)
+                          ? '${_userProfile!.firstName} ${_userProfile!.lastName}'
+                          : currentUser?.email ?? 'Guest User', // Fallback to email or Guest
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: colorScheme.onBackground,
                         fontWeight: FontWeight.bold,
@@ -176,7 +256,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      currentUser?.email ?? '',
+                      currentUser?.email ?? '', // Still display email below
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onBackground.withOpacity(0.7),
                       ),
@@ -197,23 +277,28 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () async {
                   await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AccountSettingsPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system))),
+                    MaterialPageRoute(builder: (context) => AccountSettingsPage(themeModeNotifier: widget.themeModeNotifier)),
                   );
+                  // NEW: Reload user profile after returning from AccountSettingsPage
                   if (mounted) {
-                    setState(() {
-                      print('SettingsPage: Refreshing UI after returning from Account Settings.');
-                    });
+                    print('SettingsPage: Returned from Account Settings. Reloading user profile...');
+                    await _loadUserProfile();
+                    // No need for setState directly here, _loadUserProfile does it
                   }
                 },
               ),
               const SizedBox(height: 16.0),
 
               // --- NEW: Mascot Selection Option ---
-              _buildMascotSelectionTile(context, theme, colorScheme, mascotProvider), // <--- NEW
+              _buildMascotSelectionTile(context, theme, colorScheme, mascotProvider),
               const SizedBox(height: 16.0),
 
               // --- Theme Settings (Existing) ---
               _buildThemeExpansionTile(context, theme, colorScheme),
+              const SizedBox(height: 16.0),
+
+              // --- NEW: Body Model Selection ---
+              _buildBodyModelExpansionTile(context, theme, colorScheme),
               const SizedBox(height: 16.0),
 
               // --- Help Page Link (Existing) ---
@@ -226,7 +311,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HelpPage(themeModeNotifier: ValueNotifier<ThemeMode>(ThemeMode.system),)),
+                    MaterialPageRoute(builder: (context) => HelpPage(themeModeNotifier: widget.themeModeNotifier)),
                   );
                 },
               ),
@@ -400,6 +485,103 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // --- NEW: Body Model Selection Expansion Tile ---
+  Widget _buildBodyModelExpansionTile(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+    return Card(
+      color: colorScheme.surface,
+      margin: const EdgeInsets.symmetric(vertical: 0.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      child: Theme(
+        data: theme.copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          unselectedWidgetColor: colorScheme.onSecondary,
+        ),
+        child: ExpansionTile(
+          initiallyExpanded: false,
+          backgroundColor: colorScheme.surface,
+          collapsedBackgroundColor: colorScheme.surface,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            side: const BorderSide(color: Colors.transparent),
+          ),
+          collapsedShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            side: const BorderSide(color: Colors.transparent),
+          ),
+          clipBehavior: Clip.antiAlias,
+          title: Row(
+            children: [
+              Icon(
+                Icons.accessibility_new, // Icon for body model
+                color: colorScheme.onSecondary,
+                size: 24.0,
+              ),
+              const SizedBox(width: 12.0),
+              Text(
+                'Body Model',
+                style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
+              ),
+            ],
+          ),
+          subtitle: Text(
+            _getBodyModelDisplayName(_currentSelectedBodyModel),
+            style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
+          ),
+          iconColor: colorScheme.onSecondary,
+          collapsedIconColor: colorScheme.onSecondary.withOpacity(0.7),
+          children: <Widget>[
+            Column(
+              children: [
+                RadioListTile<String>(
+                  title: Text(
+                    'Male Body',
+                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                  ),
+                  value: 'male_body', // Corresponds to 'assets/models/male_body.glb'
+                  groupValue: _currentSelectedBodyModel,
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      setState(() {
+                        _currentSelectedBodyModel = value;
+                      });
+                      widget.bodyModelNotifier.value = value; // Update the notifier
+                      _saveBodyModel(value); // Save to SharedPreferences
+                    }
+                  },
+                  activeColor: colorScheme.secondary,
+                ),
+                RadioListTile<String>(
+                  title: Text(
+                    'Female Body',
+                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                  ),
+                  value: 'female_body', // Corresponds to 'assets/models/female_body.glb'
+                  groupValue: _currentSelectedBodyModel,
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      setState(() {
+                        _currentSelectedBodyModel = value;
+                      });
+                      widget.bodyModelNotifier.value = value; // Update the notifier
+                      _saveBodyModel(value); // Save to SharedPreferences
+                    }
+                  },
+                  activeColor: colorScheme.secondary,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // --- NEW: Helper method for Selection ---
   Widget _buildMascotSelectionTile(BuildContext context, ThemeData theme, ColorScheme colorScheme, MascotProvider mascotProvider) {
     return Card(
@@ -421,12 +603,12 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         subtitle: Text(
           'Current: ${mascotProvider.currentMascotName}', // Show current mascot
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
           size: 18,
-          color: colorScheme.onSecondary,
+          color: colorScheme.onSecondary.withOpacity(0.7),
         ),
         onTap: () => _showMascotSelectionDialog(context, mascotProvider, theme, colorScheme),
       ),
@@ -442,7 +624,7 @@ class _SettingsPageState extends State<SettingsPage> {
           backgroundColor: colorScheme.surface,
           title: Text(
             'Choose your Mascot',
-            style: theme.textTheme.titleLarge,
+            style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onBackground),
           ),
           content: SizedBox(
             width: double.maxFinite,
@@ -461,7 +643,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   title: Text(
                     mascotName,
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground),
                   ),
                   trailing: mascotProvider.currentMascotName == mascotName
                       ? Icon(Icons.check, color: colorScheme.secondary)

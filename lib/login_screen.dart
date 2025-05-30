@@ -264,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Health App',
+                'Kokoro',
                 style: theme.textTheme.displayLarge?.copyWith(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,

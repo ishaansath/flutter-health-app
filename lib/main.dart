@@ -1,4 +1,4 @@
-// lib/main.dart (MODIFIED FOR AUTHENTICATION FLOW)
+// lib/main.dart (MODIFIED FOR AUTHENTICATION FLOW AND FULL APP REFRESH)
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/body_screen.dart'; // Correctly import BodyScreen
@@ -14,8 +14,17 @@ import 'help_page.dart';
 import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart'; // Make sure this path is correct
 
+// NEW: ValueNotifier for theme mode
+ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
+// NEW: ValueNotifier for body model preference
+ValueNotifier<String> bodyModelNotifier = ValueNotifier('human_body'); // 'male_body', 'female_body', 'human_body'
+// NEW: ValueNotifier to trigger a full app refresh
+ValueNotifier<int> appRefreshTriggerNotifier = ValueNotifier(0); // Increment this to trigger refresh
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
 
   // --- NEW: Initialize Firebase FIRST ---
   await Firebase.initializeApp(
@@ -23,6 +32,22 @@ void main() async {
   );
   // Ensure app_data is initialized after Firebase, if it depends on Firebase
   initializeAppData(); // Keep this if it's not Firebase-dependent, otherwise adjust order
+
+  // Load saved theme preference
+  final prefs = await SharedPreferences.getInstance();
+  final String? savedThemeMode = prefs.getString('appThemeMode');
+  if (savedThemeMode != null) {
+    if (savedThemeMode == 'light') themeModeNotifier.value = ThemeMode.light;
+    if (savedThemeMode == 'dark') themeModeNotifier.value = ThemeMode.dark;
+    if (savedThemeMode == 'system') themeModeNotifier.value = ThemeMode.system;
+  }
+
+  // NEW: Load saved body model preference
+  final String? savedBodyModel = prefs.getString('selectedBodyModel');
+  if (savedBodyModel != null) {
+    bodyModelNotifier.value = savedBodyModel;
+  }
+
   runApp(const HealthApp());
 }
 
@@ -50,19 +75,50 @@ class HealthApp extends StatefulWidget {
 }
 
 class _HealthAppState extends State<HealthApp> {
-  final ValueNotifier<ThemeMode> _themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
+  // themeModeNotifier and bodyModelNotifier are now global, so no need to redeclare here
   static const String _themeModeKey = 'appThemeMode'; // Key for SharedPreferences
+
+  // NEW: Key to force MaterialApp rebuild
+  Key _appKey = UniqueKey();
 
   @override
   void initState() {
     super.initState();
-    _loadThemeMode();
+    _loadThemeMode(); // This will update the global themeModeNotifier
+
+    // Listen to bodyModelNotifier changes to force app rebuild
+    bodyModelNotifier.addListener(_onBodyModelNotifierChanged);
+    // NEW: Listen to appRefreshTriggerNotifier changes to force app rebuild
+    appRefreshTriggerNotifier.addListener(_onAppRefreshTriggered);
+  }
+
+  @override
+  void dispose() {
+    // Remove listeners
+    bodyModelNotifier.removeListener(_onBodyModelNotifierChanged);
+    appRefreshTriggerNotifier.removeListener(_onAppRefreshTriggered); // NEW: Dispose listener
+    super.dispose();
+  }
+
+  // Listener for bodyModelNotifier changes
+  void _onBodyModelNotifierChanged() {
+    print('main.dart: bodyModelNotifier changed to ${bodyModelNotifier.value}. Forcing app rebuild.');
+    setState(() {
+      _appKey = UniqueKey(); // Change the key to force MaterialApp rebuild
+    });
+  }
+
+  // NEW: Listener for appRefreshTriggerNotifier changes
+  void _onAppRefreshTriggered() {
+    print('main.dart: appRefreshTriggerNotifier triggered. Forcing app rebuild.');
+    setState(() {
+      _appKey = UniqueKey(); // Change the key to force MaterialApp rebuild
+    });
   }
 
   Future<void> _loadThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
     final String? themeModeString = prefs.getString(_themeModeKey);
-    // final bool hasCompletedTour = prefs.getBool('hasCompletedTour') ?? false; // This line is not used here
 
     ThemeMode loadedMode;
     if (themeModeString == 'light') {
@@ -73,7 +129,7 @@ class _HealthAppState extends State<HealthApp> {
       loadedMode = ThemeMode.system; // Default to system if not found or invalid
     }
 
-    _themeModeNotifier.value = loadedMode;
+    themeModeNotifier.value = loadedMode; // Update the global notifier
   }
 
   Future<void> _saveThemeMode(ThemeMode mode) async {
@@ -94,25 +150,20 @@ class _HealthAppState extends State<HealthApp> {
   }
 
   @override
-  void dispose() {
-    _themeModeNotifier.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
-      valueListenable: _themeModeNotifier,
+      valueListenable: themeModeNotifier, // Use the global notifier
       builder: (context, currentThemeMode, child) {
         // --- RE-ADD THE MULTIPROVIDER HERE ---
         return MultiProvider(
           providers: [
             // Add your MascotProvider
             ChangeNotifierProvider(create: (_) => MascotProvider()),
-            // Add any other providers you might have or add in the future here
+            // Add any other providers you might have or in the future here
           ],
           child: MaterialApp(
-            title: 'Health App',
+            key: _appKey, // NEW: Assign the dynamic key here to force rebuild
+            title: 'Kokoro',
             debugShowCheckedModeBanner: false,
             themeMode: currentThemeMode, // This controls the active theme
 
@@ -121,15 +172,15 @@ class _HealthAppState extends State<HealthApp> {
               brightness: Brightness.light,
               fontFamily: 'NotoSerif',
               colorScheme: ColorScheme.light(
-                  primary: Colors.white,
-                  onPrimary: Colors.blue.shade700,
-                  secondary: Colors.amber.shade700,
-                  onSecondary: Colors.black,
-                  surface: Colors.grey[200]!,
-                  onSurface: Colors.grey[100]!,
-                  error: Colors.red.shade700,
-                  onError: Colors.black,
-                  tertiary: Colors.cyan.shade400,
+                primary: Colors.white,
+                onPrimary: Colors.blue.shade700,
+                secondary: Colors.amber.shade700,
+                onSecondary: Colors.black,
+                surface: Colors.grey[200]!,
+                onSurface: Colors.grey[100]!,
+                error: Colors.red.shade700,
+                onError: Colors.black,
+                tertiary: Colors.cyan.shade400,
               ),
               scaffoldBackgroundColor: Colors.white,
               appBarTheme: AppBarTheme(
@@ -149,7 +200,7 @@ class _HealthAppState extends State<HealthApp> {
                 titleSmall: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w300),
                 bodySmall: TextStyle(color: Colors.black54, fontSize: 9, fontWeight: FontWeight.w200),
                 displaySmall: TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
-                displayMedium: TextStyle(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w400),
+                displayMedium: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w400),
                 displayLarge: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
                 headlineSmall: TextStyle(color: Colors.black38, fontSize: 10, fontWeight: FontWeight.w500),
               ),
@@ -242,13 +293,14 @@ class _HealthAppState extends State<HealthApp> {
                   print('User is logged in: ${snapshot.data!.email}');
                   return BodyScreen(
                     mode: 'normal', // Pass the mode you need
-                    themeModeNotifier: _themeModeNotifier, // Pass the theme notifier
+                    themeModeNotifier: themeModeNotifier, // Pass the theme notifier
+                    bodyModelNotifier: bodyModelNotifier, // PASSED: bodyModelNotifier
                   );
                 }
                 // If no user is logged in, show LoginScreen
                 print('No user logged in. Redirecting to LoginScreen.');
                 return LoginScreen(
-                  themeModeNotifier: _themeModeNotifier, // You might need to pass this to your LoginScreen too
+                  themeModeNotifier: themeModeNotifier, // You might need to pass this to your LoginScreen too
                 );
               },
             ),

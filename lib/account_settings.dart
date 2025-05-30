@@ -1,10 +1,11 @@
-// lib/account_settings_page.dart (MODIFIED to include Age & Radio Buttons)
+// lib/account_settings.dart (MODIFIED - Triggers full app refresh on save)
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Ensure this is imported
 import 'package:ishaan/auth_firebase_data.dart'; // Make sure this is imported (adjust path if different)
 import 'package:ishaan/login_screen.dart'; // Import your LoginScreen
+import 'package:ishaan/main.dart'; // NEW: Import main.dart to access global notifiers
 
 class AccountSettingsPage extends StatefulWidget {
   final ValueNotifier<ThemeMode> themeModeNotifier; // Add themeModeNotifier here
@@ -125,8 +126,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         return;
       }
 
-      if (newAge == null || newAge <= 0 || newAge > 120) {
-        _showSnackBar('Please enter a valid age (1-120).');
+      if (newAge == null || newAge <= 0 || newAge > 100) {
+        _showSnackBar('Please enter a valid age (1-100).');
         setState(() { _isLoading = false; });
         return;
       }
@@ -147,6 +148,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       _showSnackBar('Changes saved successfully!');
       print('User details saved to Firestore and Firebase Auth updated.');
 
+      // NEW: Trigger a full app refresh after saving changes
+      appRefreshTriggerNotifier.value++;
+      print('AccountSettingsPage: Triggered full app refresh.');
+
     } on FirebaseAuthException catch (e) {
       _errorMessage = 'Failed to save changes: ${e.message}';
       print('Firebase Auth Error saving changes: $e');
@@ -154,7 +159,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       _errorMessage = 'Failed to save changes: ${e.message}';
       print('Firebase Error saving changes: $e');
     } catch (e) {
-      _errorMessage = 'Failed to save changes: $e';
+      _errorMessage = '';
       print('General Error saving changes: $e');
     } finally {
       setState(() {
@@ -169,7 +174,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       _isLoading = true;
     });
     try {
-      await _authService.logout();
+      await _authService.logout(); // Corrected method name
 
       if (mounted) {
         // Navigate to LoginScreen and remove all previous routes
@@ -219,7 +224,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           children: [
             Text(
               'Profile Information',
-              style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onBackground),
+              style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onSecondary),
             ),
             const SizedBox(height: 20),
 
@@ -233,7 +238,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
                 prefixIcon: Icon(Icons.person, color: colorScheme.secondary), // Changed color
               ),
-              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground), // Ensure text color is readable
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary), // Ensure text color is readable
             ),
             const SizedBox(height: 16),
 
@@ -247,7 +252,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
                 prefixIcon: Icon(Icons.person, color: colorScheme.secondary), // Changed color
               ),
-              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground), // Ensure text color is readable
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary), // Ensure text color is readable
             ),
             const SizedBox(height: 16),
 
@@ -259,14 +264,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                   child: Text(
                     'Gender:',
-                    style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onBackground),
+                    style: theme.textTheme.headlineSmall?.copyWith(color: colorScheme.onSecondary),
                   ),
                 ),
                 Row(
                   children: [
                     Expanded(
                       child: RadioListTile<String>(
-                        title: Text('Male', style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground)),
+                        title: Text('Male', style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary)),
                         value: 'Male',
                         groupValue: _selectedGender,
                         onChanged: (String? value) {
@@ -279,7 +284,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     ),
                     Expanded(
                       child: RadioListTile<String>(
-                        title: Text('Female', style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground)),
+                        title: Text('Female', style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary)),
                         value: 'Female',
                         groupValue: _selectedGender,
                         onChanged: (String? value) {
@@ -308,7 +313,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
                 prefixIcon: Icon(Icons.cake, color: colorScheme.secondary), // Cake icon for age
               ),
-              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground), // Ensure text color is readable
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary), // Ensure text color is readable
             ),
             const SizedBox(height: 32),
 

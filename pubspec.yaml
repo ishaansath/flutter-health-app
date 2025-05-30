@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
   sdk: ^3.7.2
@@ -39,7 +39,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/body_outline.png
     - assets/brain.png
     - assets/eyes.png
     - assets/heart.png
@@ -150,6 +149,9 @@ flutter:
     - assets/google logo.png
     - assets/mascot/Melonzo.png
     - assets/mascot/MelonzoTalking.gif
+    - assets/models/male_body.glb
+    - assets/models/female_body.glb
+
 
   fonts:
     - family: Poppins

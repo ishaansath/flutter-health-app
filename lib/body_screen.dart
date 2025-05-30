@@ -1,29 +1,29 @@
-// lib/body_screen.dart
+// lib/body_screen.dart (LATEST FULL VERSION - Fixed _getBodyModelPath logic, Male as Default, and Male Body Offset by shifting target)
 
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart'; // Unused import, consider removing
 import 'package:ishaan/organ_detail_page.dart';
 import 'package:ishaan/mascot_page.dart';
-import 'package:ishaan/app_data.dart'; // Unused import, consider removing
-import 'package:ishaan/item_detail_page.dart'; // Unused import, consider removing
-import 'package:ishaan/nutrition_item_model.dart'; // Unused import, consider removing
 import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:ishaan/nutrition_tab_content.dart';
 import 'package:ishaan/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 import 'app_data.dart' as AppData;
+import 'package:ishaan/main.dart'; // Import main.dart to access global notifiers if needed, or ensure they are passed
 
 
 class BodyScreen extends StatefulWidget {
   final String mode;
   final ValueNotifier<ThemeMode> themeModeNotifier;
+  final ValueNotifier<String> bodyModelNotifier; // Accept bodyModelNotifier
 
   const BodyScreen({
     super.key,
     required this.mode,
     required this.themeModeNotifier,
+    required this.bodyModelNotifier, // Update constructor
   });
 
   @override
@@ -37,8 +37,13 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
   final List<String> _topTabs = ['Body', 'Nutrition', 'Mascot'];
 
-  // This variable correctly holds the currently selected index for the BottomNavigationBar
   int _selectedIndex = 0;
+
+  // IMPORTANT: You MUST have these files:
+  // 'assets/models/male_body.glb'
+  // 'assets/models/female_body.glb'
+  // in your project's assets folder, and ensure they are declared in pubspec.yaml.
+  // If these files are missing, the app will crash or the model won't load.
 
   @override
   void initState() {
@@ -48,38 +53,79 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     flutterTts = FlutterTts();
     _initializeTtsGeneral();
 
-    // The key fix is here: listen directly to `_tabController.index` changes
     _tabController.addListener(() {
-      // Only update if the index has actually changed to avoid unnecessary setState calls
       if (_selectedIndex != _tabController.index) {
         setState(() {
           _selectedIndex = _tabController.index;
         });
-        // Stop TTS when the tab changes, regardless of whether it was a tap or swipe
         flutterTts.stop();
       }
     });
 
-    // Initialize _selectedIndex with the initial tab controller index
     _selectedIndex = _tabController.index;
   }
 
-  // --- MODIFIED: Custom transition for navigating to SettingsPage ---
+  @override
+  void dispose() {
+    _tabController.dispose();
+    flutterTts.stop();
+    super.dispose();
+  }
+
+  // Helper to get the model path based on the key
+  String _getBodyModelPath(String modelKey) {
+    String path;
+    switch (modelKey) {
+      case 'female_body':
+        path = 'assets/models/female_body.glb';
+        break;
+      case 'male_body': // Explicitly handle male_body
+      default: // Default to male_body if not female or unrecognized
+        path = 'assets/models/male_body.glb';
+        break;
+    }
+    print('BodyScreen: _getBodyModelPath called with "$modelKey", returning path: "$path"');
+    return path;
+  }
+
+  // Helper to get the camera orbit string based on the model key
+  // This controls the camera's position relative to the target.
+  String _getCameraOrbit(String modelKey) {
+    // We are now shifting the model using cameraTarget, so orbit can be standard
+    return '0deg 90deg auto'; // Keeping a standard orbit
+  }
+
+  // NEW Helper: To get the camera target based on the model key
+  // This controls where the camera is looking, effectively shifting the model's visible position.
+  String _getCameraTarget(String modelKey) {
+    switch (modelKey) {
+      case 'male_body':
+      // Shift target right (positive X) to make the model appear right
+      // You might need to fine-tune these values (e.g., '0.1m 0m 0m')
+        return '0.1m auto auto'; // Example: Shift 0.1 meters to the right
+      case 'female_body':
+        return '0m auto auto'; // Default target for female (center)
+      default:
+        return '0m 0m 0m'; // Default target (center)
+    }
+  }
+
+
   void _navigateToSettingsPage() {
     Navigator.push(
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(
           themeModeNotifier: widget.themeModeNotifier,
+          bodyModelNotifier: widget.bodyModelNotifier, // Pass bodyModelNotifier
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // Use FadeTransition for a smooth fade-in effect
           return SlideTransition(
-            position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)), // Apply the animated offset
+            position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)),
             child: child,
           );
         },
-        transitionDuration: const Duration(milliseconds: 400), // Duration of the slide
+        transitionDuration: const Duration(milliseconds: 400),
       ),
     );
   }
@@ -90,13 +136,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     await flutterTts.setVolume(1.0);
     await flutterTts.setPitch(1.0);
     print("BodyScreen TTS initialized.");
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    flutterTts.stop();
-    super.dispose();
   }
 
   void _toggleMode() {
@@ -110,8 +149,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final User? currentUser = FirebaseAuth.instance.currentUser;
-
-    const TextStyle emojiStyle = TextStyle(fontSize: 20);
 
     return Scaffold(
       backgroundColor: colorScheme.primary,
@@ -173,12 +210,12 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: colorScheme.secondary, // Choose your border color
-                    width: 2.0, // Choose your border width
+                    color: colorScheme.secondary,
+                    width: 2.0,
                   ),
                 ),
                 child: CircleAvatar(
-                  radius: 20, // Keep the radius for the avatar content
+                  radius: 20,
                   backgroundColor: colorScheme.surface,
                   backgroundImage: currentUser?.photoURL != null
                       ? NetworkImage(currentUser!.photoURL!)
@@ -199,100 +236,114 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _tabController,
         children: [
-          Stack(
-            children: [
-              Center(
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.8,
-                    maxWidth: MediaQuery.of(context).size.width * 0.8,
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final height = constraints.maxHeight;
-                      final width = height * 0.55;
-
-                      return Center(
-                        child: SizedBox(
-                          height: height,
-                          width: width,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Image.asset('assets/body_outline.png', fit: BoxFit.contain),
-                              // Brain
-                              Positioned(
-                                top: height * 0.19,
-                                left: width * 0.3655,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Brain"),
-                                  child: const Text("🧠", style: emojiStyle),
-                                ),
-                              ),
-                              // Eyes
-                              Positioned(
-                                top: height * 0.22,
-                                left: width * 0.3655,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Eyes"),
-                                  child: const Text("👁️", style: emojiStyle),
-                                ),
-                              ),
-                              // Heart
-                              Positioned(
-                                top: height * 0.32,
-                                left: width * 0.42,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Heart"),
-                                  child: const Text("❤️", style: emojiStyle),
-                                ),
-                              ),
-                              // Lungs
-                              Positioned(
-                                top: height * 0.35,
-                                left: width * 0.3655,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Lungs"),
-                                  child: const Text("🫁", style: emojiStyle),
-                                ),
-                              ),
-                              // Muscles - Assuming Muscles are a category in your organData
-                              Positioned(
-                                top: height * 0.39,
-                                left: width * 0.23,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Muscles"),
-                                  child: const Text("💪", style: emojiStyle),
-                                ),
-                              ),
-                              // Stomach
-                              Positioned(
-                                top: height * 0.43,
-                                left: width * 0.3655,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Stomach"),
-                                  child: const Text("🍽️", style: emojiStyle),
-                                ),
-                              ),
-                              // Legs - Assuming Legs are a category in your organData
-                              Positioned(
-                                top: height * 0.62,
-                                left: width * 0.30,
-                                child: GestureDetector(
-                                  onTap: () => showOrganDialog(context, "Legs"),
-                                  child: const Text("🦵", style: emojiStyle),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+          // Body Tab Content (Model Viewer and Organ Overlays)
+          Center(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // NEW: ValueListenableBuilder to dynamically update ModelViewer's src AND cameraOrbit
+                  ValueListenableBuilder<String>(
+                    valueListenable: widget.bodyModelNotifier,
+                    builder: (context, currentModelKey, child) {
+                      print('BodyScreen: ValueListenableBuilder rebuilding. Current model key: "$currentModelKey"');
+                      return ModelViewer(
+                        src: _getBodyModelPath(currentModelKey), // Get path from notifier's value
+                        alt: "A 3D model of a human body",
+                        ar: false,
+                        disableZoom: true,
+                        disableTap: true,
+                        disablePan: true,
+                        autoRotate: true,
+                        cameraControls: true,
+                        cameraOrbit: _getCameraOrbit(currentModelKey), // Dynamically set camera orbit
+                        cameraTarget: _getCameraTarget(currentModelKey), // NEW: Dynamically set camera target
+                        minCameraOrbit: 'auto 90deg auto',
+                        maxCameraOrbit: 'auto 90deg auto',
+                        backgroundColor: Colors.transparent,
                       );
                     },
                   ),
-                ),
+
+                  // Organ overlays (positions might need adjustment based on specific models)
+                  Positioned(
+                    top: -5.5,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Brain"),
+                      child: Image.asset(
+                        'assets/brain.png',
+                        width: 40,
+                        height: 40,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.0565,
+                    right: 100,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Eyes"),
+                      child: Image.asset(
+                        'assets/eyes.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.15,
+                    right: 50,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Heart"),
+                      child: Image.asset(
+                        'assets/heart.png',
+                        width: 40,
+                        height: 40,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.16,
+                    left: 40,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Lungs"),
+                      child: Image.asset(
+                        'assets/lungs.png',
+                        width: 40,
+                        height: 40,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.22,
+                    left: 40,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Muscles"),
+                      child: Image.asset(
+                        'assets/muscle.png',
+                        width: 40,
+                        height: 40,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 100,
+                    right: 50,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Legs"),
+                      child: Image.asset(
+                        'assets/legs.png',
+                        width: 40,
+                        height: 40,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
+
 
           NutritionTabContent(currentMode: _currentMode),
 
@@ -300,18 +351,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        // The currentIndex must be updated to match the TabController's index
-        currentIndex: _selectedIndex, // Now correctly uses _selectedIndex
+        currentIndex: _selectedIndex,
         onTap: (index) {
-          // Update both _selectedIndex and TabController's index
           setState(() {
             _selectedIndex = index;
           });
-          // Explicitly set duration and curve for smooth animation when tapping tabs
           _tabController.animateTo(
             index,
-            duration: const Duration(milliseconds: 400), // Increased duration for smoother feel
-            curve: Curves.easeInOut, // A common smooth curve for navigation
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
           );
         },
         items: _topTabs.map((tabName) {
@@ -384,7 +432,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // --- MODIFIED: Custom transition for navigating to OrganDetailPage ---
               Navigator.push(
                 context,
                 PageRouteBuilder(
@@ -395,13 +442,12 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     organ: organName,
                   ),
                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    // Use FadeTransition for a smooth fade-in effect
                     return SlideTransition(
-                      position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)), // Apply the animated offset
+                      position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)),
                       child: child,
                     );
                   },
-                  transitionDuration: const Duration(milliseconds: 400), // Duration of the slide
+                  transitionDuration: const Duration(milliseconds: 400),
                 ),
               );
             },
