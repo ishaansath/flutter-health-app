@@ -1,14 +1,15 @@
-// lib/body_screen.dart (LATEST FULL VERSION - Fixed _getBodyModelPath logic, Male as Default, and Male Body Offset by shifting target)
+// lib/body_screen.dart (LATEST FULL VERSION - Home Tab, Dynamic Ion Icons, and Model Offsets)
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/organ_detail_page.dart';
 import 'package:ishaan/mascot_page.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
 import 'package:ishaan/nutrition_tab_content.dart';
 import 'package:ishaan/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:ionicons/ionicons.dart'; // Import Ion Icons
+import 'package:ishaan/home_page.dart'; // NEW: Import HomePage
 
 import 'app_data.dart' as AppData;
 import 'package:ishaan/main.dart'; // Import main.dart to access global notifiers if needed, or ensure they are passed
@@ -17,13 +18,13 @@ import 'package:ishaan/main.dart'; // Import main.dart to access global notifier
 class BodyScreen extends StatefulWidget {
   final String mode;
   final ValueNotifier<ThemeMode> themeModeNotifier;
-  final ValueNotifier<String> bodyModelNotifier; // Accept bodyModelNotifier
+  final ValueNotifier<String> bodyModelNotifier;
 
   const BodyScreen({
     super.key,
     required this.mode,
     required this.themeModeNotifier,
-    required this.bodyModelNotifier, // Update constructor
+    required this.bodyModelNotifier,
   });
 
   @override
@@ -35,7 +36,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   late TabController _tabController;
   late FlutterTts flutterTts;
 
-  final List<String> _topTabs = ['Body', 'Nutrition', 'Mascot'];
+  // NEW: Reordered tabs - 'Body' is now last
+  final List<String> _topTabs = ['Home', 'Nutrition', 'Mascot', 'Body'];
 
   int _selectedIndex = 0;
 
@@ -49,6 +51,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _currentMode = widget.mode;
+    // Adjusted TabController length for the new 'Home' tab
     _tabController = TabController(length: _topTabs.length, vsync: this);
     flutterTts = FlutterTts();
     _initializeTtsGeneral();
@@ -89,22 +92,21 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   }
 
   // Helper to get the camera orbit string based on the model key
-  // This controls the camera's position relative to the target.
   String _getCameraOrbit(String modelKey) {
-    // We are now shifting the model using cameraTarget, so orbit can be standard
     return '0deg 90deg auto'; // Keeping a standard orbit
   }
 
-  // NEW Helper: To get the camera target based on the model key
-  // This controls where the camera is looking, effectively shifting the model's visible position.
+  // Helper: To get the camera target based on the model key
   String _getCameraTarget(String modelKey) {
     switch (modelKey) {
       case 'male_body':
       // Shift target right (positive X) to make the model appear right
-      // You might need to fine-tune these values (e.g., '0.1m 0m 0m')
-        return '0.1m auto auto'; // Example: Shift 0.1 meters to the right
+      // Using a reasonable value for meters, not 'auto'
+        return '0.1m 0m 0m'; // Shift 0.1 meters to the right
       case 'female_body':
-        return '0m auto auto'; // Default target for female (center)
+      // Shift target down (negative Y) to make the model appear lower
+      // Using a reasonable value for meters, not 'auto'
+        return '0m -0.1m 0m'; // Shift 0.1 meters down
       default:
         return '0m 0m 0m'; // Default target (center)
     }
@@ -120,8 +122,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           bodyModelNotifier: widget.bodyModelNotifier, // Pass bodyModelNotifier
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)),
+          return FadeTransition( // Changed to FadeTransition for smoother transition
+            opacity: animation,
             child: child,
           );
         },
@@ -236,7 +238,13 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Body Tab Content (Model Viewer and Organ Overlays)
+          // NEW: Home Tab Content
+          HomePage(mode: _currentMode, themeModeNotifier: widget.themeModeNotifier),
+          // Nutrition Tab Content
+          NutritionTabContent(currentMode: _currentMode),
+          // Mascot Tab Content
+          MascotPage(mode: _currentMode),
+          // Body Tab Content (Model Viewer and Organ Overlays) - NOW LAST
           Center(
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -244,7 +252,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // NEW: ValueListenableBuilder to dynamically update ModelViewer's src AND cameraOrbit
+                  // ValueListenableBuilder to dynamically update ModelViewer's src AND cameraOrbit
                   ValueListenableBuilder<String>(
                     valueListenable: widget.bodyModelNotifier,
                     builder: (context, currentModelKey, child) {
@@ -259,7 +267,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                         autoRotate: true,
                         cameraControls: true,
                         cameraOrbit: _getCameraOrbit(currentModelKey), // Dynamically set camera orbit
-                        cameraTarget: _getCameraTarget(currentModelKey), // NEW: Dynamically set camera target
+                        cameraTarget: _getCameraTarget(currentModelKey), // Dynamically set camera target
                         minCameraOrbit: 'auto 90deg auto',
                         maxCameraOrbit: 'auto 90deg auto',
                         backgroundColor: Colors.transparent,
@@ -267,15 +275,23 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     },
                   ),
 
-                  // Organ overlays (positions might need adjustment based on specific models)
+                  // Organ overlays with rounded box backgrounds
                   Positioned(
-                    top: -5.5,
+                    top: 5,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Brain"),
-                      child: Image.asset(
-                        'assets/brain.png',
-                        width: 40,
-                        height: 40,
+                      child: Container( // NEW: Container for background
+                        padding: const EdgeInsets.all(3), // Add some padding around the image
+                        decoration: BoxDecoration(
+                          color: Colors.transparent, // Background color for the box
+                          border: Border.all(color: colorScheme.secondary, width: 2),
+                          borderRadius: BorderRadius.circular(100), // Rounded corners
+                        ),
+                        child: Image.asset(
+                          'assets/brain.png',
+                          width: 40,
+                          height: 40,
+                        ),
                       ),
                     ),
                   ),
@@ -284,58 +300,95 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     right: 100,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Eyes"),
-                      child: Image.asset(
-                        'assets/eyes.png',
-                        width: 30,
-                        height: 30,
+                      child: Container( // NEW: Container for background
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: colorScheme.onError,
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: colorScheme.surface, width: 2)
+                        ),
+                        child: Image.asset(
+                          'assets/eyes.png',
+                          width: 30,
+                          height: 30,
+                        ),
                       ),
                     ),
                   ),
                   Positioned(
                     top: MediaQuery.of(context).size.height * 0.15,
-                    right: 50,
+                    right: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Heart"),
-                      child: Image.asset(
-                        'assets/heart.png',
-                        width: 40,
-                        height: 40,
+                      child: Container( // NEW: Container for background
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: colorScheme.surface.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: colorScheme.onSurface, width: 2)
+                        ),
+                        child: Image.asset(
+                          'assets/heart.png',
+                          width: 40,
+                          height: 40,
+                        ),
                       ),
                     ),
                   ),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.16,
+                    top: MediaQuery.of(context).size.height * 0.30,
                     left: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Lungs"),
-                      child: Image.asset(
-                        'assets/lungs.png',
-                        width: 40,
-                        height: 40,
+                      child: Container( // NEW: Container for background
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Image.asset(
+                          'assets/lungs.png',
+                          width: 40,
+                          height: 40,
+                        ),
                       ),
                     ),
                   ),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.22,
+                    top: MediaQuery.of(context).size.height * 0.5,
                     left: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Muscles"),
-                      child: Image.asset(
-                        'assets/muscle.png',
-                        width: 40,
-                        height: 40,
+                      child: Container( // NEW: Container for background
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Image.asset(
+                          'assets/muscle.png',
+                          width: 40,
+                          height: 40,
+                        ),
                       ),
                     ),
                   ),
                   Positioned(
-                    bottom: 100,
-                    right: 50,
+                    bottom: 20,
+                    right: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Legs"),
-                      child: Image.asset(
-                        'assets/legs.png',
-                        width: 40,
-                        height: 40,
+                      child: Container( // NEW: Container for background
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Image.asset(
+                          'assets/legs.png',
+                          width: 40,
+                          height: 40,
+                        ),
                       ),
                     ),
                   ),
@@ -343,11 +396,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
-
-
-          NutritionTabContent(currentMode: _currentMode),
-
-          MascotPage(mode: _currentMode),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -363,22 +411,48 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           );
         },
         items: _topTabs.map((tabName) {
-          IconData icon;
+          IconData outlineIcon;
+          IconData filledIcon;
+          double iconSize = 24.0; // Default size
+          double selectedIconSize = 28.0; // Slightly larger when selected
+
           switch (tabName) {
+            case 'Home':
+              outlineIcon = Ionicons.home_outline;
+              filledIcon = Ionicons.home;
+              break;
             case 'Body':
-              icon = Icons.accessibility_new;
+              outlineIcon = Ionicons.body_outline;
+              filledIcon = Ionicons.body;
               break;
             case 'Nutrition':
-              icon = Icons.fastfood;
+              outlineIcon = Ionicons.fast_food_outline;
+              filledIcon = Ionicons.fast_food;
               break;
             case 'Mascot':
-              icon = Icons.pets;
+              outlineIcon = Ionicons.paw_outline;
+              filledIcon = Ionicons.paw;
               break;
             default:
-              icon = Icons.help_outline;
+              outlineIcon = Ionicons.help_circle_outline;
+              filledIcon = Ionicons.help_circle;
           }
+
+          final bool isSelected = _selectedIndex == _topTabs.indexOf(tabName);
+
           return BottomNavigationBarItem(
-            icon: Icon(icon),
+            icon: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              height: isSelected ? selectedIconSize : iconSize,
+              width: isSelected ? selectedIconSize : iconSize,
+              alignment: Alignment.center,
+              child: Icon(
+                isSelected ? filledIcon : outlineIcon,
+                size: isSelected ? selectedIconSize : iconSize,
+                color: isSelected ? colorScheme.secondary : colorScheme.onSecondary.withOpacity(0.6),
+              ),
+            ),
             label: tabName,
           );
         }).toList(),
@@ -442,8 +516,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     organ: organName,
                   ),
                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position: animation.drive(Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)),
+                    return FadeTransition(
+                      opacity: animation,
                       child: child,
                     );
                   },

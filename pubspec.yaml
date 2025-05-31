@@ -29,6 +29,9 @@ dependencies:
   firebase_core: ^2.27.0
   firebase_auth: ^4.16.0
   cloud_firestore: ^4.15.10
+  ionicons: ^0.2.2
+  lottie: ^3.3.1
+
 
 dev_dependencies:
   flutter_test:
@@ -151,6 +154,12 @@ flutter:
     - assets/mascot/MelonzoTalking.gif
     - assets/models/male_body.glb
     - assets/models/female_body.glb
+    - assets/animations/light/loading.json
+    - assets/animations/dark/loading.json
+    - assets/animations/dark/welcome.json
+    - assets/animations/light/welcome.json
+    - assets/animations/dark/chatbg.json
+    - assets/animations/light/chatbg.json
 
 
   fonts:

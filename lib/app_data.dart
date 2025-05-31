@@ -159,9 +159,9 @@ final Map<String, Map<String, dynamic>> organData = {
           }
         ],
       },
-      'cereals &Grains': {
-        'normalModeTitle': 'Cereals & Grains',
-        'funModeTitle': 'Cereals & Grains 🌾',
+      'grains': {
+        'normalModeTitle': 'Grains',
+        'funModeTitle': 'Grains 🌾',
         'items': [
           {
             'name': 'grain',
@@ -824,9 +824,9 @@ final Map<String, Map<String, dynamic>> generalNutritionData = {
     "funModeTitle": "Nutrients 💊",
     "items": <Map<String, dynamic>>[],
   },
-  "Meat Products": {
-    "normalModeTitle": "Meat Products",
-    "funModeTitle": "Meat Products 🍖",
+  "Meat": {
+    "normalModeTitle": "Meat",
+    "funModeTitle": "Meat🍖",
     "items": <Map<String, dynamic>>[],
   },
   "Dairy": {
@@ -834,9 +834,9 @@ final Map<String, Map<String, dynamic>> generalNutritionData = {
     "funModeTitle": "Dairy 🥛",
     "items": <Map<String, dynamic>>[],
   },
-  "Cereals & Grains": {
-    "normalModeTitle": "Cereals & Grains",
-    "funModeTitle": "Cereals & Grains 🍞",
+  "Grains": {
+    "normalModeTitle": "Grains",
+    "funModeTitle": "Grains 🍞",
     "items": <Map<String, dynamic>>[],
   },
   "Protein": {
@@ -885,7 +885,7 @@ void initializeAppData() {
       addItemsToCategory(List<Map<String, dynamic>>.from(organInfo['nutrients']!), "Nutrients");
     }
     if (organInfo.containsKey('meat')) { // Assuming 'meat' key might exist at top level for some organs
-      addItemsToCategory(List<Map<String, dynamic>>.from(organInfo['meat']!), "Meat Products");
+      addItemsToCategory(List<Map<String, dynamic>>.from(organInfo['meat']!), "Meat");
     }
 
     // Add items from moreInfoCategories
@@ -895,14 +895,14 @@ void initializeAppData() {
       if (moreInfo.containsKey('dairy') && moreInfo['dairy']!['items'] != null) {
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['dairy']!['items']!), "Dairy");
       }
-      if (moreInfo.containsKey('cereals &Grains') && moreInfo['cereals &Grains']!['items'] != null) {
-        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['cereals &Grains']!['items']!), "Cereals & Grains");
+      if (moreInfo.containsKey('grains') && moreInfo['grains']!['items'] != null) {
+        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['grains']!['items']!), "Grains");
       }
       if (moreInfo.containsKey('protein') && moreInfo['protein']!['items'] != null) {
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['protein']!['items']!), "Protein");
       }
       if (moreInfo.containsKey('food') && moreInfo['food']!['items'] != null) { // Add 'food' if you want it included
-        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['food']!['items']!), "Meat Products"); // Or a new "General Food" category
+        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['food']!['items']!), "Meat"); // Or a new "General Food" category
       }
       // Note: "funFacts", "symptoms", "diseases", "weeklyDiet" typically aren't nutrition items
       // so they are not added to generalNutritionData here.

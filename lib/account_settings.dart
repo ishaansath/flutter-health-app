@@ -2,15 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Ensure this is imported
-import 'package:ishaan/auth_firebase_data.dart'; // Make sure this is imported (adjust path if different)
-import 'package:ishaan/login_screen.dart'; // Import your LoginScreen
-import 'package:ishaan/main.dart'; // NEW: Import main.dart to access global notifiers
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ishaan/auth_firebase_data.dart';
+import 'package:ishaan/login_screen.dart';
+import 'package:ishaan/main.dart';
+import 'package:lottie/lottie.dart'; // Ensure Lottie is imported
 
 class AccountSettingsPage extends StatefulWidget {
-  final ValueNotifier<ThemeMode> themeModeNotifier; // Add themeModeNotifier here
+  final ValueNotifier<ThemeMode> themeModeNotifier;
 
-  const AccountSettingsPage({super.key, required this.themeModeNotifier}); // Update constructor
+  const AccountSettingsPage({super.key, required this.themeModeNotifier});
 
   @override
   State<AccountSettingsPage> createState() => _AccountSettingsPageState();
@@ -18,17 +19,16 @@ class AccountSettingsPage extends StatefulWidget {
 
 class _AccountSettingsPageState extends State<AccountSettingsPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  // We'll use AuthFirebaseDataSourceImpl directly for profile operations
   final AuthFirebaseDataSource _authService = AuthFirebaseDataSourceImpl();
 
   User? _currentUser;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController(); // NEW: Age controller
-  String? _selectedGender; // Changed to String? for radio buttons
+  final TextEditingController _ageController = TextEditingController();
+  String? _selectedGender;
 
   bool _isLoading = false;
-  String? _errorMessage; // To display specific errors
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _ageController.dispose(); // Dispose age controller
+    _ageController.dispose();
     super.dispose();
   }
 
@@ -71,23 +71,21 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     });
 
     try {
-      // Use the getUserProfile method from your auth service
       final userProfile = await _authService.getUserProfile(_currentUser!.uid);
 
       if (userProfile != null) {
         _firstNameController.text = userProfile.firstName;
         _lastNameController.text = userProfile.lastName;
         _selectedGender = userProfile.gender;
-        _ageController.text = userProfile.age?.toString() ?? ''; // Set age controller
+        _ageController.text = userProfile.age?.toString() ?? '';
       } else {
-        // If profile not found in Firestore, try to pre-fill from Firebase Auth display name
         final String? displayName = _currentUser?.displayName;
         List<String> nameParts = displayName?.split(' ') ?? [];
 
         _firstNameController.text = nameParts.isNotEmpty ? nameParts[0] : '';
         _lastNameController.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-        _selectedGender = 'Prefer not to say'; // Default if not found
-        _ageController.text = ''; // Default empty
+        _selectedGender = 'Prefer not to say';
+        _ageController.text = '';
       }
     } on FirebaseException catch (e) {
       _errorMessage = 'Failed to load user data: ${e.message}';
@@ -119,7 +117,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       final String newGender = _selectedGender ?? 'Prefer not to say';
       final int? newAge = int.tryParse(_ageController.text.trim());
 
-      // Basic validation
       if (newFirstName.isEmpty || newLastName.isEmpty || _selectedGender == null || _ageController.text.isEmpty) {
         _showSnackBar('Please fill in all required fields.');
         setState(() { _isLoading = false; });
@@ -132,7 +129,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         return;
       }
 
-      // Use the updateUserData method from your auth service
       await _authService.updateUserData(
         _currentUser!.uid,
         newFirstName,
@@ -141,14 +137,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         newAge,
       );
 
-      // Reload current user object to reflect latest changes from Firebase Auth (displayName)
       await _currentUser!.reload();
-      _currentUser = _auth.currentUser; // Update the local _currentUser instance
+      _currentUser = _auth.currentUser;
 
       _showSnackBar('Changes saved successfully!');
       print('User details saved to Firestore and Firebase Auth updated.');
 
-      // NEW: Trigger a full app refresh after saving changes
       appRefreshTriggerNotifier.value++;
       print('AccountSettingsPage: Triggered full app refresh.');
 
@@ -174,13 +168,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       _isLoading = true;
     });
     try {
-      await _authService.logout(); // Corrected method name
+      await _authService.logout();
 
       if (mounted) {
-        // Navigate to LoginScreen and remove all previous routes
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => LoginScreen(themeModeNotifier: widget.themeModeNotifier)),
-              (Route<dynamic> route) => false, // This predicate ensures all previous routes are removed
+              (Route<dynamic> route) => false,
         );
       }
       print('Successfully logged out and navigated to login screen.');
@@ -204,8 +197,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Determine Lottie animation path based on current theme brightness
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final String lottieAssetPath = isDarkMode
+        ? 'assets/animations/dark/loading.json'
+        : 'assets/animations/light/loading.json';
+
     return Scaffold(
-      backgroundColor: colorScheme.primary, // Changed to primary for consistency with LoginScreen
+      backgroundColor: colorScheme.primary,
       appBar: AppBar(
         title: Text(
           'Account Settings',
@@ -216,7 +215,16 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: colorScheme.secondary))
+          ? Center(
+        // NEW: Replace CircularProgressIndicator with Lottie animation
+        child: Lottie.asset(
+          lottieAssetPath,
+          width: 200, // Adjust size as needed
+          height: 200, // Adjust size as needed
+          fit: BoxFit.contain,
+          repeat: true, // Make the animation loop
+        ),
+      )
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -233,12 +241,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               keyboardType: TextInputType.name,
               decoration: InputDecoration(
                 labelText: 'First Name',
+                labelStyle: theme.textTheme.headlineSmall,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                prefixIcon: Icon(Icons.person, color: colorScheme.secondary), // Changed color
+                prefixIcon: Icon(Icons.person, color: colorScheme.secondary),
               ),
-              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary), // Ensure text color is readable
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
             ),
             const SizedBox(height: 16),
 
@@ -247,16 +256,16 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               keyboardType: TextInputType.name,
               decoration: InputDecoration(
                 labelText: 'Last Name',
+                labelStyle: theme.textTheme.headlineSmall,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                prefixIcon: Icon(Icons.person, color: colorScheme.secondary), // Changed color
+                prefixIcon: Icon(Icons.person, color: colorScheme.secondary),
               ),
-              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary), // Ensure text color is readable
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
             ),
             const SizedBox(height: 16),
 
-            // NEW: Gender Radio Buttons (consistent with LoginScreen)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -301,23 +310,23 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
             const SizedBox(height: 16),
 
-            // NEW: Age TextField
             TextField(
               controller: _ageController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Age',
+                labelStyle: theme.textTheme.headlineSmall,
                 hintText: 'Enter your age',
+                hintStyle: theme.textTheme.bodyMedium,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                prefixIcon: Icon(Icons.cake, color: colorScheme.secondary), // Cake icon for age
+                prefixIcon: Icon(Icons.cake, color: colorScheme.secondary),
               ),
-              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary), // Ensure text color is readable
+              style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
             ),
             const SizedBox(height: 32),
 
-            // Error Message Display
             if (_errorMessage != null)
               Text(
                 _errorMessage!,
@@ -325,7 +334,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 textAlign: TextAlign.center,
               ),
             if (_errorMessage != null) const SizedBox(height: 16),
-
 
             SizedBox(
               width: double.infinity,
@@ -340,8 +348,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                   ),
                 ),
                 child: _isLoading
-                    ? CircularProgressIndicator(
-                  color: colorScheme.onSecondary,
+                    ? Lottie.asset( // NEW: Lottie for Save Changes button
+                  lottieAssetPath, // Reusing the same loading animation
+                  height: 30, // Smaller size for button
+                  width: 30,
+                  fit: BoxFit.contain,
+                  repeat: true,
                 )
                     : Text(
                   'Save Changes',
@@ -354,7 +366,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
             const SizedBox(height: 24),
 
-            // --- LOGOUT BUTTON ---
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
@@ -368,8 +379,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                   ),
                 ),
                 child: _isLoading
-                    ? CircularProgressIndicator(
-                  color: colorScheme.error,
+                    ? Lottie.asset( // NEW: Lottie for Log Out button
+                  lottieAssetPath, // Reusing the same loading animation
+                  height: 30, // Smaller size for button
+                  width: 30,
+                  fit: BoxFit.contain,
+                  repeat: true,
                 )
                     : Text(
                   'Log Out',

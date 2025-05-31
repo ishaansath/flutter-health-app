@@ -1,4 +1,4 @@
-// lib/settings_page.dart (MODIFIED - Display First/Last Name from Firestore)
+// lib/settings_page.dart (MODIFIED - Lottie animation based on theme)
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,9 +6,10 @@ import 'package:ishaan/help_page.dart';
 import 'package:ishaan/auth_firebase_data.dart'; // Ensure this is imported correctly
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ishaan/account_settings.dart'; // Ensure this import is correct
-
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart';
+import 'package:ionicons/ionicons.dart';
 
 // Placeholder for future About Page (kept simple)
 class AboutPage extends StatelessWidget {
@@ -197,6 +198,15 @@ class _SettingsPageState extends State<SettingsPage> {
     final colorScheme = theme.colorScheme;
     final User? currentUser = FirebaseAuth.instance.currentUser; // Still need currentUser for photoURL/email
 
+    // Determine the Lottie animation path based on the current theme mode
+    String lottieAssetPath;
+    if (_currentSelectedThemeMode == ThemeMode.dark) {
+      lottieAssetPath = 'assets/animations/dark/loading.json';
+    } else {
+      // Default to light theme animation if it's light mode or system mode (which will resolve to light if system is light)
+      lottieAssetPath = 'assets/animations/light/loading.json';
+    }
+
     return Consumer<MascotProvider>(
       builder: (context, mascotProvider, child) {
         return Scaffold(
@@ -211,8 +221,14 @@ class _SettingsPageState extends State<SettingsPage> {
             centerTitle: true,
             iconTheme: IconThemeData(color: colorScheme.onSecondary),
           ),
-          body: _isLoadingProfile // NEW: Show loading indicator if profile is being loaded
-              ? Center(child: CircularProgressIndicator(color: colorScheme.secondary))
+          body: _isLoadingProfile
+              ? Center(
+            child: Lottie.asset(
+              lottieAssetPath, // Use the dynamically determined path
+              height: 100,
+              width: 100,
+            ),
+          )
               : ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             children: [
