@@ -1,20 +1,25 @@
-// lib/nutrition_tab_content.dart (MODIFIED - Directional Slide In/Out Animation)
+// lib/nutrition_tab_content.dart (FULL CORRECTED - Lottie for No Results & Initial Animation)
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/app_data.dart' as AppData;
 import 'package:ishaan/item_detail_page.dart';
 import 'package:ishaan/nutrition_item_model.dart';
 import 'package:ishaan/searchable_nutrition_items.dart';
-import 'package:string_similarity/string_similarity.dart'; // Import the package
-import 'package:ionicons/ionicons.dart'; // Import Ion Icons
+import 'package:ishaan/shared_preferences_helper.dart'; // Ensure this import is correct for save/load functions
+import 'package:string_similarity/string_similarity.dart';
+import 'package:ionicons/ionicons.dart';
+import 'package:lottie/lottie.dart'; // REQUIRED for Lottie animations
 
 class NutritionTabContent extends StatefulWidget {
   final String currentMode;
-
+  final ValueNotifier<ThemeMode> themeModeNotifier;
+  final ValueNotifier<Map<String, String>?> lastVisitedNutritionNotifier;
 
   const NutritionTabContent({
     super.key,
     required this.currentMode,
+    required this.themeModeNotifier,
+    required this.lastVisitedNutritionNotifier,
   });
 
   @override
@@ -25,9 +30,8 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
   final TextEditingController _searchController = TextEditingController();
   List<SearchableNutritionItem> _allGeneralNutritionItems = [];
   List<SearchableNutritionItem> _filteredNutritionItems = [];
-  String? _suggestedQuery; // Added for "Did you mean?" functionality
+  String? _suggestedQuery;
 
-  // NEW: List of categories with their display names and Ion Icons
   final List<Map<String, dynamic>> _nutritionCategoriesWithIcons = [
     {'name': 'All', 'icon': Ionicons.grid_outline, 'filledIcon': Ionicons.grid},
     {'name': 'Fruits', 'icon': Ionicons.nutrition_outline, 'filledIcon': Ionicons.nutrition},
@@ -37,21 +41,30 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     {'name': 'Meat', 'icon': Icons.egg_outlined, 'filledIcon': Icons.egg},
     {'name': 'Grains', 'icon': Icons.grain_outlined, 'filledIcon': Icons.grain},
     {'name': 'Protein', 'icon': Ionicons.barbell_outline, 'filledIcon': Ionicons.barbell},
+    {'name': 'Food', 'icon': Ionicons.restaurant_outline, 'filledIcon': Ionicons.restaurant},
   ];
 
-  // NEW: State to hold the currently selected category filter
   String _currentCategoryFilter = 'All';
-  // NEW: State to hold the previously selected category filter for animation direction
   String? _previousCategoryFilter;
 
+  bool _showInitialLottieAnimation = true; // Renamed for clarity
 
   @override
   void initState() {
     super.initState();
     _loadGeneralNutritionDataAndFlatten();
     _searchController.addListener(_onSearchChanged);
-    _applyFilters(); // Apply initial filter (which is 'All')
-    _previousCategoryFilter = _currentCategoryFilter; // Initialize previous category
+    _applyFilters();
+    _previousCategoryFilter = _currentCategoryFilter;
+
+    // Play initial Lottie animation once
+    Future.delayed(const Duration(seconds: 2), () { // Adjust duration as needed
+      if (mounted) {
+        setState(() {
+          _showInitialLottieAnimation = false;
+        });
+      }
+    });
   }
 
   @override
@@ -84,18 +97,16 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
         }
       }
     });
-    // Initial filter will be applied in _applyFilters
     print("Loaded ${_allGeneralNutritionItems.length} general nutrition items.");
   }
 
-  // New method for suggesting corrections
   String? _getCorrectionSuggestion(String query) {
     if (query.isEmpty) return null;
 
     final queryLower = query.toLowerCase();
     String? bestMatch;
     double highestSimilarity = 0.0;
-    const double similarityThreshold = 0.1; // Adjust this threshold as needed
+    const double similarityThreshold = 0.1;
 
     for (var item in _allGeneralNutritionItems) {
       final itemNameLower = item.name.toLowerCase();
@@ -109,7 +120,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     return bestMatch;
   }
 
-  // NEW: Centralized method to apply both search and category filters
   void _applyFilters() {
     final query = _searchController.text.toLowerCase();
     List<SearchableNutritionItem> tempFilteredList = [];
@@ -122,7 +132,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
       }).toList();
     }
 
-    // Apply search query filter if not empty
     if (query.isNotEmpty) {
       tempFilteredList = tempFilteredList.where((item) {
         return item.searchableText.contains(query);
@@ -131,14 +140,12 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
 
     setState(() {
       _filteredNutritionItems = tempFilteredList;
-      _suggestedQuery = null; // Clear suggestion initially
+      _suggestedQuery = null;
 
-      // Only suggest if search query is active and results are empty
       if (query.isNotEmpty && _filteredNutritionItems.isEmpty) {
         _suggestedQuery = _getCorrectionSuggestion(query);
       }
 
-      // Sort results (priority to startsWith, then contains, then alphabetical)
       _filteredNutritionItems.sort((a, b) {
         final aSearchText = a.searchableText;
         final bSearchText = b.searchableText;
@@ -155,31 +162,38 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
   }
 
   void _onSearchChanged() {
-    _applyFilters(); // Call the centralized filter method
+    _applyFilters();
   }
 
   void _onCategorySelected(String category) {
-    if (_currentCategoryFilter == category) return; // No change, no animation
+    if (_currentCategoryFilter == category) return;
 
     setState(() {
-      _previousCategoryFilter = _currentCategoryFilter; // Store current as previous
-      _currentCategoryFilter = category; // Update current
-      _searchController.clear(); // Clear search when category changes
-      FocusScope.of(context).unfocus(); // Dismiss keyboard
+      _previousCategoryFilter = _currentCategoryFilter;
+      _currentCategoryFilter = category;
+      _searchController.clear();
+      FocusScope.of(context).unfocus();
     });
-    _applyFilters(); // Apply the new category filter
+    _applyFilters();
   }
 
-  // Helper to build individual list tile UI for filtered search results
   Widget _buildSearchResultItemUI(BuildContext context, SearchableNutritionItem item) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return GestureDetector( // Wrap the Card with GestureDetector for onTap
+    return GestureDetector(
       onTap: () {
         final String descriptionForDetailPage = widget.currentMode == 'fun'
             ? (item.funModeDescription.isNotEmpty ? item.funModeDescription : item.normalModeDescription)
             : item.normalModeDescription;
+
+        // Call the top-level function directly and pass both name and imagePath
+        saveLastVisitedNutritionItem(item.name, item.imagePath); // Corrected call
+        // Update the ValueNotifier with both name and imagePath
+        widget.lastVisitedNutritionNotifier.value = {
+          'name': item.name,
+          'imagePath': item.imagePath, // Ensure imagePath is passed
+        };
 
         Navigator.push(
           context,
@@ -200,43 +214,39 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
         elevation: 2,
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         color: colorScheme.surface,
-        child: Padding( // Add padding inside the card
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column( // Use Column to stack elements vertically
-            crossAxisAlignment: CrossAxisAlignment.center, // Center content horizontally
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image/Icon at the top
               if (item.imagePath.isNotEmpty)
                 Image.asset(
                   item.imagePath,
-                  width: 300, // Increased size for better visibility
+                  width: 300,
                   height: 200,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image, size: 80, color: colorScheme.onSecondary),
                 )
               else
-                Icon(Icons.fastfood, size: 80, color: colorScheme.onSecondary), // Default icon
+                Icon(Icons.fastfood, size: 80, color: colorScheme.onSecondary),
 
-              const SizedBox(height: 12), // Spacing between image and text
+              const SizedBox(height: 12),
 
-              // Title
               Text(
                 '${item.name} (${item.parentCategory})',
                 style: theme.textTheme.displayLarge?.copyWith(color: colorScheme.onSecondary),
-                textAlign: TextAlign.center, // Center align title
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4), // Spacing between title and subtitle
+              const SizedBox(height: 4),
 
-              // Subtitle (short description)
               if (item.shortDescription.isNotEmpty)
                 Text(
                   item.shortDescription,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.displaySmall?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
-                  textAlign: TextAlign.center, // Center align short description
+                  textAlign: TextAlign.center,
                 ),
-
             ],
           ),
         ),
@@ -249,31 +259,34 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // Determine the starting offset for the slide animation based on category change
     Offset beginOffset;
-    Offset endOffsetOldChild; // New: Offset for the old child to slide out to
+    Offset endOffsetOldChild;
 
     int newIndex = _nutritionCategoriesWithIcons.indexWhere((map) => map['name'] == _currentCategoryFilter);
     int oldIndex = _nutritionCategoriesWithIcons.indexWhere((map) => map['name'] == _previousCategoryFilter);
 
     if (oldIndex == -1 || newIndex == -1 || newIndex == oldIndex) {
-      // No valid old index, or no actual change in category position, or initial load
-      beginOffset = Offset.zero; // No slide, or fade in from center
-      endOffsetOldChild = Offset.zero; // Old child stays in place and fades
+      beginOffset = Offset.zero;
+      endOffsetOldChild = Offset.zero;
     } else if (newIndex > oldIndex) {
-      // Moving right (e.g., Fruits to Vegetables)
-      beginOffset = const Offset(1.0, 0.0); // New child slides in from right
-      endOffsetOldChild = const Offset(-1.0, 0.0); // Old child slides out to left
+      beginOffset = const Offset(1.0, 0.0);
+      endOffsetOldChild = const Offset(-1.0, 0.0);
     } else {
-      // Moving left (e.g., Vegetables to Fruits)
-      beginOffset = const Offset(-1.0, 0.0); // New child slides in from left
-      endOffsetOldChild = const Offset(1.0, 0.0); // Old child slides out to right
+      beginOffset = const Offset(-1.0, 0.0);
+      endOffsetOldChild = const Offset(1.0, 0.0);
     }
 
+    // Determine Lottie animation path based on theme mode
+    String clickLottiePath;
+    if (widget.themeModeNotifier.value == ThemeMode.dark) {
+      clickLottiePath = 'assets/animations/dark/click.json';
+    } else {
+      clickLottiePath = 'assets/animations/light/click.json';
+    }
 
     return Column(
       children: [
-        // The Search Bar for Nutrition Tab
+        // NEW: Initial Lottie Animation at the top, plays once
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: TextField(
@@ -305,7 +318,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             },
           ),
         ),
-        // "Did you mean?" suggestion
         if (_searchController.text.isNotEmpty && _filteredNutritionItems.isEmpty && _suggestedQuery != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -319,8 +331,8 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
                 GestureDetector(
                   onTap: () {
                     _searchController.text = _suggestedQuery!;
-                    _onSearchChanged(); // Re-run search with the suggested query
-                    FocusScope.of(context).unfocus(); // Dismiss keyboard
+                    _onSearchChanged();
+                    FocusScope.of(context).unfocus();
                   },
                   child: Text(
                     '"$_suggestedQuery"',
@@ -337,7 +349,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
               ],
             ),
           ),
-        // NEW: Category Icons Row
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: SingleChildScrollView(
@@ -389,31 +401,36 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             ),
           ),
         ),
-        const Divider(height: 20, thickness: 1), // Separator
+        const Divider(height: 20, thickness: 1),
+
+        if (_showInitialLottieAnimation)
+          Lottie.asset(
+            clickLottiePath,
+            height: 150, // Adjust height as needed
+            repeat: false, // Play once
+            fit: BoxFit.fill,
+          ),
 
         // Main List of Nutrition Items (filtered by search or category)
         Expanded(
-          child: AnimatedSwitcher( // Added AnimatedSwitcher for transition
-            duration: const Duration(milliseconds: 300), // Duration of the animation
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
             transitionBuilder: (Widget child, Animation<double> animation) {
-              return Stack( // Use a Stack to overlay the old and new child during transition
+              return Stack(
                 children: [
-                  // Old child (slides out)
                   if (animation.status == AnimationStatus.forward && child.key != null && child.key is ValueKey && (child.key as ValueKey).value == (_currentCategoryFilter + _searchController.text))
-                  // This condition ensures oldChild is only shown when the new child is animating in
                     Positioned.fill(
                       child: SlideTransition(
                         position: Tween<Offset>(
-                          begin: Offset.zero, // Start at current position
-                          end: endOffsetOldChild, // Slide out to the determined direction
+                          begin: Offset.zero,
+                          end: endOffsetOldChild,
                         ).animate(animation),
                         child: FadeTransition(
                           opacity: Tween<double>(begin: 1.0, end: 0.0).animate(animation),
-                          child: child, // This is the old child, passed implicitly
+                          child: child,
                         ),
                       ),
                     ),
-                  // New child (slides in)
                   Positioned.fill(
                     child: SlideTransition(
                       position: Tween<Offset>(begin: beginOffset, end: Offset.zero).animate(animation),
@@ -426,17 +443,31 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
                 ],
               );
             },
+            // --- THIS IS THE SECTION YOU ASKED TO FIX ---
             child: _filteredNutritionItems.isEmpty && _searchController.text.isNotEmpty && _suggestedQuery == null
                 ? Center(
-              key: ValueKey('no_results_${_currentCategoryFilter}_${_searchController.text}'), // Unique key for AnimatedSwitcher
-              child: Text(
-                'No results found for "${_searchController.text}" in "$_currentCategoryFilter"',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: colorScheme.onBackground.withOpacity(0.7)),
+              key: ValueKey('no_results_${_currentCategoryFilter}_${_searchController.text}'),
+              child: Column( // <--- Changed to Column to hold Lottie and Text
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset( // <--- Lottie animation for no results
+                    'assets/animations/no-results.json', // **IMPORTANT: Replace with your actual path**
+                    width: 200,
+                    height: 100,
+                    fit: BoxFit.contain,
+                    repeat: true, // You can set this to false if you want it to play once
+                  ),
+                  const SizedBox(height: 16), // Spacing between Lottie and text
+                  Text(
+                    'No results found for "${_searchController.text}" in "$_currentCategoryFilter"',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: colorScheme.onBackground.withOpacity(0.7)),
+                  ),
+                ],
               ),
             )
                 : ListView.builder(
-              key: ValueKey(_currentCategoryFilter + _searchController.text), // Unique key for AnimatedSwitcher
+              key: ValueKey(_currentCategoryFilter + _searchController.text),
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               itemCount: _filteredNutritionItems.length,
               itemBuilder: (context, index) {

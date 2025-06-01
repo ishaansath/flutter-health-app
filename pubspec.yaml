@@ -111,9 +111,7 @@ flutter:
     - assets/models/blackberries.glb
     - assets/blackberry.png
     - assets/kiwi.png
-    - assets/models/kiwi.glb
     - assets/models/carrot.glb
-    - assets/models/kale.glb
     - assets/models/red_bell_pepper.glb
     - assets/redbellpepper.png
     - assets/models/vitamin_a.glb
@@ -160,6 +158,15 @@ flutter:
     - assets/animations/light/welcome.json
     - assets/animations/dark/chatbg.json
     - assets/animations/light/chatbg.json
+    - assets/beefliver.png
+    - assets/animations/light/click.json
+    - assets/animations/dark/click.json
+    - assets/animations/no-results.json
+    - assets/turkeybreast.png
+    - assets/duckmeat.png
+    - assets/yellowbellpepper.png
+    - assets/cottage cheese.png
+    - assets/milk.png
 
 
   fonts:

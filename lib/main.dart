@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:ishaan/body_screen.dart'; // Correctly import BodyScreen
 import 'package:ishaan/app_data.dart'; // Ensure app_data.dart is imported
+import 'package:ishaan/shared_preferences_helper.dart'; // Keep if you use this elsewhere
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +21,10 @@ ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
 ValueNotifier<String> bodyModelNotifier = ValueNotifier('human_body'); // 'male_body', 'female_body', 'human_body'
 // NEW: ValueNotifier to trigger a full app refresh
 ValueNotifier<int> appRefreshTriggerNotifier = ValueNotifier(0); // Increment this to trigger refresh
+
+// NEW: Global ValueNotifiers for last visited items
+ValueNotifier<Map<String, String>?> lastVisitedOrganNotifier = ValueNotifier(null);
+ValueNotifier<Map<String, String>?> lastVisitedNutritionNotifier = ValueNotifier(null);
 
 
 void main() async {
@@ -48,8 +53,86 @@ void main() async {
     bodyModelNotifier.value = savedBodyModel;
   }
 
+  // Load last visited organ and nutrition items on app start
+  _loadLastVisitedOrganOnStart();
+  _loadLastVisitedNutritionOnStart();
+
+
   runApp(const HealthApp());
 }
+
+// Function to save the last visited organ
+Future<void> saveLastVisitedOrgan(String name, String imagePath) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('lastVisitedOrganName', name);
+  await prefs.setString('lastVisitedOrganImagePath', imagePath);
+  lastVisitedOrganNotifier.value = {'name': name, 'imagePath': imagePath};
+  print('Saved last visited organ: $name');
+}
+
+// Function to save the last visited nutrition item (now handles two)
+Future<void> saveLastVisitedNutrition(String name, String imagePath) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // Get current last two items
+  String? name1 = prefs.getString('lastVisitedNutritionItemName1');
+  String? path1 = prefs.getString('lastVisitedNutritionItemPath1');
+
+  // Shift current item1 to item2, and new item becomes item1
+  if (name1 != null && path1 != null) {
+    await prefs.setString('lastVisitedNutritionItemName2', name1);
+    await prefs.setString('lastVisitedNutritionItemPath2', path1);
+  }
+
+  // Set the new item as item1
+  await prefs.setString('lastVisitedNutritionItemName1', name);
+  await prefs.setString('lastVisitedNutritionItemPath1', imagePath);
+
+  // Manually trigger the notifier to update HomePage
+  _loadLastVisitedNutritionOnStart(); // Re-load to update the list in HomePage
+  print('Saved last visited nutrition: $name');
+}
+
+
+// Helper to load last visited organ on app start
+Future<void> _loadLastVisitedOrganOnStart() async {
+  final prefs = await SharedPreferences.getInstance();
+  final String? name = prefs.getString('lastVisitedOrganName');
+  final String? path = prefs.getString('lastVisitedOrganImagePath');
+  if (name != null && path != null) {
+    lastVisitedOrganNotifier.value = {'name': name, 'imagePath': path};
+  }
+}
+
+// Helper to load last visited nutrition items on app start
+Future<void> _loadLastVisitedNutritionOnStart() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<Map<String, String>> loadedItems = [];
+
+  String? name1 = prefs.getString('lastVisitedNutritionItemName1');
+  String? path1 = prefs.getString('lastVisitedNutritionItemPath1');
+  if (name1 != null && path1 != null) {
+    loadedItems.add({'name': name1, 'imagePath': path1});
+  }
+
+  String? name2 = prefs.getString('lastVisitedNutritionItemName2');
+  String? path2 = prefs.getString('lastVisitedNutritionItemPath2');
+  if (name2 != null && path2 != null) {
+    loadedItems.add({'name': name2, 'imagePath': path2});
+  }
+  // This notifier now contains the list, but HomePage will read them individually.
+  // We'll update the HomePage's listener to re-read from SharedPreferences when this notifier changes.
+  // For simplicity, we just trigger the notifier if anything changes.
+  // A better approach would be to pass the list directly, but to keep the current HomePage logic,
+  // we just update the single `lastVisitedNutritionNotifier` with the latest item,
+  // and the HomePage's `_updateLastVisitedNutritionItem` reloads both.
+  if (loadedItems.isNotEmpty) {
+    lastVisitedNutritionNotifier.value = loadedItems.first; // Trigger HomePage to reload both
+  } else {
+    lastVisitedNutritionNotifier.value = null;
+  }
+}
+
 
 // This extension adds your custom button colors as getters to ColorScheme.
 extension CustomButtonColors on ColorScheme {
@@ -294,7 +377,9 @@ class _HealthAppState extends State<HealthApp> {
                   return BodyScreen(
                     mode: 'normal', // Pass the mode you need
                     themeModeNotifier: themeModeNotifier, // Pass the theme notifier
-                    bodyModelNotifier: bodyModelNotifier, // PASSED: bodyModelNotifier
+                    bodyModelNotifier: bodyModelNotifier,
+                    lastVisitedOrganNotifier: lastVisitedOrganNotifier, // PASSED: lastVisitedOrganNotifier
+                    lastVisitedNutritionNotifier: lastVisitedNutritionNotifier, // PASSED: lastVisitedNutritionNotifier
                   );
                 }
                 // If no user is logged in, show LoginScreen

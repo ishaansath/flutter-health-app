@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart'; // NEW: Import provider
-import 'package:ishaan/mascot_provider.dart'; // NEW: Import your MascotProvider
+import 'package:ishaan/mascot_provider.dart';
+
+import 'app_data.dart' as AppData; // NEW: Import your MascotProvider
 
 // Define an enum for clear TTS states
 enum TtsState { playing, stopped, paused, continued }
@@ -96,6 +98,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     super.initState();
     _initTts(); // Initialize TTS
     // Use addPostFrameCallback to ensure context is available for initial sizing calculations
+    AppData.AppData.saveLastVisitedNutritionItem(widget.name);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateMascotPositionAndSize(); // Set initial state after widget is laid out
     });

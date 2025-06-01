@@ -1,4 +1,4 @@
-// lib/body_screen.dart (LATEST FULL VERSION - Home Tab, Dynamic Ion Icons, and Model Offsets)
+// lib/body_screen.dart (MODIFIED - Last Visited Organ Save)
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/organ_detail_page.dart';
@@ -12,7 +12,8 @@ import 'package:ionicons/ionicons.dart'; // Import Ion Icons
 import 'package:ishaan/home_page.dart'; // NEW: Import HomePage
 
 import 'app_data.dart' as AppData;
-import 'package:ishaan/main.dart'; // Import main.dart to access global notifiers if needed, or ensure they are passed
+import 'package:ishaan/main.dart' hide saveLastVisitedOrgan; // Import main.dart to access global notifiers
+import 'package:ishaan/shared_preferences_helper.dart' hide lastVisitedNutritionNotifier; // NEW: Import the helper
 
 
 class BodyScreen extends StatefulWidget {
@@ -20,11 +21,19 @@ class BodyScreen extends StatefulWidget {
   final ValueNotifier<ThemeMode> themeModeNotifier;
   final ValueNotifier<String> bodyModelNotifier;
 
+  // NEW: Receive notifiers for recently visited items
+  final ValueNotifier<Map<String, String>?> lastVisitedOrganNotifier;
+  final ValueNotifier<Map<String, String>?> lastVisitedNutritionNotifier;
+
+
   const BodyScreen({
     super.key,
     required this.mode,
     required this.themeModeNotifier,
     required this.bodyModelNotifier,
+    // NEW: Add to constructor
+    required this.lastVisitedOrganNotifier,
+    required this.lastVisitedNutritionNotifier,
   });
 
   @override
@@ -100,13 +109,9 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   String _getCameraTarget(String modelKey) {
     switch (modelKey) {
       case 'male_body':
-      // Shift target right (positive X) to make the model appear right
-      // Using a reasonable value for meters, not 'auto'
-        return '0.1m 0m 0m'; // Shift 0.1 meters to the right
+        return '0.1m auto auto'; // Shift 0.1 meters to the right
       case 'female_body':
-      // Shift target down (negative Y) to make the model appear lower
-      // Using a reasonable value for meters, not 'auto'
-        return '0m -0.1m 0m'; // Shift 0.1 meters down
+        return 'auto auto auto'; // Shift 0.1 meters down
       default:
         return '0m 0m 0m'; // Default target (center)
     }
@@ -239,9 +244,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
         controller: _tabController,
         children: [
           // NEW: Home Tab Content
-          HomePage(mode: _currentMode, themeModeNotifier: widget.themeModeNotifier),
+          HomePage(
+            mode: _currentMode,
+            themeModeNotifier: widget.themeModeNotifier,
+            lastVisitedOrganNotifier: widget.lastVisitedOrganNotifier, // Pass notifier
+            lastVisitedNutritionNotifier: widget.lastVisitedNutritionNotifier, // Pass notifier
+          ),
           // Nutrition Tab Content
-          NutritionTabContent(currentMode: _currentMode),
+          NutritionTabContent(currentMode: _currentMode, themeModeNotifier: widget.themeModeNotifier, lastVisitedNutritionNotifier: lastVisitedNutritionNotifier),
           // Mascot Tab Content
           MascotPage(mode: _currentMode),
           // Body Tab Content (Model Viewer and Organ Overlays) - NOW LAST
@@ -277,15 +287,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
                   // Organ overlays with rounded box backgrounds
                   Positioned(
-                    top: 5,
+                    top: MediaQuery.of(context).size.height * 0.001,
+                    right: MediaQuery.of(context).size.height * 0.0565,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Brain"),
                       child: Container( // NEW: Container for background
-                        padding: const EdgeInsets.all(3), // Add some padding around the image
+                        padding: const EdgeInsets.all(8), // Add some padding around the image
                         decoration: BoxDecoration(
-                          color: Colors.transparent, // Background color for the box
-                          border: Border.all(color: colorScheme.secondary, width: 2),
-                          borderRadius: BorderRadius.circular(100), // Rounded corners
+                          color: colorScheme.onSurface, // Background color for the box
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
                         ),
                         child: Image.asset(
                           'assets/brain.png',
@@ -296,14 +306,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     ),
                   ),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.0565,
-                    right: 100,
+                    top: MediaQuery.of(context).size.height * 0.07,
+                    right: MediaQuery.of(context).size.height * 0.0565,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Eyes"),
                       child: Container( // NEW: Container for background
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: colorScheme.onError,
+                            color: colorScheme.onSurface,
                             borderRadius: BorderRadius.circular(100),
                             border: Border.all(color: colorScheme.surface, width: 2)
                         ),
@@ -472,6 +482,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
     String dialogContent;
     final Map<String, dynamic>? organInfo = AppData.organData[organName]?.cast<String, dynamic>();
+    final String imagePath = organInfo?['image'] as String? ?? 'assets/placeholder.png'; // Get image path
 
     if (organInfo != null) {
       if (_currentMode == 'fun') {
@@ -504,8 +515,13 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async { // MODIFIED: Added async
               Navigator.pop(context);
+              // NEW: Save last visited organ
+              await saveLastVisitedOrgan(organName, imagePath); // Call the new function
+              // Update the notifier in HomePage
+              widget.lastVisitedOrganNotifier.value = await loadLastVisitedOrgan(); // Update notifier
+
               Navigator.push(
                 context,
                 PageRouteBuilder(

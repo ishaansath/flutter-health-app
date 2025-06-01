@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 final Map<String, Map<String, dynamic>> organData = {
   "Brain": {
     "image": "assets/models/brain.glb",
@@ -6,8 +8,8 @@ final Map<String, Map<String, dynamic>> organData = {
     "fruits": [
       {
         "name": "Banana",
-        "normalModeDescription": "🍌 Bananas are a top-tier brain food because they’re rich in vitamin B6. \n \n 🍌 They help in the creation of neurotransmitters :- \n ★ Serotonin, \n ★ Dopamine. \n \n 🍌 Dopamine is critical for mood regulation and clear thinking. \n \n 🍌 They also supply natural sugars and potassium. \n \n 🍌 It gives your brain steady energy and helps maintain electrical conductivity between nerve cells. \n \n 🍌 Eating a banana in the morning can: \n • Improve learning capacity, \n • Improve cognitive function, \n • Help in the regulation of your mood throughout the day.",
-        'funModeDescription': '🍌 Bananas are basically mood boosters with WiFi for your brain.💡\n \n 🍌 They drop that vitamin B6 to: \n ★ Charge your thoughts, \n ★ Boost your vibes, \n ★ Help you stay focused, \n ★ Stop the "bruhhh" moments. \n \n 🍌 Eat one and you might just go from sleepy monkey to Einstein mode. 🧠⚡🐵',
+        "normalModeDescription": " 🍌 Bananas are a top-tier brain food because they’re rich in vitamin B6. \n \n 🍌 They help in the creation of neurotransmitters :- \n ★ Serotonin, \n ★ Dopamine. \n \n 🍌 Dopamine is critical for mood regulation and clear thinking. \n \n 🍌 They also supply natural sugars and potassium. \n \n 🍌 It gives your brain steady energy and helps maintain electrical conductivity between nerve cells. \n \n 🍌 Eating a banana in the morning can: \n • Improve learning capacity, \n • Improve cognitive function, \n • Help in the regulation of your mood throughout the day.",
+        'funModeDescription': ' 🍌 Bananas are basically mood boosters with WiFi for your brain.💡\n \n 🍌 They drop that vitamin B6 to: \n ★ Charge your thoughts, \n ★ Boost your vibes, \n ★ Help you stay focused, \n ★ Stop the "bruhhh" moments. \n \n 🍌 Eat one and you might just go from sleepy monkey to Einstein mode. 🧠⚡🐵',
         'additionalInfoExtra': 'ℹ️ Calories: 89 \nℹ️ Carbohydrates: 23g \nℹ️ Protein: 1.1g \nℹ️ Vitamin B6: 33% \nℹ️ Potassium: 358mg',
         'additionalInfo': 'additionalInfo test',
         'image': 'assets/bananas.png',
@@ -87,6 +89,26 @@ final Map<String, Map<String, dynamic>> organData = {
         'modelPath': 'assets/models/cucumber.glb',
         'shortDescription': 'Hydrates and boosts brain function',
       },
+      {
+        "name": "Cauliflower",
+        "normalModeDescription": " 🥦 Cauliflower is a brain-boosting powerhouse disguised as a simple white veggie. \n \n 🥦 It’s packed with choline, a nutrient crucial for: \n • Neurotransmitter production, \n • Memory retention \n • Mental sharpness. \n \n 🥦 Choline also helps in maintaining the structural integrity of brain cells and improves signal transmission between neurons. \n \n 🥦 Cauliflower is rich in vitamin C, vitamin K, and glucosinolates, which support detoxification and reduce brain inflammation. \n \n 🥦 Its antioxidants help combat oxidative stress that can otherwise damage brain cells over time.",
+        'funModeDescription': " 🥦 Cauliflower is the undercover genius of the veggie squad 🧠⚡. \n \n 🥦 It is white, fluffy, and low-key brilliant. \n \n 🥦 It’s got choline, which keeps your memory smooth and signals strong. \n \n 🥦 Add in some antioxidants and anti-inflammatory power. \n \n 🥦 It’s basically mental armor in food form. \n \n 🥦 Want to avoid brain fog? Munch this veggie cloud. \n \n 🥦 Roast it, mash it like potatoes, or throw it in a stir-fry. \n \n 🥦 Cauliflower is the low-cal legend your brain’s been craving.",
+        'additionalInfo': '',
+        'additionalInfoExtra': ' ℹ️ Calories: 25 \n ℹ️ Carbs: 5g \n ℹ️ Protein: 1.9g \n ℹ️ Fiber: 2g \n ℹ️ Vitamin C: 77% DV \n ℹ️ Vitamin K: 20% DV \n ℹ️ Choline: 45mg \n ℹ️ Folate: 15% DV',
+        'image': 'assets/cauliflower.png',
+        'modelPath': 'assets/models/cauliflower.glb',
+        'shortDescription': 'White florets, bright thoughts.',
+      },
+      {
+        "name": "Yellow Bell Pepper",
+        "normalModeDescription": " 🌶️ Yellow bell peppers aren’t just bright and crunchy, they’re loaded with vitamin C! \n \n 🌶️ Vitamin C supports the health of blood vessels in the brain and helps with iron absorption, vital for oxygen delivery. \n \n 🌶️ They’re rich in lutein and zeaxanthin. \n \n 🌶️ These antioxidants that protect brain cells and improve visual processing. \n \n 🌶️ Yellow bell peppers also contain vitamin B6, which aids in the creation of neurotransmitters like serotonin and dopamine, improving mood and focus. \n \n 🌶️ Their low-calorie, high-fiber nature makes them perfect for snacking or tossing into stir-fries without spiking blood sugar.",
+        'funModeDescription': " 🌶️ Yellow bell peppers are like the sunshine your brain didn't know it needed ☀️. \n \n 🌶️ They’ve got that vitamin C blast to keep your neurons buzzing and iron flowing, plus lutein and zeaxanthin for superhero-level protection. \n \n 🌶️ B6 boosts your mood and focus like a vibe enhancer. \n \n 🌶️ Sweet, crunchy, and totally snackable! \n \n 🌶️ Dip them, grill them, or stuff them. \n \n 🌶️ This brain food doesn’t just slap, it crunches its way into your mental high score.",
+        'additionalInfo': '',
+        'additionalInfoExtra': ' ℹ️ Calories: 27 \n ℹ️ Carbs: 6.3g \n ℹ️ Protein: 1g \n ℹ️ Fiber: 0.9g \n ℹ️ Vitamin C: 200% DV \n ℹ️ Vitamin B6: 15% DV \n ℹ️ Lutein + Zeaxanthin: 120 mcg \n ℹ️ Folate: 10% DV',
+        'image': 'assets/yellowbellpepper.png',
+        'modelPath': '',
+        'shortDescription': 'Colorful crunch for cognitive punch',
+      },
     ],
     "meat": [
       {
@@ -103,11 +125,41 @@ final Map<String, Map<String, dynamic>> organData = {
         "name": "Chicken Breast",
         "normalModeDescription": " 🍗 Chicken breast is a rich source of lean protein. \n \n 🍗 It is essential for creating neurotransmitters like dopamine and serotonin that regulate mood, focus, and memory. \n \n 🍗 It contains high levels of vitamin B6. \n \n 🍗 Vitamin B6 supports brain development and helps in the production of brain chemicals. \n \n 🍗 The choline found in chicken supports brain cell structure and neurotransmitter acetylcholine, which is critical for learning and memory. \n \n 🍗 Regular consumption supports long-term cognitive resilience, especially when paired with leafy greens or whole grains.",
         'funModeDescription': " 🍗 Chicken breast is the brain's gym buddy 💪🧠. \n \n 🍗 Packed with clean protein and B6 magic, it powers your mental reps and keeps your mood in beast mode. \n \n 🍗 Wanna excel the exams? This one’s your wingman. \n \n 🍗 Plus, choline in it helps your memory go full Sherlock mode 🔍. \n \n 🍗 You’re basically feeding your brain the answers to learning and slaying tasks. \n \n 🍗 Light, lean, and lit for your mental health!",
-        'additionalInfo': '',
+        'additionalInfo': 'Tap to learn more!',
         'additionalInfoExtra': ' ℹ️ Calories: 165, \n ℹ️ Protein: 31g, \n ℹ️ Fat: 3.6g, \n ℹ️ Carbs: 0g, \n ℹ️ Vitamin B6: 30% DV, \n ℹ️ Choline: ~72mg (13% DV)',
         'image': 'assets/chickenbreast.png',
         'modelPath': '',
         'shortDescription': 'Lean meat for memory.',
+      },
+      {
+        "name": "Beef Liver",
+        "normalModeDescription": " 🥩 Beef liver is a nutritional powerhouse for brain health. \n \n 🥩 It's incredibly rich in vitamin B12, which is vital for the formation of red blood cells and maintaining healthy brain function. \n \n 🥩 Beef liver also delivers high doses of iron which: \n • Ensures oxygen delivery to brain cells, \n • Enhances focus and mental stamina. \n \n 🥩 Folate and vitamin A from liver play critical roles in neurological development and cellular repair. \n \n 🥩 It's also packed with zinc and selenium, minerals that protect against cognitive decline. ",
+        'funModeDescription': " 🥩 Beef liver’s that underdog MVP for your brain 🧠🔥. \n \n 🥩 It’s like giving your noggin a multivitamin shot: \n • B12 for brain buzz, \n • Iron for pure mental hustle, \n • Zinc for that anti-dumb shield. 🥩 Think of it like brain armor in bite-size form. \n \n 🥩 Sure, it’s got a bold taste, but it comes with big IQ perks. \n \n 🥩 Throw a couple bites on the plate and your brain’s doing cartwheels before breakfast 💃🧠. ",
+        'additionalInfo': '',
+        'additionalInfoExtra': ' ℹ️ Calories: 135 kcal, \n ℹ️ Protein: 20.4g, \n ℹ️ Fat: 3.6g, \n ℹ️ Carbs: 3.9g, \n ℹ️ Vitamin B12: 3,460% DV, \n ℹ️ Vitamin A: 634% DV, \n ℹ️Iron: 35% DV, \n ℹ️Folate: 65% DV, \n ℹ️ Zinc: 32% DV, \n ℹ️ Selenium: 57% DV',
+        'image': 'assets/beefliver.png',
+        'modelPath': '',
+        'shortDescription': 'Nutrient-packed brain meat',
+      },
+      {
+        "name": "Turkey Breast",
+        "normalModeDescription": " 🦃 Turkey breast is a lean protein that’s rich in tryptophan, which helps your body produce serotonin! \n \n 🦃 Serotonin is a neurotransmitter that plays a major role in mood, memory, and focus. \n \n 🦃 It also provides: \n 1. Vitamin B6 vital for neurotransmitter synthesis, \n 2. Zinc which supports cognitive stability and neuroplasticity. \n \n 🦃 This meat contains choline which is a key nutrient in the production of acetylcholine. \n \n 🦃 It is the neurotransmitter tied to memory retention and learning ability. \n \n 🦃 Being low in saturated fats makes it ideal for brain health, reducing risks of inflammation that may affect cognition. ",
+        'funModeDescription': " 🦃 Turkey breast is basically brain fuel wrapped in juicy gains 🧠💪. \n \n 🦃 It’s got tryptophan, the vibe molecule maker! \n \n 🦃 It helps in pumping out feel-good serotonin so your brain isn’t stuck in lag mode. \n \n 🦃 B6 and zinc are in there too, boosting your brain’s WiFi signal and memory cache. \n \n 🦃 And choline? That’s the MVP that makes your brain cells talk better. \n \n 🦃 It’s lean, clean, and mean at keeping brain fog away",
+        'additionalInfo': '',
+        'additionalInfoExtra': ' ℹ️ Calories: 135, \n ℹ️ Protein: 30g \n ℹ️ Fat: 1g \n ℹ️ Carbs: 0g \n ℹ️ Vitamin B6: 46% DV \n ℹ️ Zinc: 22% DV \n ℹ️ Choline: 16% DV \n ℹ️ Tryptophan: ~330mg',
+        'image': 'assets/turkeybreast.png',
+        'modelPath': '',
+        'shortDescription': 'Memory-boosting lean meat',
+      },
+      {
+        "name": "Duck Meat",
+        "normalModeDescription": " 🦆 Duck meat, particularly duck breast, is rich in heme iron, zinc, and high-quality protein! \n \n 🦆 All of which support oxygen flow and neural efficiency. \n \n 🦆 It contains significant amounts of B vitamins that fuel neurotransmitter production and brain metabolism. \n \n 🦆 Unlike most lean meats, duck also contains beneficial omega-3 fatty acids! \n \n 🦆 These are essential for maintaining cognitive sharpness, emotional regulation, and neuroprotection. \n \n 🦆 The higher fat content helps in absorbing fat-soluble vitamins like vitamin A and vitamin K, supporting visual memory and neuron stability.",
+        'funModeDescription': " 🦆 Duck meat is the smooth operator of brain food 🧠. \n \n 🦆 It is rich, juicy, and loaded with the good kind of fats your brain craves. \n \n 🦆 It brings omega-3s to the party, keeping your thoughts slick and your moods unbothered. \n \n 🦆 Iron and zinc make sure your neurons are sprinting like they drank espresso! \n \n 🦆 They’re the behind-the-scenes squad keeping your brain’s power grid lit. \n \n 🦆 Yeah, it’s a bit fancier than your usual meat—but your brain deserves that VIP treatment. ",
+        'additionalInfo': '',
+        'additionalInfoExtra': ' ℹ️ Calories: 337 \n ℹ️ Protein: 27.1g \n ℹ️ Fat: 28.4g \n ℹ️ Carbs: 0g \n ℹ️ Iron: 16% DV \n ℹ️ Zinc: 21% DV \n ℹ️ Vitamin B6: 35% DV \n ℹ️ Niacin: 42% DV \n ℹ️ Omega-3: ~170mg',
+        'image': 'assets/duckmeat.png',
+        'modelPath': '',
+        'shortDescription': 'Fatty brainpower',
       },
     ],
     "nutrients": [
@@ -148,15 +200,25 @@ final Map<String, Map<String, dynamic>> organData = {
         'funModeTitle': 'Dairy 🧀',
         'items': [
           {
-            'name': 'dairy',
-            'normalModeDescription': 'normal dairy',
-            'funModeDescription': 'fun dairy',
-            'image': 'assets/FishTestImage.png',
+            'name': 'Cottage Cheese',
+            'normalModeDescription': " 🧀 Cottage cheese is rich in casein protein! \n \n 🧀 It is a slow-digesting type that fuels your brain steadily over time. \n \n 🧀 Which is perfect for long study sessions or work grinds. \n \n 🧀 It also delivers a healthy dose of vitamin B12, essential for memory and mood regulation. \n \n 🧀 The presence of calcium helps with neurotransmitter function and communication between neurons. \n \n 🧀 Thanks to its low glycemic index, it won't cause blood sugar spikes that can fog your brain. \n \n 🧀 It also has tryptophan, which contributes to serotonin production—keeping your brain balanced and chill.",
+            'funModeDescription': " 🧀 Cottage cheese = the brain’s low-key GOAT 🐐. \n \n 🧀 It’s like drip-feeding your noggin steady power all day—no energy crashes, just pure vibe. \n \n 🧀 It has: \n • Vitamin B12 for that memory sharpness, \n • Calcium to help your neurons talk, \n • Tryptophan so your mood ain’t flopping. \n \n 🧀 It’s slow-burn fuel, like a brain buffet that never runs out. \n \n 🧀 Whether you're grinding homework or bingeing documentaries, this is your creamy backup dancer.",
+            'image': 'assets/cottage cheese.png',
             'additionalInfo': '',
-            'additionalInfoExtra': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 98, \n ℹ️ Carbs: 3.4g, \n ℹ️ Protein: 11.1g,\n ℹ️ Fat: 4.3g, \n ℹ️ Calcium: 8% DV,\n ℹ️ Vitamin B12: 19% DV, \n ℹ️ Tryptophan: 0.29g',
             'modelPath': '',
-            'shortDescription': '',
-          }
+            'shortDescription': 'Slow-digesting brain fuel',
+          },
+          {
+            "name": "Whole Milk",
+            "normalModeDescription": " 🥛 Whole milk is a complete package of: \n 1. Brain-friendly nutrients, \n 2. Healthy fats, \n 3. Protein, \n 4. Vitamin D, \n 5. Choline. \n \n 🥛 These contribute to the growth and repair of brain cells, and help support long-term memory. \n \n 🥛 The high saturated fat content in whole milk, in moderation, can aid in myelin sheath formation around neurons. \n \n 🥛 Vitamin D is crucial for mood regulation and cognitive clarity! \n \n 🥛 Choline plays a big role in brain development and neurotransmitter synthesis.",
+            'funModeDescription': " 🥛 Whole milk’s that old-school legend that never left 🧠. \n \n 🥛 Packed with fats that build brain highways and protein to keep ya running, it’s like brain fuel with OG vibes. \n \n 🥛 Choline’s the real MVP here—it boosts memory like a cheat code. \n \n 🥛 And that vitamin D is mood armor, fam. \n \n 🥛 One glass and your neurons are like “zoom zoom.” \n \n 🥛 Forget watered-down nonsense, this is the creamy key to thinking straight and vibing sharp. ",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 61, \n ℹ️ Carbs: 4.8g, \n ℹ️ Protein: 3.2g, \n ℹ️ Fat: 3.3g, \n ℹ️ Vitamin D: 12% DV, \n ℹ️ Choline: 14mg, \n ℹ️ Calcium: 12% DV',
+            'image': 'assets/milk.png',
+            'modelPath': '',
+            'shortDescription': 'Classic brain hydrator',
+          },
         ],
       },
       'grains': {
@@ -793,13 +855,13 @@ final Map<String, Map<String, dynamic>> organData = {
     ],
     "meat": [
       {
-        "name": "FishTest",
-        "normalModeDescription": "fishtest",
-        'funModeDescription': "fishtestfun",
-        'additionalInfoExtra': 'FishTestAddInfo',
+        "name": "z",
+        "normalModeDescription": "",
+        'funModeDescription': "",
+        'additionalInfoExtra': '',
         'additionalInfo': '',
-        'image': 'assets/FishTestImage.png',
-        'shortDescription': 'FishTestShortDesc',
+        'image': 'assets/.png',
+        'shortDescription': '',
       },
     ],
     "nfunFact": "The femur, which is the longest bone in your leg, holds the title of being the longest bone in your entire body, providing the strength and support needed for movement and stability.",
@@ -842,6 +904,11 @@ final Map<String, Map<String, dynamic>> generalNutritionData = {
   "Protein": {
     "normalModeTitle": "Protein",
     "funModeTitle": "Protein 💪",
+    "items": <Map<String, dynamic>>[],
+  },
+  "Food": {
+    "normalModeTitle": "Food",
+    "funModeTitle": "Food 🍽️",
     "items": <Map<String, dynamic>>[],
   },
 };
@@ -902,10 +969,32 @@ void initializeAppData() {
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['protein']!['items']!), "Protein");
       }
       if (moreInfo.containsKey('food') && moreInfo['food']!['items'] != null) { // Add 'food' if you want it included
-        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['food']!['items']!), "Meat"); // Or a new "General Food" category
+        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['food']!['items']!), "Food"); // Or a new "General Food" category
       }
       // Note: "funFacts", "symptoms", "diseases", "weeklyDiet" typically aren't nutrition items
       // so they are not added to generalNutritionData here.
     }
   });
+}
+
+class AppData {
+  static Future<void> saveLastVisitedOrgan(String organName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastVisitedOrgan', organName);
+  }
+
+  static Future<String?> getLastVisitedOrgan() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('lastVisitedOrgan');
+  }
+
+  static Future<void> saveLastVisitedNutritionItem(String itemName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastVisitedNutritionItem', itemName);
+  }
+
+  static Future<String?> getLastVisitedNutritionItem() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('lastVisitedNutritionItem');
+  }
 }

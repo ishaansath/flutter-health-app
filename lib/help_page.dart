@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ishaan/main.dart';
+import 'package:ishaan/main.dart' hide lastVisitedOrganNotifier, lastVisitedNutritionNotifier;
+import 'package:ishaan/shared_preferences_helper.dart';
 import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // NEW: For tour completion tracking
 import 'package:ishaan/body_screen.dart'; // NEW: Import your main app screen
@@ -235,7 +236,7 @@ class _HelpPageState extends State<HelpPage> {
     await prefs.setBool('hasCompletedTour', true); // Mark as completed
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) => BodyScreen(themeModeNotifier: widget.themeModeNotifier, mode: 'mode', bodyModelNotifier: bodyModelNotifier),
+        builder: (context) => BodyScreen(themeModeNotifier: widget.themeModeNotifier, mode: 'mode', bodyModelNotifier: bodyModelNotifier, lastVisitedOrganNotifier: lastVisitedOrganNotifier,lastVisitedNutritionNotifier: lastVisitedNutritionNotifier),
       ),
           (Route<dynamic> route) => false, // Clear all previous routes
     );
