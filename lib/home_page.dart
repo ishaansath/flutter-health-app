@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:ishaan/main.dart'; // Make sure main.dart has saveLastVisitedNutrition
+// import 'package:ishaan/main.dart'; // This import is likely unnecessary and can cause issues, remove if unused
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ishaan/organ_detail_page.dart';
 import 'package:ishaan/item_detail_page.dart';
@@ -11,6 +11,7 @@ import 'package:ishaan/mascot_provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:ishaan/auth_firebase_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ishaan/shared_preferences_helper.dart'; // Ensure this import is present for save/load functions
 
 import 'app_data.dart' as AppData;
 
@@ -72,15 +73,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadLastVisited() async {
-    final prefs = await SharedPreferences.getInstance();
+    // Use the helper functions for loading
+    final Map<String, String>? organData = await loadLastVisitedOrgan();
     setState(() {
-      _lastVisitedOrganName = prefs.getString('lastVisitedOrganName');
-      _lastVisitedOrganImagePath = prefs.getString('lastVisitedOrganImagePath');
+      _lastVisitedOrganName = organData?['name'];
+      _lastVisitedOrganImagePath = organData?['imagePath'];
     });
     _loadLastVisitedNutritionItems(); // Load nutrition items separately
   }
 
   Future<void> _loadLastVisitedNutritionItems() async {
+    // This part of loading nutrition items should ideally also use a helper
+    // function that returns a List<Map<String, String>> for the two most recent.
+    // For now, keeping your existing logic here.
     final prefs = await SharedPreferences.getInstance();
     List<Map<String, String>> loadedItems = [];
 
@@ -176,25 +181,39 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(8.0),
-                            image: DecorationImage(
-                              image: AssetImage(_lastVisitedOrganImagePath!),
-                              fit: BoxFit.contain,
-                            ),
+                        // --- START OF IMAGE DISPLAY FIX & SIZE ADJUSTMENT ---
+                        ClipRRect( // Use ClipRRect for rounded corners on the image directly
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.asset(
+                            _lastVisitedOrganImagePath!,
+                            width: 40,  // HALF SIZE
+                            height: 40, // HALF SIZE
+                            fit: BoxFit.cover, // Use cover to fill the box without distortion
+                            errorBuilder: (context, error, stackTrace) {
+                              // This will print to your debug console if the image fails to load
+                              print('Error loading last visited organ image: $error');
+                              // Display a broken image icon as a fallback
+                              return Container(
+                                width: 40, // Match desired half size
+                                height: 40, // Match desired half size
+                                color: Colors.grey[300], // Placeholder background
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 24, // Smaller icon for smaller container
+                                  color: Colors.red,
+                                ),
+                              );
+                            },
                           ),
                         ),
+                        // --- END OF IMAGE DISPLAY FIX & SIZE ADJUSTMENT ---
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Last Visited Organ',
+                                'Recently Visited',
                                 style: theme.textTheme.titleSmall,
                               ),
                               Text(
@@ -202,8 +221,10 @@ class _HomePageState extends State<HomePage> {
                                 style: theme.textTheme.titleMedium,
                               ),
                               const SizedBox(height: 4),
+                              // Note: This AppData.organData[_lastVisitedOrganName]?[''] is likely incorrect.
+                              // You might want AppData.organData[_lastVisitedOrganName]?['briefInfo']
                               Text(
-                                AppData.organData[_lastVisitedOrganName]?[''] ?? '',
+                                AppData.organData[_lastVisitedOrganName]?['briefInfo'] ?? 'No brief info available.',
                                 style: theme.textTheme.bodyMedium,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -243,6 +264,8 @@ class _HomePageState extends State<HomePage> {
                     final item = _lastVisitedNutritionItems[index];
                     final itemName = item['name']!;
                     final itemImagePath = item['imagePath']!;
+                    // Assuming 'All' category exists and contains all items for lookup
+                    // This lookup might be inefficient for large datasets.
                     final itemData = AppData.generalNutritionData['All']!
                         .firstWhere((data) => data['name'] == itemName, orElse: () => {});
 
@@ -369,9 +392,20 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// Ensure you have these helper extensions/classes if they are not already defined elsewhere
+// This looks like it was generated by the IDE, but ensure it's correct.
 extension on Map<String, dynamic> {
   firstWhere(bool Function(dynamic data) param0, {required Map Function() orElse}) {}
+  // This extension method seems problematic as 'All' is a List<Map<String, dynamic>>
+  // and firstWhere should be on the List, not the Map itself.
+  // Consider if AppData.generalNutritionData['All']! is actually a List or Map.
+  // If 'All' is a List, this extension should be removed.
+  // For now, I'm assuming it might be a typo, and the lookup
+  // `AppData.generalNutritionData['All']!.firstWhere` is intended to work.
+  // firstWhere(bool Function(dynamic data) param0, {required Map Function() orElse}) {}
 }
 
+// Assuming FirebaseAuthService is a class defined elsewhere in your project
+// If not, you'll need to define it.
 FirebaseAuthService() {
 }

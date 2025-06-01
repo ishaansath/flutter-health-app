@@ -150,8 +150,6 @@ flutter:
     - assets/google logo.png
     - assets/mascot/Melonzo.png
     - assets/mascot/MelonzoTalking.gif
-    - assets/models/male_body.glb
-    - assets/models/female_body.glb
     - assets/animations/light/loading.json
     - assets/animations/dark/loading.json
     - assets/animations/dark/welcome.json
@@ -167,6 +165,16 @@ flutter:
     - assets/yellowbellpepper.png
     - assets/cottage cheese.png
     - assets/milk.png
+    - assets/buttergrassfed.png
+    - assets/paneer.png
+    - assets/kefir.png
+    - assets/oats.png
+    - assets/brownrice.png
+    - assets/quinoa.png
+    - assets/millet.png
+    - assets/barley.png
+    - assets/female_body.png
+    - assets/male_body.png
 
 
   fonts:

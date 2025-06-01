@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app_data.dart';
 
 // Keys for SharedPreferences
 const String _lastVisitedOrganNameKey = 'lastVisitedOrganName';
@@ -16,11 +17,11 @@ final ValueNotifier<Map<String, String>?> lastVisitedNutritionNotifier =
 ValueNotifier<Map<String, String>?>(null);
 
 /// Saves the last visited organ's name and image path to SharedPreferences.
-Future<void> saveLastVisitedOrgan(String name, String imagePath) async {
+Future<void> saveLastVisitedOrgan(String name, String image) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString(_lastVisitedOrganNameKey, name);
-  await prefs.setString(_lastVisitedOrganImagePathKey, imagePath);
-  lastVisitedOrganNotifier.value = {'name': name, 'imagePath': imagePath};
+  await prefs.setString(_lastVisitedOrganImagePathKey, image);
+  lastVisitedOrganNotifier.value = {'name': name, 'image': image};
   print('Saved last visited organ: $name');
 }
 
@@ -29,19 +30,19 @@ Future<void> saveLastVisitedOrgan(String name, String imagePath) async {
 Future<Map<String, String>?> loadLastVisitedOrgan() async {
   final prefs = await SharedPreferences.getInstance();
   final name = prefs.getString(_lastVisitedOrganNameKey);
-  final imagePath = prefs.getString(_lastVisitedOrganImagePathKey);
-  if (name != null && imagePath != null) {
-    return {'name': name, 'imagePath': imagePath};
+  final image = prefs.getString(_lastVisitedOrganImagePathKey);
+  if (name != null && image != null) {
+    return {'name': name, 'image': image};
   }
   return null;
 }
 
 /// Saves the last visited nutrition item's name and image path to SharedPreferences.
-Future<void> saveLastVisitedNutritionItem(String name, String imagePath) async {
+Future<void> saveLastVisitedNutritionItem(String name, String image) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString(_lastVisitedNutritionItemNameKey, name);
-  await prefs.setString(_lastVisitedNutritionItemImagePathKey, imagePath);
-  lastVisitedNutritionNotifier.value = {'name': name, 'imagePath': imagePath};
+  await prefs.setString(_lastVisitedNutritionItemImagePathKey, image);
+  lastVisitedNutritionNotifier.value = {'name': name, 'image': image};
   print('Saved last visited nutrition item: $name');
 }
 
@@ -50,9 +51,9 @@ Future<void> saveLastVisitedNutritionItem(String name, String imagePath) async {
 Future<Map<String, String>?> loadLastVisitedNutritionItem() async {
   final prefs = await SharedPreferences.getInstance();
   final name = prefs.getString(_lastVisitedNutritionItemNameKey);
-  final imagePath = prefs.getString(_lastVisitedNutritionItemImagePathKey);
-  if (name != null && imagePath != null) {
-    return {'name': name, 'imagePath': imagePath};
+  final image = prefs.getString(_lastVisitedNutritionItemImagePathKey);
+  if (name != null && image != null) {
+    return {'name': name, 'image': image};
   }
   return null;
 }

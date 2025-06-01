@@ -219,6 +219,36 @@ final Map<String, Map<String, dynamic>> organData = {
             'modelPath': '',
             'shortDescription': 'Classic brain hydrator',
           },
+          {
+            "name": "Butter Grass-Fed",
+            "normalModeDescription": " 🧈 Grass-fed butter contains: \n 1. Omega 3, \n 2. Conjugated linoleic acid, \n 3. Butyrate. \n \n 🧈 These fats help reduce inflammation in brain tissues, improve focus, and may support better mood regulation. \n \n 🧈 Vitamin A and K2 in butter aid in neuroprotection and cellular communication. \n \n 🧈 Butter also helps in the absorption of fat-soluble brain-friendly nutrients like vitamin D and E. \n \n 🧈 In small amounts, butter can be a rich source of quality fat.",
+            'funModeDescription': " 🧈 Butter ain’t just toast swag, it’s brain gold ⚡. \n \n 🧈 Grass-fed is where it’s at, loaded with omega-3s and brain-loving fats that keep your thinking smooth and clear. \n \n 🧈 It’s got that butyrate magic for chill vibes, plus vitamin A for those sharp thoughts. \n \n 🧈 Toss in K2 and your neurons are basically dancing. \n \n 🧈 A dab here, a swirl there, your brain’s lowkey celebrating. \n \n 🧈 Just don’t go butter crazy; it’s a flex, not a flood.",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 717, \n ℹ️ Carbs: 0.1g, \n ℹ️ Protein: 0.9g, \n ℹ️ Fat: 81g, \n ℹ️ Omega-3: 0.3g, \n ℹ️ Vitamin A: 684µg (76% DV), \n ℹ️ Vitamin K2: High',
+            'image': 'assets/buttergrassfed.png',
+            'modelPath': '',
+            'shortDescription': 'Fat-rich focus booster',
+          },
+          {
+            "name": "Paneer",
+            "normalModeDescription": " 🧀 Paneer is an excellent vegetarian protein source that delivers both tyrosine and choline! \n \n 🧀 It aids memory and learning functions. \n \n 🧀 It’s also high in calcium and vitamin B12, supporting neuron communication and brain energy. \n \n 🧀 Unlike other cheeses, it’s usually low in sodium and can be included daily without bloating or fogginess. \n \n 🧀 The fat and protein combination makes it ideal for sustained mental performance, especially in younger individuals. \n \n 🧀 It’s a favorite in Indian cuisine and can be prepared in dozens of delicious, healthy ways.",
+            'funModeDescription': " 🧀 Paneer is basically brain gains in a block 🧠🧊. \n \n 🧀 High in tyrosine for turbocharged focus and choline for memory moves. \n \n 🧀 Paneer’s that no-nonsense snack that’s got your mental clarity and energy synced. \n \n 🧀 It’s low-key, low-salt, and high-impact. \n \n 🧀 Fry it, grill it, curry it—your brain’s eating good regardless. \n \n 🧀 Bonus: no crash, just smart fuel and full vibes.",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 265, \n ℹ️ Carbs: 1.2g, \n ℹ️ Protein: 18g, \n ℹ️ Fat: 21g, \n ℹ️ Calcium: 20% DV, \n ℹ️ Vitamin B12: 22% DV, \n ℹ️ Tyrosine: Present',
+            'image': 'assets/paneer.png',
+            'modelPath': '',
+            'shortDescription': 'Indian Cottage Cheese',
+          },
+          {
+            "name": "Kefir",
+            "normalModeDescription": " 🥛 Kefir is a fermented milk drink packed with probiotics, which support gut-brain axis health. \n \n 🥛 A healthy gut microbiome can reduce anxiety, improve memory, and enhance overall brain function. \n \n 🥛 Kefir is also rich in vitamin B12, calcium, and tryptophan, contributing to better sleep, mood, and neurocommunication. \n \n 🥛 It’s more powerful than yogurt when it comes to microbial diversity! 🥛 Thus, making it excellent for mental clarity and emotional stability. ",
+            'funModeDescription': " 🥛 Kefir’s the bubbly brain booster you didn’t know you needed 🥂🧠. \n \n 🥛 Packed with trillions of gut buddies that talk to your brain like besties. \n \n 🥛 It smooths out stress, levels up your memory, and keeps your mood vibes high. \n \n 🥛 Think of it as your daily happy drink that’s secretly turning your neurons into scholars. \n \n 🥛 More bugs = more brains, fam. Swirl, sip, smile.",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 41, \n ℹ️ Carbs: 4.5g, \n ℹ️ Protein: 3.3g, \n ℹ️ Fat: 1g, \n ℹ️ Vitamin B12: 17% DV, \n ℹ️ Calcium: 12% DV, \n ℹ️ Probiotics: 30–50 strains',
+            'image': 'assets/kefir.png',
+            'modelPath': '',
+            'shortDescription': 'Probiotic brain awakener',
+          },
         ],
       },
       'grains': {
@@ -226,18 +256,58 @@ final Map<String, Map<String, dynamic>> organData = {
         'funModeTitle': 'Grains 🌾',
         'items': [
           {
-            'name': 'grain',
-            'normalModeDescription': 'normal grain',
-            'funModeDescription': 'fun grain',
-            'image': 'assets/FishTestImage.png',
+            'name': 'Oats',
+            'normalModeDescription': ' 🌾 Oats are a complex carbohydrate powerhouse that slowly release glucose, providing a steady stream of energy for the brain. \n \n 🌾 They’re rich in vitamin B1, essential for focus, and also contain iron to help oxygenate the brain. \n \n 🌾 The beta-glucan fiber improves heart health and circulation, indirectly enhancing brain performance. \n \n 🌾 Oats also support serotonin production, balancing mood. \n \n 🌾 Regular consumption has been linked to better cognitive function and sustained attention spans.',
+            'funModeDescription': ' 🌾 Oats are like brain power bars in disguise 💥. \n \n 🌾 They fuel you up slow and steady, just pure focus all morning long. \n \n 🌾 Packed with vitamin B1 and iron, they keep your brain oxygen-rich and sharp. \n \n 🌾 That beta-glucan fiber is like a highway to good vibes and clean blood flow. \n \n  🌾 Toss ‘em in your smoothie, bake ‘em into cookies, or go full oatmeal mode. \n \n 🌾Your brain’s like “Yes, chef!” with every bite.',
+            'image': 'assets/oats.png',
             'additionalInfo': '',
-            'additionalInfoExtra': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 389 kcal \n ℹ️ Carbs: 66g \n ℹ️ Protein: 17g \n ℹ️ Fiber: 10.6g \n ℹ️ Iron: 4.7mg (26% DV) \n ℹ️ Vitamin B1: 0.76mg (63% DV) \n ℹ️ Beta-glucan: High',
             'modelPath': '',
-            'shortDescription': '',
-          }
+            'shortDescription': 'Brain-fueling breakfast hero',
+          },
+          {
+            "name": "Brown Rice",
+            "normalModeDescription": " 🍚 Brown rice is a whole grain rich in vitamin B6, crucial for neurotransmitter synthesis. \n \n 🍚 It has complex carbohydrates that offer long-lasting energy, keeping the brain active and responsive. \n \n 🍚 The magnesium in brown rice helps relax the nervous system and supports better sleep—both important for memory retention. \n \n 🍚 It also contains manganese, which is vital for brain enzyme function. \n \n 🍚 Unlike white rice, its bran layer is preserved, retaining fiber and antioxidants that improve circulation to the brain.",
+            'funModeDescription': " 🍚 Brown rice is your brain’s chill grain homie 🧠. \n \n 🍚 It fuels your brain all day with those complex carbs! \n \n It also drops some serious B6 magic to keep your thoughts lightning fast. \n \n 🍚 Magnesium unlocks your zen mode. \n \n 🍚 It’s like the calm before the genius storm. \n \n 🍚 That fiber makes your brain's blood flow on point. \n \n 🍚 It's not just rice, it's a memory-boosting grain wizard. \n \n 🍚 Make it your sidekick and flex smarter, not harder.",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 123 kcal \n ℹ️ Carbs: 25.6g \n ℹ️ Protein: 2.7g \n ℹ️ Fiber: 1.6g \n ℹ️ Vitamin B6: 0.4mg (30% DV) \n ℹ️ Magnesium: 43mg (11% DV) \n ℹ️ Manganese: 1.1mg (55% DV)',
+            'image': 'assets/brownrice.png',
+            'modelPath': '',
+            'shortDescription': 'Whole grain for whole-brain health',
+          },
+          {
+            "name": "Quinoa",
+            "normalModeDescription": " 🌱 Quinoa is technically a seed but acts like a grain. \n \n 🌱 It is loaded with all nine essential amino acids, making it a complete protein—rare for a plant. \n \n 🌱 It’s rich in iron, magnesium, and vitamin B2, all crucial for brain metabolism and oxygenation. \n \n 🌱 The high fiber content helps regulate blood sugar, supporting consistent mental energy. \n \n 🌱 Quinoa also contains flavonoids, which offer antioxidant protection to brain cells. \n \n 🌱 Gluten-free and light, it supports mental focus and clarity while being easy to digest.",
+            'funModeDescription': "🌱 Quinoa’s the cool brain food that lowkey does it all 🌈💪. \n \n 🌱 It’s got full-on protein power, so your brain’s got all the fuel it needs for beast mode thinking. \n \n 🌱 Iron gives oxygen boost. \n 🌱 Magnesium makes your brain chill. \n 🌱 Vitamin B2 is pure clarity upgrade. \n \n 🌱 Plus, it’s light, easy, and never bloats your vibe. \n \n 🌱 Toss it in salads, bowls, or even desserts—your neurons are vibing either way.",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 120 kcal \n ℹ️ Carbs: 21.3g \n ℹ️ Protein: 4.1g \n ℹ️ Fiber: 2.8g \n ℹ️ Iron: 1.5mg (8% DV) \n ℹ️ Magnesium: 64mg (16% DV) \n ℹ️ Vitamin B2 (Riboflavin): 0.1mg (8% DV)',
+            'image': 'assets/quinoa.png',
+            'modelPath': '',
+            'shortDescription': 'Protein-packed grain for peak brain',
+          },
+          {
+            "name": "Millets",
+            "normalModeDescription": " 🌾 Millets are nutrient-dense whole grains that support brain health with their high levels of magnesium, phosphorus, and tryptophan. \n \n 🌾 Tryptophan is an amino acid involved in serotonin production. \n \n 🌾  They stabilize blood sugar, which improves mental clarity and reduces mood swings. \n \n 🌾 Millets also offer vitamin B3 (niacin), supporting brain cell communication. \n \n 🌾 Known to be gluten-free and high in fiber, they improve digestion and reduce inflammation, indirectly aiding mental performance.",
+            'funModeDescription': " 🌾 Millets are like the underrated indie heroes of brain food 🧠. \n \n 🌾 Packed with feel-good tryptophan, they boost your happy hormones while keeping your thoughts sharp and smooth. \n \n 🌾 Magnesium levels are high. Brain fog is Gone. \n \n🌾 From porridge to pancakes—get those gains for your brain.",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 119 kcal \n ℹ️ Carbs: 23.7g \n ℹ️ Protein: 3.5g \n ℹ️ Fiber: 1.3g \n ℹ️ Magnesium: 44mg (11% DV) \n ℹ️ Phosphorus: 100mg (14% DV) \n ℹ️ Vitamin B3: 1.6mg (10% DV) \n ℹ️ Tryptophan: Present',
+            'image': 'assets/millet.png',
+            'modelPath': '',
+            'shortDescription': 'Ancient grains for a modern brain',
+          },
+          {
+            "name": "Barley",
+            "normalModeDescription": " 🌾 Barley is rich in beta-glucan, a type of soluble fiber that stabilizes glucose levels, ensuring your brain gets a steady supply of energy. \n \n 🌾 It’s also packed with selenium, which supports cognitive function and brain cell defense. \n \n 🌾 The niacin and vitamin B6 in barley are essential for neurotransmitter function and mental clarity. \n \n 🌾 It enhances blood flow to the brain and helps reduce cholesterol, benefiting cardiovascular and cognitive systems alike. ",
+            'funModeDescription': " 🌾 Barley’s like your brain’s energy DJ 🎶🧠. \n \n 🌾 It drops beta-glucan beats that keep sugar crashes away and vibes high. \n \n 🌾 Niacin and B6 are spinning clear thoughts and sharp memory mixes. \n \n 🌾 It’s got that selenium spice, too—protecting your mental playlist. \n \n 🌾 Add it to soups, bowls, or go all in on a barley risotto. \n \n 🌾 Big brain gains are guaranteed!",
+            'additionalInfo': '',
+            'additionalInfoExtra': ' ℹ️ Calories: 123 kcal \n ℹ️ Carbs: 28.2g \n ℹ️ Protein: 2.3g \n ℹ️ Fiber: 3.8g \n ℹ️ Vitamin B6: 0.26mg (20% DV) \n ℹ️ Niacin: 2.1mg (13% DV) \n ℹ️ Selenium: 13.5mcg (25% DV)',
+            'image': 'assets/barley.png',
+            'modelPath': '',
+            'shortDescription': 'Beta-glucan grain for mental flow',
+          },
         ],
       },
-      'protein': {
+      'pulses': {
         'normalModeTitle': 'Protein',
         'funModeTitle': 'Protein 🥚',
         'items': [
@@ -277,23 +347,23 @@ final Map<String, Map<String, dynamic>> organData = {
           },
         ],
       },
-      'firstAid': {
-        'normalModeTitle': 'First Aid',
-        'funModeTitle': 'First Aid 🩹',
-        'items'
-            : [
-          {
-            'name': 'firstaid',
-            'normalModeDescription': 'normal',
-            'funModeDescription': 'fun',
-            'image': 'assets/FishTestImage.png',
-            'additionalInfo': '',
-            'additionalInfoExtra': '',
-            'modelPath': '',
-            'shortDescription': '',
-          }
-        ],
-      },
+      // 'firstAid': {
+      //   'normalModeTitle': 'First Aid',
+      //   'funModeTitle': 'First Aid 🩹',
+      //   'items'
+      //       : [
+      //     {
+      //       'name': 'firstaid',
+      //       'normalModeDescription': 'normal',
+      //       'funModeDescription': 'fun',
+      //       'image': 'assets/FishTestImage.png',
+      //       'additionalInfo': '',
+      //       'additionalInfoExtra': '',
+      //       'modelPath': '',
+      //       'shortDescription': '',
+      //     }
+      //   ],
+      // },
       'diseases': {
         'normalModeTitle': 'Diseases',
         'funModeTitle': 'Diseases 😵',
@@ -328,37 +398,21 @@ final Map<String, Map<String, dynamic>> organData = {
           },
         ],
       },
-      'food': {
-        'normalModeTitle': 'Food',
-        'funModeTitle': 'Food 😋',
-        'items': [
-          {'name': 'food item',
-            'normalModeDescription': 'normal food',
-            'funModeDescription': 'fun food',
-            'image': 'assets/FishTestImage.png',
-            'additionalInfo': '',
-            'additionalInfoExtra': '',
-            'modelPath': '',
-            'shortDescription': '',
-          }
-        ]
-      },
-      'weeklyDiet': {
-        'normalModeTitle': 'Weekly Diet',
-        'funModeTitle': 'Weekly Diet 🥗',
-        'items': [
-          {
-            'name': 'Monday',
-            'normalModeDescription': 'normal weekly diet',
-            'funModeDescription': 'fun weekly diet',
-            'image': 'assets/FishTestImage.png',
-            'additionalInfo': '',
-            'additionalInfoExtra': '',
-            'modelPath': '',
-            'shortDescription': '',
-          }
-        ]
-      }
+      // 'food': {
+      //   'normalModeTitle': 'Food',
+      //   'funModeTitle': 'Food 😋',
+      //   'items': [
+      //     {'name': 'food item',
+      //       'normalModeDescription': 'normal food',
+      //       'funModeDescription': 'fun food',
+      //       'image': 'assets/FishTestImage.png',
+      //       'additionalInfo': '',
+      //       'additionalInfoExtra': '',
+      //       'modelPath': '',
+      //       'shortDescription': '',
+      //     }
+      //   ]
+      // },
     },
   },
   "Heart": {
@@ -901,9 +955,9 @@ final Map<String, Map<String, dynamic>> generalNutritionData = {
     "funModeTitle": "Grains 🍞",
     "items": <Map<String, dynamic>>[],
   },
-  "Protein": {
-    "normalModeTitle": "Protein",
-    "funModeTitle": "Protein 💪",
+  "Pulses": {
+    "normalModeTitle": "Pulses",
+    "funModeTitle": "Pulses 💪",
     "items": <Map<String, dynamic>>[],
   },
   "Food": {
@@ -965,8 +1019,8 @@ void initializeAppData() {
       if (moreInfo.containsKey('grains') && moreInfo['grains']!['items'] != null) {
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['grains']!['items']!), "Grains");
       }
-      if (moreInfo.containsKey('protein') && moreInfo['protein']!['items'] != null) {
-        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['protein']!['items']!), "Protein");
+      if (moreInfo.containsKey('pulses') && moreInfo['pulses']!['items'] != null) {
+        addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['pulses']!['items']!), "Pulses");
       }
       if (moreInfo.containsKey('food') && moreInfo['food']!['items'] != null) { // Add 'food' if you want it included
         addItemsToCategory(List<Map<String, dynamic>>.from(moreInfo['food']!['items']!), "Food"); // Or a new "General Food" category

@@ -188,7 +188,8 @@ class ModelView extends StatelessWidget {
       child: ModelViewer(
         src: modelPath,
         alt: "Organ model", // Alt text for accessibility
-        ar: false,          // Augmented Reality mode disabled
+        ar: false, // Augmented Reality mode disabled
+        disableTap: true,
         autoRotate: true,   // Model rotates automatically
         cameraControls: true, // Allows user to control camera (zoom, pan, rotate)
         backgroundColor: colorScheme.primary, // ModelViewer background also from theme

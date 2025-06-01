@@ -40,7 +40,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     {'name': 'Dairy', 'icon': Ionicons.pint_outline, 'filledIcon': Ionicons.pint},
     {'name': 'Meat', 'icon': Icons.egg_outlined, 'filledIcon': Icons.egg},
     {'name': 'Grains', 'icon': Icons.grain_outlined, 'filledIcon': Icons.grain},
-    {'name': 'Protein', 'icon': Ionicons.barbell_outline, 'filledIcon': Ionicons.barbell},
+    {'name': 'Pulses', 'icon': Ionicons.barbell_outline, 'filledIcon': Ionicons.barbell},
     {'name': 'Food', 'icon': Ionicons.restaurant_outline, 'filledIcon': Ionicons.restaurant},
   ];
 

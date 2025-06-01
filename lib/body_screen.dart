@@ -1,4 +1,4 @@
-// lib/body_screen.dart (MODIFIED - Last Visited Organ Save)
+// lib/body_screen.dart (MODIFIED - 2D Body Image Only)
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/organ_detail_page.dart';
@@ -7,13 +7,13 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:ishaan/nutrition_tab_content.dart';
 import 'package:ishaan/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
+// REMOVED: import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:ionicons/ionicons.dart'; // Import Ion Icons
 import 'package:ishaan/home_page.dart'; // NEW: Import HomePage
 
 import 'app_data.dart' as AppData;
-import 'package:ishaan/main.dart' hide saveLastVisitedOrgan; // Import main.dart to access global notifiers
-import 'package:ishaan/shared_preferences_helper.dart' hide lastVisitedNutritionNotifier; // NEW: Import the helper
+import 'package:ishaan/main.dart'; // Import main.dart to access global notifiers
+import 'package:ishaan/shared_preferences_helper.dart' hide lastVisitedNutritionNotifier, saveLastVisitedOrgan; // NEW: Import the helper
 
 
 class BodyScreen extends StatefulWidget {
@@ -50,12 +50,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
   int _selectedIndex = 0;
 
-  // IMPORTANT: You MUST have these files:
-  // 'assets/models/male_body.glb'
-  // 'assets/models/female_body.glb'
-  // in your project's assets folder, and ensure they are declared in pubspec.yaml.
-  // If these files are missing, the app will crash or the model won't load.
-
   @override
   void initState() {
     super.initState();
@@ -84,39 +78,23 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  // Helper to get the model path based on the key
-  String _getBodyModelPath(String modelKey) {
+  // Renamed and updated: Now returns 2D image paths for body
+  String _getBodyImagePath(String modelKey) {
     String path;
     switch (modelKey) {
       case 'female_body':
-        path = 'assets/models/female_body.glb';
+        path = 'assets/female_body.png'; // Make sure this file exists!
         break;
-      case 'male_body': // Explicitly handle male_body
+      case 'male_body':
       default: // Default to male_body if not female or unrecognized
-        path = 'assets/models/male_body.glb';
+        path = 'assets/male_body.png'; // Make sure this file exists!
         break;
     }
-    print('BodyScreen: _getBodyModelPath called with "$modelKey", returning path: "$path"');
+    print('BodyScreen: _getBodyImagePath called with "$modelKey", returning path: "$path"');
     return path;
   }
 
-  // Helper to get the camera orbit string based on the model key
-  String _getCameraOrbit(String modelKey) {
-    return '0deg 90deg auto'; // Keeping a standard orbit
-  }
-
-  // Helper: To get the camera target based on the model key
-  String _getCameraTarget(String modelKey) {
-    switch (modelKey) {
-      case 'male_body':
-        return '0.1m auto auto'; // Shift 0.1 meters to the right
-      case 'female_body':
-        return 'auto auto auto'; // Shift 0.1 meters down
-      default:
-        return '0m 0m 0m'; // Default target (center)
-    }
-  }
-
+  // REMOVED: _getCameraOrbit and _getCameraTarget as they are for ModelViewer
 
   void _navigateToSettingsPage() {
     Navigator.push(
@@ -156,6 +134,13 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    String welcomeLottiePath;
+    if (widget.themeModeNotifier.value == ThemeMode.dark) {
+      welcomeLottiePath = 'assets/animations/dark/welcome.json';
+    } else {
+      welcomeLottiePath = 'assets/animations/light/welcome.json';
+    }
 
     return Scaffold(
       backgroundColor: colorScheme.primary,
@@ -251,10 +236,10 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
             lastVisitedNutritionNotifier: widget.lastVisitedNutritionNotifier, // Pass notifier
           ),
           // Nutrition Tab Content
-          NutritionTabContent(currentMode: _currentMode, themeModeNotifier: widget.themeModeNotifier, lastVisitedNutritionNotifier: lastVisitedNutritionNotifier),
+          NutritionTabContent(currentMode: _currentMode, themeModeNotifier: widget.themeModeNotifier, lastVisitedNutritionNotifier: widget.lastVisitedNutritionNotifier),
           // Mascot Tab Content
           MascotPage(mode: _currentMode),
-          // Body Tab Content (Model Viewer and Organ Overlays) - NOW LAST
+          // Body Tab Content (2D Image and Organ Overlays)
           Center(
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -262,43 +247,39 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // ValueListenableBuilder to dynamically update ModelViewer's src AND cameraOrbit
+                  // ValueListenableBuilder to dynamically update the 2D body image
                   ValueListenableBuilder<String>(
                     valueListenable: widget.bodyModelNotifier,
                     builder: (context, currentModelKey, child) {
-                      print('BodyScreen: ValueListenableBuilder rebuilding. Current model key: "$currentModelKey"');
-                      return ModelViewer(
-                        src: _getBodyModelPath(currentModelKey), // Get path from notifier's value
-                        alt: "A 3D model of a human body",
-                        ar: false,
-                        disableZoom: true,
-                        disableTap: true,
-                        disablePan: true,
-                        autoRotate: true,
-                        cameraControls: true,
-                        cameraOrbit: _getCameraOrbit(currentModelKey), // Dynamically set camera orbit
-                        cameraTarget: _getCameraTarget(currentModelKey), // Dynamically set camera target
-                        minCameraOrbit: 'auto 90deg auto',
-                        maxCameraOrbit: 'auto 90deg auto',
-                        backgroundColor: Colors.transparent,
+                      print('BodyScreen: ValueListenableBuilder rebuilding for 2D image. Current model key: "$currentModelKey"');
+                      return Image.asset(
+                        _getBodyImagePath(currentModelKey), // Use the new image path method
+                        fit: BoxFit.contain, // Adjust fit as needed for your image aspect ratio
+                        // Add errorBuilder for debugging if image doesn't load
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading body image: $error');
+                          return Center(
+                            child: Icon(Icons.broken_image, size: 100, color: Colors.red),
+                          );
+                        },
                       );
                     },
                   ),
 
-                  // Organ overlays with rounded box backgrounds
+                  // Organ overlays with rounded box backgrounds (existing positions)
                   Positioned(
                     top: MediaQuery.of(context).size.height * 0.001,
                     right: MediaQuery.of(context).size.height * 0.0565,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Brain"),
-                      child: Container( // NEW: Container for background
-                        padding: const EdgeInsets.all(8), // Add some padding around the image
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: colorScheme.onSurface, // Background color for the box
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Image.asset(
-                          'assets/brain.png',
+                          'assets/brain.png', // Ensure this is a 2D image asset
                           width: 40,
                           height: 40,
                         ),
@@ -310,7 +291,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     right: MediaQuery.of(context).size.height * 0.0565,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Eyes"),
-                      child: Container( // NEW: Container for background
+                      child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                             color: colorScheme.onSurface,
@@ -318,7 +299,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                             border: Border.all(color: colorScheme.surface, width: 2)
                         ),
                         child: Image.asset(
-                          'assets/eyes.png',
+                          'assets/eyes.png', // Ensure this is a 2D image asset
                           width: 30,
                           height: 30,
                         ),
@@ -330,7 +311,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     right: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Heart"),
-                      child: Container( // NEW: Container for background
+                      child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                             color: colorScheme.surface.withOpacity(0.7),
@@ -338,7 +319,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                             border: Border.all(color: colorScheme.onSurface, width: 2)
                         ),
                         child: Image.asset(
-                          'assets/heart.png',
+                          'assets/heart.png', // Ensure this is a 2D image asset
                           width: 40,
                           height: 40,
                         ),
@@ -350,14 +331,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     left: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Lungs"),
-                      child: Container( // NEW: Container for background
+                      child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: colorScheme.surface.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Image.asset(
-                          'assets/lungs.png',
+                          'assets/lungs.png', // Ensure this is a 2D image asset
                           width: 40,
                           height: 40,
                         ),
@@ -369,14 +350,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     left: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Muscles"),
-                      child: Container( // NEW: Container for background
+                      child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: colorScheme.surface.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Image.asset(
-                          'assets/muscle.png',
+                          'assets/muscle.png', // Ensure this is a 2D image asset
                           width: 40,
                           height: 40,
                         ),
@@ -388,14 +369,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     right: 40,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Legs"),
-                      child: Container( // NEW: Container for background
+                      child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: colorScheme.surface.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Image.asset(
-                          'assets/legs.png',
+                          'assets/legs.png', // Ensure this is a 2D image asset
                           width: 40,
                           height: 40,
                         ),
@@ -482,7 +463,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
     String dialogContent;
     final Map<String, dynamic>? organInfo = AppData.organData[organName]?.cast<String, dynamic>();
-    final String imagePath = organInfo?['image'] as String? ?? 'assets/placeholder.png'; // Get image path
+    // Make sure the imagePath for organs in app_data.dart are 2D images (.png, .jpg)
+    final String imagePath = organInfo?['image'] as String? ?? 'assets/placeholder.png';
 
     if (organInfo != null) {
       if (_currentMode == 'fun') {
@@ -515,12 +497,10 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
             ),
           ),
           TextButton(
-            onPressed: () async { // MODIFIED: Added async
+            onPressed: () async {
               Navigator.pop(context);
-              // NEW: Save last visited organ
-              await saveLastVisitedOrgan(organName, imagePath); // Call the new function
-              // Update the notifier in HomePage
-              widget.lastVisitedOrganNotifier.value = await loadLastVisitedOrgan(); // Update notifier
+              await saveLastVisitedOrgan(organName, imagePath); // Save the organ with its image path
+              widget.lastVisitedOrganNotifier.value = await loadLastVisitedOrgan(); // Update the notifier for HomePage
 
               Navigator.push(
                 context,
