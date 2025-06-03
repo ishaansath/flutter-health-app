@@ -129,10 +129,39 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   }
 
   Future<void> _initTts() async { // Make it async
-    await flutterTts.setLanguage("en-US");
-    await flutterTts.setSpeechRate(0.4);
-    await flutterTts.setPitch(1.0);
-    // await flutterTts.setVoice({"name": "ja-jp-x-htm-network", "locale": "ja-JP"});
+    await flutterTts.stop();
+
+    // Get the mascot's current voice settings from the provider
+    final mascotProvider = Provider.of<MascotProvider>(context, listen: false);
+    final Map<String, dynamic> settings = mascotProvider.currentMascotTtsVoiceSettings;
+
+    final String language = settings['language'] ?? "en-US";
+    final double pitch = (settings['pitch'] as num?)?.toDouble() ?? 1.0;
+    final double rate = (settings['rate'] as num?)?.toDouble() ?? 0.5;
+    final String? voiceName = settings['name']; // This is the 'name' of the specific voice
+
+    // Apply language, pitch, and rate
+    await flutterTts.setLanguage(language);
+    await flutterTts.setPitch(pitch);
+    await flutterTts.setSpeechRate(rate);
+
+    if (voiceName != null && voiceName.isNotEmpty) {
+      // The _flutterTts.setVoice method expects a map with 'name' and 'locale'
+      // You should ensure the locale matches the language you're trying to set.
+      try {
+        await flutterTts.setVoice({'name': voiceName, 'locale': language});
+        print("HomePage TTS Voice Set to: $voiceName ($language)");
+      } catch (e) {
+        print("HomePage TTS Error setting voice $voiceName for $language: $e");
+        // Fallback to just setting the language if specific voice fails
+        await flutterTts.setLanguage(language);
+      }
+    } else {
+      // If no specific voice name, ensure it falls back to language default
+      await flutterTts.setLanguage(language);
+      print("HomePage TTS using default voice for language: $language (no specific voice name provided)");
+    }
+
 
     List<dynamic> voices = await flutterTts.getVoices;
     print("Available Voices: $voices");
@@ -287,9 +316,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             children: [
               SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-                // Crucial: Add padding to the bottom of the scrollable content
-                // to make space for the button and mascot.
-                // Adjust the '200' based on the max height your button/mascot combo takes when animated.
                 child: Padding(
                   padding: EdgeInsets.only(bottom: _mascotTalkingHeight(context) + 200), // Increased buffer
                   child: Center(

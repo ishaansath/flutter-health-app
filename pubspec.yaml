@@ -175,12 +175,29 @@ flutter:
     - assets/barley.png
     - assets/female_body.png
     - assets/male_body.png
+    - assets/animations/light/mascotwidgetbg.json
+    - assets/animations/dark/mascotwidgetbg.json
+    - assets/redgrapes.png
+    - assets/kidneys.png
+    - assets/models/kidneys.glb
+    - assets/strawberry.png
+    - assets/models/strawberry.glb
+    - assets/omega3.png
+    - assets/eggwhite.png
+    - assets/mascot/Sage Broccoli.png
+    - assets/mascot/SageBroccoliTalking.gif
+    - assets/liver.png
+    - assets/bladder.png
+    - assets/largeintestine.png
 
 
   fonts:
-    - family: Poppins
+    - family: DeliusSwashCaps
       fonts:
-        - asset: assets/Poppins-Regular.ttf
-    - family: ComicNeue
+        - asset: assets/font/DeliusSwashCaps-Regular.ttf
+    - family: DynaPuff
       fonts:
-        - asset: assets/ComicNeue-Bold.ttf
+        - asset: assets/font/DynaPuff.ttf
+    - family: Griffy
+      fonts:
+        - asset: assets/font/Griffy-Regular.ttf

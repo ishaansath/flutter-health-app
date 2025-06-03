@@ -5,7 +5,8 @@ import 'detail_info_page.dart'; // Ensure correct import for your project
 import 'custom_button.dart'; // Ensure correct import for your project
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'more_info_page.dart'; // Ensure correct import for your project
-import 'app_data.dart'; // Crucial: Import your app_data.dart file
+import 'app_data.dart';
+import 'package:ionicons/ionicons.dart';
 
 class OrganDetailPage extends StatelessWidget {
   final String organ;
@@ -15,12 +16,11 @@ class OrganDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FIX: Changed {Data}[organ]! to organData[organ]!
-    // This accesses the top-level organData map from app_data.dart
     final Map<String, dynamic> data = organData[organ]!;
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final GlobalKey _tooltipKey = GlobalKey();
 
     final organName = organ;
     final briefInfoText = mode == 'fun' ? data['briefInfoFun']! as String : data['briefInfo']! as String;
@@ -32,11 +32,31 @@ class OrganDetailPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.primary,
       appBar: AppBar(
-        title: Text(organ), // AppBar title, uses theme.appBarTheme.titleTextStyle
+        title: Text(organ),
         centerTitle: true,
-        // AppBar's transparency and style are handled by main.dart's AppBarTheme
+          actions: [
+          Tooltip(
+          key: _tooltipKey,
+          message: 'Explore the 3D brain model by dragging or zooming in! Tap on the buttons below—Fruits, Veggies, Meat, Nutrients & More—to discover foods that boost brain health, fun facts, and extra info!',
+          margin: const EdgeInsets.symmetric(horizontal: 20.0),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+          textAlign: TextAlign.left,
+          child: IconButton(
+            icon: Icon(Ionicons.help_circle_outline),
+            color: colorScheme.onSecondary,
+            onPressed: () {
+              final dynamic tooltip = _tooltipKey.currentState;
+              tooltip?.ensureTooltipVisible();
+            },
+          )
+      )
+        ]
       ),
-      body: SingleChildScrollView( // Added SingleChildScrollView here
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Wrap(
@@ -44,7 +64,6 @@ class OrganDetailPage extends StatelessWidget {
             runSpacing: 40,
             alignment: WrapAlignment.center,
             children: [
-              // Only show ModelView if modelPath is a .glb file
               if (modelPath.isNotEmpty && modelPath.endsWith('.glb'))
                 SizedBox(
                   height: 300,
@@ -54,21 +73,15 @@ class OrganDetailPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  // Use colorScheme.surface for container background (like a card)
                   color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   briefInfoText,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge,
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize:11.5),
                 ),
               ),
-              // Custom buttons for categories:
-              // Ensure these keys (e.g., 'fruits', 'vegetables', 'meat', 'nutrients')
-              // actually exist in your organData for the selected organ.
-              // Use null-aware operator `?.` and provide a default empty list `?? []`
-              // to prevent errors if a category is missing for an organ.
 
               CustomButton(
                 text: mode == 'fun' ? "Fruits 🍎" : "Fruits",

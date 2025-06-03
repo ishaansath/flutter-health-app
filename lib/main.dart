@@ -264,6 +264,10 @@ class _HealthAppState extends State<HealthApp> {
                 error: Colors.red.shade700,
                 onError: Color(0xFFFFE5B4),
                 tertiary: Colors.cyan.shade400,
+                onPrimaryContainer: Color(0xffffcc00),
+                onSecondaryContainer: Color(0xffff8a00),
+                onTertiaryContainer: Color(0xffff3333),
+                surfaceContainer: Colors.grey[700]!,
               ),
               scaffoldBackgroundColor: Colors.white,
               appBarTheme: AppBarTheme(
@@ -321,6 +325,10 @@ class _HealthAppState extends State<HealthApp> {
                 error: Colors.red.shade400,
                 onError:Color(0xFFFFE5B4),
                 tertiary: Colors.amber.shade700,
+                onPrimaryContainer: Color(0xff4dcae6),
+                onSecondaryContainer: Color(0xff9483fc),
+                onTertiaryContainer: Color(0xff715aff),
+                surfaceContainer: Colors.grey[200]!,
               ),
               scaffoldBackgroundColor: Colors.grey.shade900,
               appBarTheme: AppBarTheme(

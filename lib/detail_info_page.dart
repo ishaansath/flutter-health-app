@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'item_detail_page.dart';
+import 'package:ionicons/ionicons.dart';
 
 class DetailInfoPage extends StatelessWidget {
   final String title;
@@ -11,9 +12,11 @@ class DetailInfoPage extends StatelessWidget {
   final Color color;
   final String organ;
   final String? info;
+  final String? tooltip;
   final List<Map<String, dynamic>>? items;
+  final GlobalKey _tooltipKey = GlobalKey();
 
-  const DetailInfoPage({
+  DetailInfoPage({
     super.key,
     this.info,
     required this.mode,
@@ -21,7 +24,7 @@ class DetailInfoPage extends StatelessWidget {
     required this.color,
     required this.organ,
     required this.title,
-    this.items,
+    this.items, this.tooltip,
   });
 
 
@@ -35,6 +38,27 @@ class DetailInfoPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title), // AppBar title, automatically styled by AppBarTheme in main.dart
         centerTitle: true,
+        actions: [
+        Tooltip(
+          key: _tooltipKey,
+        message: 'Swipe left or right to explore the cards. Tap on any card to see detailed info about that food item!',
+            margin: const EdgeInsets.symmetric(horizontal: 20.0),
+        decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+        textAlign: TextAlign.justify,
+        child: IconButton(
+          icon: Icon(Ionicons.help_circle_outline),
+          color: colorScheme.onSecondary,
+          onPressed: () {
+            final dynamic tooltip = _tooltipKey.currentState;
+          tooltip?.ensureTooltipVisible();
+          },
+        )
+        )
+        ],
         // AppBar's transparency, font, and icon colors are governed by main.dart's AppBarTheme
       ),
       body: SafeArea(
@@ -132,13 +156,14 @@ class DetailInfoPage extends StatelessWidget {
                                     Image.asset(
                                       item['image']!,
                                       height: 250, // Height for the image
+                                      width: 250,
                                       fit: BoxFit.contain,
                                     ),
                                   // --- END OF SIMPLIFIED IMAGE DISPLAY ---
                                   const SizedBox(height: 10),
                                   Text(
                                     item['name']!,
-                                    style: theme.textTheme.titleLarge,
+                                    style: theme.textTheme.titleLarge?.copyWith(fontSize: 20),
                                     textAlign: TextAlign.center,
                                   ),
                                   if (item['shortDescription'] != null)
@@ -146,7 +171,7 @@ class DetailInfoPage extends StatelessWidget {
                                       padding: const EdgeInsets.only(top: 3),
                                       child: Text(
                                         item['shortDescription']!,
-                                        style: theme.textTheme.bodyMedium,
+                                        style: theme.textTheme.bodyMedium?.copyWith(fontSize:10),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

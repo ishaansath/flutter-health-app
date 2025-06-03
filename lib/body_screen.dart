@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/organ_detail_page.dart';
-import 'package:ishaan/mascot_page.dart';
+import 'package:ishaan/mascot_page.dart' hide HomePage;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:ishaan/nutrition_tab_content.dart';
 import 'package:ishaan/settings_page.dart';
@@ -268,15 +268,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
                   // Organ overlays with rounded box backgrounds (existing positions)
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.001,
-                    right: MediaQuery.of(context).size.height * 0.0565,
+                    top: MediaQuery.of(context).size.height * 0.01,
+                    right: MediaQuery.of(context).size.height * 0.04,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Brain"),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: colorScheme.onSurface,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
                           'assets/brain.png', // Ensure this is a 2D image asset
@@ -287,36 +287,35 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     ),
                   ),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.07,
-                    right: MediaQuery.of(context).size.height * 0.0565,
+                    top: MediaQuery.of(context).size.height * 0.09,
+                    right: MediaQuery.of(context).size.height * 0.04,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Eyes"),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                             color: colorScheme.onSurface,
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: colorScheme.surface, width: 2)
+                            borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
                           'assets/eyes.png', // Ensure this is a 2D image asset
-                          width: 30,
-                          height: 30,
+                          width: 40,
+                          height: 40,
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.15,
-                    right: 40,
+                    top: MediaQuery.of(context).size.height * 0.17,
+                    right: MediaQuery.of(context).size.height * 0.04,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Heart"),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: colorScheme.surface.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: colorScheme.onSurface, width: 2)
+                            color: colorScheme.onSurface,
+                            borderRadius: BorderRadius.circular(8),
+
                         ),
                         child: Image.asset(
                           'assets/heart.png', // Ensure this is a 2D image asset
@@ -327,15 +326,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     ),
                   ),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.30,
-                    left: 40,
+                    top: MediaQuery.of(context).size.height * 0.15,
+                    left: MediaQuery.of(context).size.height * 0.04,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Lungs"),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: colorScheme.surface.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(12),
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
                           'assets/lungs.png', // Ensure this is a 2D image asset
@@ -347,14 +346,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                   ),
                   Positioned(
                     top: MediaQuery.of(context).size.height * 0.5,
-                    left: 40,
+                    left:  MediaQuery.of(context).size.height * 0.04,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Muscles"),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: colorScheme.surface.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(12),
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
                           'assets/muscle.png', // Ensure this is a 2D image asset
@@ -365,18 +364,113 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     ),
                   ),
                   Positioned(
-                    bottom: 20,
-                    right: 40,
+                    top: MediaQuery.of(context).size.height * 0.227,
+                    left:  MediaQuery.of(context).size.height * 0.04,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Liver"),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/liver.png', // Ensure this is a 2D image asset
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.33,
+                    right:  MediaQuery.of(context).size.height * 0.04,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Stomach"),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/stomach.png', // Ensure this is a 2D image asset
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.49,
+                    right:  MediaQuery.of(context).size.height * 0.04,
                     child: GestureDetector(
                       onTap: () => showOrganDialog(context, "Legs"),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: colorScheme.surface.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(12),
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
                           'assets/legs.png', // Ensure this is a 2D image asset
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.25,
+                    right:  MediaQuery.of(context).size.height * 0.04,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Kidneys"),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: colorScheme.onSurface,
+                            borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/kidneys.png', // Ensure this is a 2D image asset
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.41,
+                    right:  MediaQuery.of(context).size.height * 0.04,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Bladder"),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/bladder.png', // Ensure this is a 2D image asset
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.41,
+                    left:  MediaQuery.of(context).size.height * 0.04,
+                    child: GestureDetector(
+                      onTap: () => showOrganDialog(context, "Large Intestine"),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/largeintestine.png', // Ensure this is a 2D image asset
                           width: 40,
                           height: 40,
                         ),

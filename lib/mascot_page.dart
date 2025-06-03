@@ -40,8 +40,9 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
   late ChatSession _chat;
 
   late FlutterTts flutterTts;
-  String? _selectedVoiceName;
-  String? _selectedVoiceLocale;
+  // These are removed from state, as they will be directly applied to flutterTts
+  // String? _selectedVoiceName;
+  // String? _selectedVoiceLocale;
 
   late SpeechToText _speechToText;
   String _lastWords = '';
@@ -51,13 +52,19 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
 
   String _initialPromptText = "";
 
+  // Added a reference to the MascotProvider
+  late MascotProvider _mascotProvider;
+  // Flag to ensure listener is only added once
+  bool _isMascotProviderListenerAdded = false;
+
+
   @override
   void initState() {
     super.initState();
     _model = GenerativeModel(model: 'gemini-2.0-flash', apiKey: apikey);
 
     flutterTts = FlutterTts();
-    _initializeTts();
+    _initializeTts(); // General TTS setup
 
     _speechToText = SpeechToText();
     _initSpeechToText();
@@ -87,14 +94,34 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
       ),
     );
 
+    // This ensures context is available for Provider.of
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _mascotProvider = Provider.of<MascotProvider>(context, listen: false);
+
+      // Apply initial TTS settings for the currently selected mascot
+      _applyMascotTtsSettings(_mascotProvider.currentMascotTtsVoiceSettings);
+
+      // Add listener for changes in MascotProvider
+      if (!_isMascotProviderListenerAdded) {
+        _mascotProvider.addListener(_onMascotProviderChange);
+        _isMascotProviderListenerAdded = true;
+      }
+
       _loadAndSetupMascot();
     });
   }
 
+  // Listener function for MascotProvider changes
+  void _onMascotProviderChange() {
+    // This method is called when notifyListeners() is called in MascotProvider.
+    // It's safe to apply settings here, as it's outside the build method.
+    _applyMascotTtsSettings(_mascotProvider.currentMascotTtsVoiceSettings);
+  }
+
+
   Future<void> _loadAndSetupMascot() async {
-    final mascotProvider = Provider.of<MascotProvider>(context, listen: false);
-    final String currentMascotName = mascotProvider.currentMascotName;
+    // Use the _mascotProvider instance variable
+    final String currentMascotName = _mascotProvider.currentMascotName;
 
     final user = FirebaseAuth.instance.currentUser;
     String firstName = 'buddy';
@@ -112,7 +139,7 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
 
     _initialPromptText =
     "You are $currentMascotName, a friendly health and nutrition assistant. "
-        "Address the user by $firstName! If your name is Coco, you are a blue and amber colored bunny-sort of creature who wears space boots and a space suit. If your name is Melonzo, you are a watermelon who ate a magical potion to come to life and get hands and legs."
+        "Address the user by $firstName! ${_mascotProvider.currentMascotDesc} is your story/lore, if the user asks please let them know. Speak in this tone ${_mascotProvider.currentMascotTone}." // Use _mascotProvider
         "Your goal is to help users learn about health, their body, and nutrition. "
         "Detect the user's language and respond in that same language while maintaining your persona and all previous instructions."
         "**Crucially, detect the user's language and respond entirely in that detected language.** If you cannot confidently detect the language, default to English. Maintain your established persona as $currentMascotName, a friendly health and nutrition assistant, and all other previous instructions in every response."
@@ -147,11 +174,6 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
   }
 
   Future<void> _initializeTts() async {
-    await flutterTts.setLanguage("en-US");
-    await flutterTts.setSpeechRate(0.5);
-    await flutterTts.setVolume(1.0);
-    await flutterTts.setPitch(1.0);
-
     flutterTts.setStartHandler(() {
       if (mounted) {
         setState(() {
@@ -177,28 +199,30 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
       }
     });
 
-    final voices = await flutterTts.getVoices;
-    const String desiredVoiceName = "Google US English";
-    const String desiredVoiceLocale = "en-US";
+    // Removed direct voice selection here, as it's now handled by _applyMascotTtsSettings
+    // which is called when the mascot provider is initialized or changes.
+  }
 
-    final specificVoice = voices.firstWhere(
-          (voice) => voice['name'] == desiredVoiceName && voice['locale'] == desiredVoiceLocale,
-      orElse: () => null,
-    );
+  // New method to apply mascot-specific TTS settings
+  void _applyMascotTtsSettings(Map<String, dynamic> settings) {
+    final String language = settings['language'] ?? "en-US";
+    final double pitch = (settings['pitch'] as num?)?.toDouble() ?? 1.0;
+    final double rate = (settings['rate'] as num?)?.toDouble() ?? 0.5;
+    final String? voiceName = settings['name'];
 
-    if (specificVoice != null) {
-      await flutterTts.setVoice({"name": specificVoice['name']!, "locale": specificVoice['locale']!});
-      print("TTS Voice Set to: ${specificVoice['name']} (${specificVoice['locale']})");
-      if (mounted) {
-        setState(() {
-          _selectedVoiceName = specificVoice['name'];
-          _selectedVoiceLocale = specificVoice['locale'];
-        });
-      }
+    flutterTts.setLanguage(language);
+    flutterTts.setPitch(pitch);
+    flutterTts.setSpeechRate(rate);
+
+    if (voiceName != null && voiceName.isNotEmpty) {
+      // It's important to provide both 'name' and 'locale' for setVoice to work reliably
+      flutterTts.setVoice({'name': voiceName, 'locale': language});
     } else {
-      print("Desired voice '$desiredVoiceName' not found. Using default for 'en-US'.");
+      // If no specific voice name, ensure it falls back to language default
+      flutterTts.setLanguage(language);
     }
   }
+
 
   Future<void> _initSpeechToText() async {
     bool available = await _speechToText.initialize(
@@ -324,7 +348,7 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
       print('Gemini API Error: $e');
       if (mounted) {
         setState(() {
-          _messages.add(Message(text: 'Error contacting Coco!', isUser: false));
+          _messages.add(Message(text: 'Error contacting ${_mascotProvider.currentMascotName}!', isUser: false));
           _isLoading = false;
           _isSpeaking = false;
         });
@@ -362,6 +386,10 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
     _speechToText.stop();
     _speechToText.cancel();
     _mascotIdleController.dispose();
+    // IMPORTANT: Remove the listener when the widget is disposed
+    if (_isMascotProviderListenerAdded) {
+      _mascotProvider.removeListener(_onMascotProviderChange);
+    }
     super.dispose();
   }
 
@@ -379,6 +407,9 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
 
     return Consumer<MascotProvider>(
       builder: (context, mascotProvider, child) {
+        // Removed the _applyMascotTtsSettings call from here
+        // as it's now handled by the listener in initState.
+
         return Scaffold(
           // Remove backgroundColor from Scaffold as Lottie will cover it
           appBar: _hasUserSentMessage
