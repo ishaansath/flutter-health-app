@@ -1,11 +1,12 @@
-// item_detail_page.dart
+// lib/item_detail_page.dart
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:provider/provider.dart'; // NEW: Import provider
+import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart';
 
-import 'app_data.dart' as AppData; // NEW: Import your MascotProvider
+import 'app_data.dart' as AppData;
 
 // Define an enum for clear TTS states
 enum TtsState { playing, stopped, paused, continued }
@@ -13,11 +14,12 @@ enum TtsState { playing, stopped, paused, continued }
 class ItemDetailPage extends StatefulWidget {
   final String name;
   final String modelPath;
-  final String description; // This is the text to be read aloud
+  final String description;
   final String additionalInfo;
   final String additionalInfoExtra;
   final String image;
-  final String mode; // To determine normal/fun mode
+  final String mode;
+  // REMOVED: final List<String>? descriptionHeadings; // This will no longer be passed
 
   const ItemDetailPage({
     super.key,
@@ -28,6 +30,7 @@ class ItemDetailPage extends StatefulWidget {
     required this.image,
     required this.additionalInfoExtra,
     required this.mode,
+    // REMOVED: this.descriptionHeadings,
   });
 
   @override
@@ -36,77 +39,68 @@ class ItemDetailPage extends StatefulWidget {
 
 class _ItemDetailPageState extends State<ItemDetailPage> {
   FlutterTts flutterTts = FlutterTts();
-  TtsState ttsState = TtsState.stopped; // Use the enum for state
+  TtsState ttsState = TtsState.stopped;
 
-  // REMOVED: _mascotIdle and _mascotTalkingGif will now come from MascotProvider
+  // Define your fixed list of headings here
+  // IMPORTANT: Adjust these headings and their count to match how many
+  // sections your descriptions consistently split into.
+  final List<String> _fixedDescriptionHeadings = [
+    '🛡️ Benefits',
+    '🧠 Nutrients in Focus',
+    '🌱 Tips',
+    '🍽️ How It Helps',
+    '🔍 Key Functions',
+    '⚗️ Behind the Science',
+    // Add more if your descriptions consistently have more sections
+  ];
 
-
-  // --- Mascot Sizes & Positions ---
-  // Define IDLE state for mascot
   static const double _mascotIdleWidth = 100.0;
   static const double _mascotIdleHeight = 100.0;
-  static const double _mascotIdleBottom = 20.0; // Adjusted for better default placement
-  static const double _mascotIdleRight = 20.0; // Adjusted
+  static const double _mascotIdleBottom = 20.0;
+  static const double _mascotIdleRight = 20.0;
 
-  // Define TALKING state for mascot (now as functions to use context for responsive sizing)
-  double _mascotTalkingWidth(BuildContext context) => MediaQuery.of(context).size.width * 0.6; // 60% of screen width
-  double _mascotTalkingHeight(BuildContext context) => MediaQuery.of(context).size.height * 0.4; // 40% of screen height
+  double _mascotTalkingWidth(BuildContext context) => MediaQuery.of(context).size.width * 0.6;
+  double _mascotTalkingHeight(BuildContext context) => MediaQuery.of(context).size.height * 0.4;
 
-  // Position the talking mascot: adjusted to avoid conflicts and stay within bounds
   double _mascotTalkingBottom(BuildContext context) {
-    // Example: Place its bottom edge at 20% of screen height from the bottom
-    // You can adjust this '0.2' (20%) to move it higher or lower when talking.
     return MediaQuery.of(context).size.height * 0.2;
   }
 
   double _mascotTalkingRight(BuildContext context) {
-    // Center horizontally, or adjust as needed
     return (MediaQuery.of(context).size.width - _mascotTalkingWidth(context)) / 2;
   }
 
-  // --- Button Sizes & Positions ---
-  // Define IDLE state for button (relative to mascot's idle position)
-  static const double _buttonIdleBottom = _mascotIdleBottom + _mascotIdleHeight + 10; // 10px above idle mascot
+  static const double _buttonIdleBottom = _mascotIdleBottom + _mascotIdleHeight + 10;
   static const double _buttonIdleRight = _mascotIdleRight;
 
-  // Define TALKING state for button (relative to mascot's talking position)
   double _buttonTalkingBottom(BuildContext context) {
-    // Place button below the talking mascot, with some vertical padding
-    // Adjust '30.0' for spacing between mascot and button
-    return _mascotTalkingBottom(context) - (20 + 50); // button height (50) + padding (20)
+    return _mascotTalkingBottom(context) - (20 + 50);
   }
 
   double _buttonTalkingRight(BuildContext context) {
-    // Center the button horizontally during talking state
-    // Assuming button width is roughly 150-200. Adjust this for your actual button width.
-    return (MediaQuery.of(context).size.width - 200) / 2; // Roughly center a 200px wide button
+    return (MediaQuery.of(context).size.width - 200) / 2;
   }
 
-
-  // Current animated values for mascot
   double _currentMascotWidth = _mascotIdleWidth;
   double _currentMascotHeight = _mascotIdleHeight;
   double _currentMascotBottom = _mascotIdleBottom;
   double _currentMascotRight = _mascotIdleRight;
 
-  // Current animated values for button
   double _currentButtonBottom = _buttonIdleBottom;
   double _currentButtonRight = _buttonIdleRight;
 
   @override
   void initState() {
     super.initState();
-    _initTts(); // Initialize TTS
-    // Use addPostFrameCallback to ensure context is available for initial sizing calculations
+    _initTts();
     AppData.AppData.saveLastVisitedNutritionItem(widget.name);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateMascotPositionAndSize(); // Set initial state after widget is laid out
+      _updateMascotPositionAndSize();
     });
   }
 
-  // Helper to update mascot and button properties based on TTS state
   void _updateMascotPositionAndSize() {
-    if (!mounted) return; // Ensure widget is mounted before updating state
+    if (!mounted) return;
     setState(() {
       if (ttsState == TtsState.playing || ttsState == TtsState.continued) {
         _currentMascotWidth = _mascotTalkingWidth(context);
@@ -116,7 +110,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
         _currentButtonBottom = _buttonTalkingBottom(context);
         _currentButtonRight = _buttonTalkingRight(context);
-      } else { // TtsState.stopped or TtsState.paused
+      } else {
         _currentMascotWidth = _mascotIdleWidth;
         _currentMascotHeight = _mascotIdleHeight;
         _currentMascotBottom = _mascotIdleBottom;
@@ -128,40 +122,33 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     });
   }
 
-  Future<void> _initTts() async { // Make it async
+  Future<void> _initTts() async {
     await flutterTts.stop();
 
-    // Get the mascot's current voice settings from the provider
     final mascotProvider = Provider.of<MascotProvider>(context, listen: false);
     final Map<String, dynamic> settings = mascotProvider.currentMascotTtsVoiceSettings;
 
     final String language = settings['language'] ?? "en-US";
     final double pitch = (settings['pitch'] as num?)?.toDouble() ?? 1.0;
     final double rate = (settings['rate'] as num?)?.toDouble() ?? 0.5;
-    final String? voiceName = settings['name']; // This is the 'name' of the specific voice
+    final String? voiceName = settings['name'];
 
-    // Apply language, pitch, and rate
     await flutterTts.setLanguage(language);
     await flutterTts.setPitch(pitch);
     await flutterTts.setSpeechRate(rate);
 
     if (voiceName != null && voiceName.isNotEmpty) {
-      // The _flutterTts.setVoice method expects a map with 'name' and 'locale'
-      // You should ensure the locale matches the language you're trying to set.
       try {
         await flutterTts.setVoice({'name': voiceName, 'locale': language});
         print("HomePage TTS Voice Set to: $voiceName ($language)");
       } catch (e) {
         print("HomePage TTS Error setting voice $voiceName for $language: $e");
-        // Fallback to just setting the language if specific voice fails
         await flutterTts.setLanguage(language);
       }
     } else {
-      // If no specific voice name, ensure it falls back to language default
       await flutterTts.setLanguage(language);
       print("HomePage TTS using default voice for language: $language (no specific voice name provided)");
     }
-
 
     List<dynamic> voices = await flutterTts.getVoices;
     print("Available Voices: $voices");
@@ -190,14 +177,14 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           _updateMascotPositionAndSize();
         });
       }
-      debugPrint("TTS Error: $msg"); // Changed to debugPrint
+      debugPrint("TTS Error: $msg");
     });
 
     flutterTts.setPauseHandler(() {
       if (mounted) {
         setState(() {
           ttsState = TtsState.paused;
-          _updateMascotPositionAndSize(); // Mascot goes down when paused
+          _updateMascotPositionAndSize();
         });
       }
     });
@@ -206,35 +193,51 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       if (mounted) {
         setState(() {
           ttsState = TtsState.continued;
-          _updateMascotPositionAndSize(); // Mascot goes up when continuing
+          _updateMascotPositionAndSize();
         });
       }
     });
   }
 
+  // Uses the _fixedDescriptionHeadings list
   String _cleanTextForTts(String text) {
-    String cleanedText = text.replaceAll('\n', ' ');
-    cleanedText = cleanedText.replaceAll('\r', ' ');
+    List<String> sections = text.split('\n \n');
+    StringBuffer cleanedBuffer = StringBuffer();
 
-    // Simplified regex: removes most non-alphanumeric, non-space characters
-    // If you need specific emojis removed, you can keep parts of your long regex,
-    // but this is often sufficient for TTS.
+    for (int i = 0; i < sections.length; i++) {
+      String currentContent = sections[i].trim();
+      String currentHeading = (i < _fixedDescriptionHeadings.length) ? _fixedDescriptionHeadings[i] : '';
+
+      if (currentHeading.isNotEmpty) {
+        cleanedBuffer.write("$currentHeading. "); // Add heading with a pause
+      }
+      cleanedBuffer.write(currentContent);
+
+      if (i < sections.length - 1) {
+        cleanedBuffer.write(". "); // Add a pause between sections
+      }
+    }
+
+    String cleanedText = cleanedBuffer.toString();
+    cleanedText = cleanedText.replaceAll('\n', ' ');
+    cleanedText = cleanedText.replaceAll('\r', ' ');
     cleanedText = cleanedText.replaceAll(RegExp(r'[🍌🥷💡🧠⚡🐵🫐💓✨🍎🚀⛽💥📚🥬💚🧅💧⚔️🥒💊🚦🚓🫀🩸📶🚫🌻🛡️🕹️🧀🌾🥚🎈🤒😵😋🥗🍷💃🥑💪🟣🌳💨🍅🔥🧯🛠️🍊💉🎧🎶😎🥭🍇🪄👓🥝🕶️🥕🧡🦅👑🌶️👁️🌌☀️🌿🧴🍍🧼🫧🧄🫁🍐🧸🍠🕊️🚗🍽️💦🦿🦴🔐🧖‍♂️🦵💪🏽]'),
         '');
-    return cleanedText.trim();
-  }
+        return cleanedText.trim();
+    }
+
 
   Future _handleMascotTap() async {
     if (ttsState == TtsState.playing || ttsState == TtsState.continued) {
       await _pause();
     } else if (ttsState == TtsState.paused) {
-      await _speak(); // Continue from paused state
-    } else { // TtsState.stopped
-      await _speak(); // Start speaking
+      await _speak();
+    } else {
+      await _speak();
     }
   }
 
-
+  // Calls _cleanTextForTts without passing headings, as it uses the fixed list
   Future _speak() async {
     String textToSpeak = _cleanTextForTts(widget.description);
     if (textToSpeak.isNotEmpty) {
@@ -246,7 +249,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
         // State will be updated by setStartHandler, setContinueHandler, or setCompletionHandler
       }
     } else {
-      debugPrint('No clean text to speak for description.'); // Changed to debugPrint
+      debugPrint('No clean text to speak for description.');
     }
   }
 
@@ -266,10 +269,122 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
   @override
   void dispose() {
-    flutterTts.stop(); // Stop any ongoing TTS speech
+    flutterTts.stop();
     super.dispose();
   }
 
+  // Helper function to build the list of nutritional info widgets
+  List<Widget> _buildAdditionalInfoWidgets(String info, ThemeData theme) {
+    List<Widget> widgets = [];
+
+    List<String> infoLines = info.split('\n');
+
+    for (int i = 0; i < infoLines.length; i++) {
+
+      String currentLine = infoLines[i].trim();
+
+      if (currentLine.isNotEmpty) {
+        widgets.add(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  child: const Icon(
+                    Ionicons.information,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  currentLine,
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 11),
+                ),
+              ),
+            ],
+          ),
+        );
+        if (i < infoLines.length - 1 && infoLines[i + 1].trim().isNotEmpty) {
+          widgets.add(const SizedBox(height: 8));
+        }
+      }
+    }
+    return widgets;
+  }
+
+  // Uses the _fixedDescriptionHeadings list
+  List<Widget> _buildDescriptionSections(
+      String description,
+      ThemeData theme,
+      ColorScheme colorScheme,
+      // REMOVED: List<String>? headings // This parameter is no longer needed
+      ) {
+    List<Widget> descriptionWidgets = [];
+    List<String> sections = description.split(RegExp(r'\n\s*\n')).map((s) => s.trim()).toList();
+
+    debugPrint('--- Debugging Description Sections ---');
+    debugPrint('Original description: "$description"');
+    debugPrint('Number of sections after split: ${sections.length}');
+    debugPrint('Fixed headings: $_fixedDescriptionHeadings');
+    debugPrint('Number of fixed headings: ${_fixedDescriptionHeadings.length}');
+
+
+    for (int i = 0; i < sections.length; i++) {
+      String currentSection = sections[i].trim();
+
+      debugPrint('Section $i: "$currentSection"');
+
+      if (currentSection.isNotEmpty) {
+        // Use the fixed headings list directly
+        bool shouldAddHeading = i < _fixedDescriptionHeadings.length && _fixedDescriptionHeadings[i].isNotEmpty;
+        debugPrint('Section $i should add heading: $shouldAddHeading');
+
+        descriptionWidgets.add(
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (shouldAddHeading)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      _fixedDescriptionHeadings[i], // Use the fixed list here
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: "Montserrat-Bold", color: colorScheme.onSecondary),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                Text(
+                  currentSection,
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 12.75),
+                  textAlign: TextAlign.left,
+                ),
+
+              ],
+            ),
+          ),
+        );
+
+        if (i < sections.length - 1) {
+          descriptionWidgets.add(const SizedBox(height: 20));
+        }
+      }
+    }
+    debugPrint('--- End Debugging Description Sections ---');
+    return descriptionWidgets;
+  }
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -277,7 +392,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
     IconData buttonIcon;
     String buttonText;
-    VoidCallback onPressedAction; // Define a variable for the action
+    VoidCallback onPressedAction;
 
     if (ttsState == TtsState.playing || ttsState == TtsState.continued) {
       buttonIcon = Icons.pause;
@@ -287,16 +402,14 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       buttonIcon = Icons.play_arrow_outlined;
       buttonText = 'Continue';
       onPressedAction = _speak;
-    } else { // TtsState.stopped
+    } else {
       buttonIcon = Icons.play_arrow;
       buttonText = 'Play';
       onPressedAction = _speak;
     }
 
-    // NEW: Use Consumer to get the MascotProvider and dynamically load mascot paths
     return Consumer<MascotProvider>(
       builder: (context, mascotProvider, child) {
-        // Get the current mascot's idle and talking GIF paths from the provider
         String currentMascotIdle = mascotProvider.currentMascotStaticPath;
         String currentMascotTalkingGif = mascotProvider.currentMascotSpeakingPath;
 
@@ -315,9 +428,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           body: Stack(
             children: [
               SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(10),
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: _mascotTalkingHeight(context) + 200), // Increased buffer
+                  padding: EdgeInsets.only(bottom: _mascotTalkingHeight(context) + 200),
                   child: Center(
                     child: Column(
                       children: [
@@ -350,23 +463,27 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Pass no headings here, as _buildDescriptionSections uses the fixed list
+                              ..._buildDescriptionSections(widget.description, theme, colorScheme),
+                              const SizedBox(height: 20),
                               Container(
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(15),
                                 decoration: BoxDecoration(
                                   color: colorScheme.surface,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Text(
-                                  widget.description,
-                                  style: theme.textTheme.bodyLarge,
-                                  textAlign: TextAlign.left,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Nutritional Info (Per 100g):",
+                                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: "Montserrat-Bold"),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    ..._buildAdditionalInfoWidgets(widget.additionalInfoExtra, theme),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                widget.additionalInfoExtra,
-                                style: theme.textTheme.bodyMedium,
-                                textAlign: TextAlign.left,
                               ),
                             ],
                           ),
@@ -388,7 +505,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                 child: GestureDetector(
                   onTap: _handleMascotTap,
                   child: Image.asset(
-                    displayMascotGif, // Use the dynamically determined mascot path
+                    displayMascotGif,
                     fit: BoxFit.contain,
                     gaplessPlayback: true,
                   ),
