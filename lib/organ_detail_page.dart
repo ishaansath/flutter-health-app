@@ -8,6 +8,7 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'more_info_page.dart'; // Ensure correct import for your project
 import 'app_data.dart';
 import 'package:ionicons/ionicons.dart';
+import 'glassmorphic_button.dart';
 import 'frosted_glass_container.dart';
 
 class OrganDetailPage extends StatelessWidget {
@@ -29,11 +30,16 @@ class OrganDetailPage extends StatelessWidget {
     final modelPath = data['image']! as String; // Assuming 'image' holds the .glb path
     final Map<String, Map<String, dynamic>>? moreInfoCategories =
     data['moreInfoCategories'] as Map<String, Map<String, dynamic>>?;
+    final bool isDarkMode = theme.brightness == Brightness.dark;
+    final String backgroundImagePath = isDarkMode
+        ? "assets/organdarkbg.png"
+        : "assets/organlightbg.png";
 
 
     return Scaffold(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.primaryContainer,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(organ),
         centerTitle: true,
           actions: [
@@ -58,7 +64,15 @@ class OrganDetailPage extends StatelessWidget {
       )
         ]
       ),
-      body: SingleChildScrollView(
+      body: Stack( // Use Stack to layer background and content
+    children: [
+    // Background Image
+    Positioned.fill(
+    child: Image.asset(
+      backgroundImagePath,
+      fit: BoxFit.cover,
+    ),
+    ),SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Wrap(
@@ -72,7 +86,7 @@ class OrganDetailPage extends StatelessWidget {
                   child: ModelView(modelPath: modelPath),
                 ),
               FrostedGlassContainer(
-                padding: const EdgeInsets.all(16),
+                height: 100,
                 child: Text(
                   briefInfoText,
                   textAlign: TextAlign.center,
@@ -169,7 +183,7 @@ class OrganDetailPage extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ]));
   }
 }
 
@@ -186,9 +200,7 @@ class ModelView extends StatelessWidget {
     return Container(
       height: 250,
       decoration: BoxDecoration(
-        color: colorScheme.primary, // Background for the model container
-        border: Border.all(color: colorScheme.primary, width: 2), // Border color from theme
-        borderRadius: BorderRadius.circular(7),
+        color: Colors.transparent, // Background for the model container
       ),
       child: ModelViewer(
         src: modelPath,
@@ -197,7 +209,7 @@ class ModelView extends StatelessWidget {
         disableTap: true,
         autoRotate: true,   // Model rotates automatically
         cameraControls: true, // Allows user to control camera (zoom, pan, rotate)
-        backgroundColor: colorScheme.primary, // ModelViewer background also from theme
+        backgroundColor: Colors.transparent, // ModelViewer background also from theme
       ),
     );
   }

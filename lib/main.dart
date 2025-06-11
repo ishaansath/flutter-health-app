@@ -268,6 +268,7 @@ class _HealthAppState extends State<HealthApp> {
                 onSecondaryContainer: Color(0xffff8a00),
                 onTertiaryContainer: Color(0xffff3333),
                 surfaceContainer: Colors.grey[700]!,
+                primaryContainer: Color(0xFFF6F7FB),
               ),
               scaffoldBackgroundColor: Colors.white,
               appBarTheme: AppBarTheme(
@@ -329,6 +330,7 @@ class _HealthAppState extends State<HealthApp> {
                 onSecondaryContainer: Color(0xff9483fc),
                 onTertiaryContainer: Color(0xff715aff),
                 surfaceContainer: Colors.grey[200]!,
+                primaryContainer: Color(0xFF030D1D)
               ),
               scaffoldBackgroundColor: Colors.grey.shade900,
               appBarTheme: AppBarTheme(

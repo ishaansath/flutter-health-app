@@ -194,6 +194,8 @@ flutter:
     - assets/mascot/FinnTalking.gif
     - assets/mascot/Appy.png
     - assets/mascot/AppyTalking.gif
+    - assets/organlightbg.png
+    - assets/organdarkbg.png
 
 
   fonts:
