@@ -1,12 +1,14 @@
 // lib/organ_detail_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:ishaan/frosted_glass_button.dart';
 import 'detail_info_page.dart'; // Ensure correct import for your project
 import 'custom_button.dart'; // Ensure correct import for your project
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'more_info_page.dart'; // Ensure correct import for your project
 import 'app_data.dart';
 import 'package:ionicons/ionicons.dart';
+import 'frosted_glass_container.dart';
 
 class OrganDetailPage extends StatelessWidget {
   final String organ;
@@ -69,13 +71,8 @@ class OrganDetailPage extends StatelessWidget {
                   height: 300,
                   child: ModelView(modelPath: modelPath),
                 ),
-              Container(
+              FrostedGlassContainer(
                 padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Text(
                   briefInfoText,
                   textAlign: TextAlign.center,
@@ -83,15 +80,14 @@ class OrganDetailPage extends StatelessWidget {
                 ),
               ),
 
-              CustomButton(
-                text: mode == 'fun' ? "Fruits 🍎" : "Fruits",
-                backgroundColor: const Color(0xFFF11B26),
-                textColor: Colors.white,
+              FrostedGlassButton(
+                text: "Fruits",
+              icon: Ionicons.nutrition,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailInfoPage(
-                      title: mode == 'fun' ? "Fruits" : "Fruits",
+                      title: "Fruits",
                       items: data['fruits'] as List<Map<String, dynamic>>? ?? [],
                       color: Colors.red,
                       organ: organName,
@@ -101,15 +97,14 @@ class OrganDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              CustomButton(
-                backgroundColor: const Color(0xCC53FD1A),
-                textColor: Colors.white,
-                text: mode == 'fun' ? "Veggies 🥬" : "Vegetables",
+             FrostedGlassButton(
+               icon: Ionicons.leaf,
+                text: "Vegetables",
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailInfoPage(
-                      title: mode == 'fun' ? "Vegetables" : "Vegetables",
+                      title: "Vegetables",
                       items: data['vegetables'] as List<Map<String, dynamic>>? ?? [],
                       color: Colors.orange,
                       organ: organName,
@@ -119,15 +114,14 @@ class OrganDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              CustomButton(
-                text: mode == 'fun' ? "Meats 🍗" : "Meats",
-                backgroundColor: const Color(0xFFFF6F00),
-                textColor: Colors.white,
+              FrostedGlassButton(
+                text: "Meat",
+                icon: Icons.egg,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailInfoPage(
-                      title: mode == 'fun' ? "Meats" : "Meats",
+                      title: "Meat",
                       items: data['meat'] as List<Map<String, dynamic>>? ?? [], // Changed 'meat' to 'meat'
                       color: Colors.deepPurple,
                       organ: organName,
@@ -137,15 +131,14 @@ class OrganDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              CustomButton(
-                text: mode == 'fun' ? "Nutrients 💊" : "Nutrients",
-                backgroundColor: const Color(0xFF005FD5),
-                textColor: Colors.white,
+              FrostedGlassButton(
+                text: "Nutrients",
+                icon: Ionicons.sparkles,
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailInfoPage(
-                      title: mode == 'fun' ? "Nutrients" : "Nutrients",
+                      title: "Nutrients",
                       items: data['nutrients'] as List<Map<String, dynamic>>? ?? [],
                       color: Colors.deepPurple,
                       organ: organName,
@@ -156,10 +149,9 @@ class OrganDetailPage extends StatelessWidget {
                 ),
               ),
               if (moreInfoCategories != null && moreInfoCategories.isNotEmpty)
-                CustomButton(
-                  text: mode == 'fun' ? "More ➕" : "More",
-                  backgroundColor: const Color(0xFF93B6EA),
-                  textColor: Colors.white,
+                FrostedGlassButton(
+                  text: "More",
+                  icon: Ionicons.add,
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(

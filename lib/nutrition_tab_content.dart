@@ -1,14 +1,12 @@
-// lib/nutrition_tab_content.dart (FULL CORRECTED - Lottie for No Results & Initial Animation)
-
 import 'package:flutter/material.dart';
 import 'package:ishaan/app_data.dart' as AppData;
 import 'package:ishaan/item_detail_page.dart';
 import 'package:ishaan/nutrition_item_model.dart';
 import 'package:ishaan/searchable_nutrition_items.dart';
-import 'package:ishaan/shared_preferences_helper.dart'; // Ensure this import is correct for save/load functions
+import 'package:ishaan/shared_preferences_helper.dart';
 import 'package:string_similarity/string_similarity.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:lottie/lottie.dart'; // REQUIRED for Lottie animations
+import 'package:lottie/lottie.dart';
 
 class NutritionTabContent extends StatefulWidget {
   final String currentMode;
@@ -47,7 +45,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
   String _currentCategoryFilter = 'All';
   String? _previousCategoryFilter;
 
-  bool _showInitialLottieAnimation = true; // Renamed for clarity
+  bool _showInitialLottieAnimation = true;
 
   @override
   void initState() {
@@ -57,8 +55,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     _applyFilters();
     _previousCategoryFilter = _currentCategoryFilter;
 
-    // Play initial Lottie animation once
-    Future.delayed(const Duration(seconds: 2), () { // Adjust duration as needed
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _showInitialLottieAnimation = false;
@@ -97,7 +94,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
         }
       }
     });
-    print("Loaded ${_allGeneralNutritionItems.length} general nutrition items.");
   }
 
   String? _getCorrectionSuggestion(String query) {
@@ -187,12 +183,10 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             ? (item.funModeDescription.isNotEmpty ? item.funModeDescription : item.normalModeDescription)
             : item.normalModeDescription;
 
-        // Call the top-level function directly and pass both name and imagePath
-        saveLastVisitedNutritionItem(item.name, item.imagePath); // Corrected call
-        // Update the ValueNotifier with both name and imagePath
+        saveLastVisitedNutritionItem(item.name, item.imagePath);
         widget.lastVisitedNutritionNotifier.value = {
           'name': item.name,
-          'imagePath': item.imagePath, // Ensure imagePath is passed
+          'imagePath': item.imagePath,
         };
 
         Navigator.push(
@@ -229,16 +223,13 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
                 )
               else
                 Icon(Icons.fastfood, size: 80, color: colorScheme.onSecondary),
-
               const SizedBox(height: 12),
-
               Text(
                 '${item.name} (${item.parentCategory})',
                 style: theme.textTheme.displayLarge?.copyWith(color: colorScheme.onSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
-
               if (item.shortDescription.isNotEmpty)
                 Text(
                   item.shortDescription,
@@ -259,24 +250,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    Offset beginOffset;
-    Offset endOffsetOldChild;
-
-    int newIndex = _nutritionCategoriesWithIcons.indexWhere((map) => map['name'] == _currentCategoryFilter);
-    int oldIndex = _nutritionCategoriesWithIcons.indexWhere((map) => map['name'] == _previousCategoryFilter);
-
-    if (oldIndex == -1 || newIndex == -1 || newIndex == oldIndex) {
-      beginOffset = Offset.zero;
-      endOffsetOldChild = Offset.zero;
-    } else if (newIndex > oldIndex) {
-      beginOffset = const Offset(1.0, 0.0);
-      endOffsetOldChild = const Offset(-1.0, 0.0);
-    } else {
-      beginOffset = const Offset(-1.0, 0.0);
-      endOffsetOldChild = const Offset(1.0, 0.0);
-    }
-
-    // Determine Lottie animation path based on theme mode
     String clickLottiePath;
     if (widget.themeModeNotifier.value == ThemeMode.dark) {
       clickLottiePath = 'assets/animations/dark/click.json';
@@ -286,7 +259,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
 
     return Column(
       children: [
-        // NEW: Initial Lottie Animation at the top, plays once
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: TextField(
@@ -349,7 +321,6 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
               ],
             ),
           ),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: SingleChildScrollView(
@@ -401,79 +372,110 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             ),
           ),
         ),
-        const Divider(height: 20, thickness: 1),
-
-        if (_showInitialLottieAnimation)
-          Lottie.asset(
-            clickLottiePath,
-            height: 150, // Adjust height as needed
-            repeat: false, // Play once
-            fit: BoxFit.fill,
-          ),
-
-        // Main List of Nutrition Items (filtered by search or category)
         Expanded(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return Stack(
-                children: [
-                  if (animation.status == AnimationStatus.forward && child.key != null && child.key is ValueKey && (child.key as ValueKey).value == (_currentCategoryFilter + _searchController.text))
-                    Positioned.fill(
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: Offset.zero,
-                          end: endOffsetOldChild,
-                        ).animate(animation),
-                        child: FadeTransition(
-                          opacity: Tween<double>(begin: 1.0, end: 0.0).animate(animation),
-                          child: child,
+          child: Stack( // Use a Stack to layer the Lottie animation and the list
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  Offset beginOffset;
+                  Offset endOffsetOldChild;
+
+                  int newIndex = _nutritionCategoriesWithIcons.indexWhere((map) => map['name'] == _currentCategoryFilter);
+                  int oldIndex = _nutritionCategoriesWithIcons.indexWhere((map) => map['name'] == _previousCategoryFilter);
+
+                  if (oldIndex == -1 || newIndex == -1 || newIndex == oldIndex) {
+                    beginOffset = Offset.zero;
+                    endOffsetOldChild = Offset.zero;
+                  } else if (newIndex > oldIndex) {
+                    beginOffset = const Offset(1.0, 0.0);
+                    endOffsetOldChild = const Offset(-1.0, 0.0);
+                  } else {
+                    beginOffset = const Offset(-1.0, 0.0);
+                    endOffsetOldChild = const Offset(1.0, 0.0);
+                  }
+
+                  return Stack(
+                    children: [
+                      // Only apply slide and fade to the old child if the animation is forward
+                      if (animation.status == AnimationStatus.forward && child.key != null && child.key is ValueKey && (child.key as ValueKey).value == (_currentCategoryFilter + _searchController.text))
+                        Positioned.fill(
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: Offset.zero,
+                              end: endOffsetOldChild,
+                            ).animate(animation),
+                            child: FadeTransition(
+                              opacity: Tween<double>(begin: 1.0, end: 0.0).animate(animation),
+                              child: child,
+                            ),
+                          ),
+                        ),
+                      // Apply slide and fade to the new child
+                      Positioned.fill(
+                        child: SlideTransition(
+                          position: Tween<Offset>(begin: beginOffset, end: Offset.zero).animate(animation),
+                          child: FadeTransition(
+                            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
+                            child: child,
+                          ),
                         ),
                       ),
-                    ),
-                  Positioned.fill(
-                    child: SlideTransition(
-                      position: Tween<Offset>(begin: beginOffset, end: Offset.zero).animate(animation),
-                      child: FadeTransition(
-                        opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
-                        child: child,
+                    ],
+                  );
+                },
+                child: _filteredNutritionItems.isEmpty && _searchController.text.isNotEmpty && _suggestedQuery == null
+                    ? Center(
+                  key: ValueKey('no_results_${_currentCategoryFilter}_${_searchController.text}'),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset(
+                        'assets/animations/no-results.json',
+                        width: 200,
+                        height: 100,
+                        fit: BoxFit.contain,
+                        repeat: true,
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No results found for "${_searchController.text}" in "$_currentCategoryFilter"',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: colorScheme.onBackground.withOpacity(0.7)),
+                      ),
+                    ],
                   ),
-                ],
-              );
-            },
-            // --- THIS IS THE SECTION YOU ASKED TO FIX ---
-            child: _filteredNutritionItems.isEmpty && _searchController.text.isNotEmpty && _suggestedQuery == null
-                ? Center(
-              key: ValueKey('no_results_${_currentCategoryFilter}_${_searchController.text}'),
-              child: Column( // <--- Changed to Column to hold Lottie and Text
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Lottie.asset( // <--- Lottie animation for no results
-                    'assets/animations/no-results.json', // **IMPORTANT: Replace with your actual path**
-                    width: 200,
-                    height: 100,
-                    fit: BoxFit.contain,
-                    repeat: true, // You can set this to false if you want it to play once
-                  ),
-                  const SizedBox(height: 16), // Spacing between Lottie and text
-                  Text(
-                    'No results found for "${_searchController.text}" in "$_currentCategoryFilter"',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: colorScheme.onBackground.withOpacity(0.7)),
-                  ),
-                ],
+                )
+                    : ListView.builder(
+                  key: ValueKey(_currentCategoryFilter + _searchController.text),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: _filteredNutritionItems.length,
+                  itemBuilder: (context, index) {
+                    return _buildSearchResultItemUI(context, _filteredNutritionItems[index]);
+                  },
+                ),
               ),
-            )
-                : ListView.builder(
-              key: ValueKey(_currentCategoryFilter + _searchController.text),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: _filteredNutritionItems.length,
-              itemBuilder: (context, index) {
-                return _buildSearchResultItemUI(context, _filteredNutritionItems[index]);
-              },
-            ),
+              // Lottie animation overlaid on top of the list
+              if (_showInitialLottieAnimation)
+                Positioned.fill(
+                  child: Lottie.asset(
+                    clickLottiePath,
+                    fit: BoxFit.contain,
+                    repeat: true, // Set to true to allow multiple repeats
+                    onLoaded: (composition) {
+                      // Schedule to hide after 'n' repeats
+                      num _lottieRepeatCount=2;
+                      Future.delayed(composition.duration * _lottieRepeatCount, () {
+                        if (mounted) {
+                          setState(() {
+                            _showInitialLottieAnimation = false;
+                          });
+                        }
+                      });
+                    },
+                  ),
+                ),
+            ],
           ),
         ),
       ],

@@ -31,6 +31,7 @@ dependencies:
   cloud_firestore: ^4.15.10
   ionicons: ^0.2.2
   lottie: ^3.3.1
+  intl: ^0.20.2
 
 
 dev_dependencies:
@@ -189,6 +190,10 @@ flutter:
     - assets/liver.png
     - assets/bladder.png
     - assets/largeintestine.png
+    - assets/mascot/Finn.png
+    - assets/mascot/FinnTalking.gif
+    - assets/mascot/Appy.png
+    - assets/mascot/AppyTalking.gif
 
 
   fonts:
@@ -201,3 +206,13 @@ flutter:
     - family: Griffy
       fonts:
         - asset: assets/font/Griffy-Regular.ttf
+    - family: Montserrat
+      fonts:
+        - asset: assets/font/Montserrat.ttf
+    - family: Montserrat-Bold
+      fonts:
+        - asset: assets/font/Montserrat-Bold.ttf
+    - family: Montserrat-ExtraBold
+      fonts:
+        - asset: assets/font/Montserrat-ExtraBold.ttf
+

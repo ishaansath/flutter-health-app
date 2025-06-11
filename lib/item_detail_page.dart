@@ -19,7 +19,7 @@ class ItemDetailPage extends StatefulWidget {
   final String additionalInfoExtra;
   final String image;
   final String mode;
-  // REMOVED: final List<String>? descriptionHeadings; // This will no longer be passed
+  final String? contentType; // NEW: Optional parameter to specify content type
 
   const ItemDetailPage({
     super.key,
@@ -30,7 +30,7 @@ class ItemDetailPage extends StatefulWidget {
     required this.image,
     required this.additionalInfoExtra,
     required this.mode,
-    // REMOVED: this.descriptionHeadings,
+    this.contentType, // NEW: Include in constructor
   });
 
   @override
@@ -51,7 +51,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     '🍽️ How It Helps',
     '🔍 Key Functions',
     '⚗️ Behind the Science',
-    // Add more if your descriptions consistently have more sections
+    // Add more if your descriptions consistently have more sections (e.g., 7th section)
   ];
 
   static const double _mascotIdleWidth = 100.0;
@@ -199,14 +199,21 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     });
   }
 
-  // Uses the _fixedDescriptionHeadings list
+  // Uses the _fixedDescriptionHeadings list conditionally
   String _cleanTextForTts(String text) {
     List<String> sections = text.split('\n \n');
     StringBuffer cleanedBuffer = StringBuffer();
 
+    // Only apply headings if contentType is not 'funFact' or 'disease'
+    bool applyHeadings = !(widget.contentType == 'funFact' || widget.contentType == 'disease');
+
     for (int i = 0; i < sections.length; i++) {
       String currentContent = sections[i].trim();
-      String currentHeading = (i < _fixedDescriptionHeadings.length) ? _fixedDescriptionHeadings[i] : '';
+      String currentHeading = '';
+
+      if (applyHeadings && i < _fixedDescriptionHeadings.length) {
+        currentHeading = _fixedDescriptionHeadings[i];
+      }
 
       if (currentHeading.isNotEmpty) {
         cleanedBuffer.write("$currentHeading. "); // Add heading with a pause
@@ -237,7 +244,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     }
   }
 
-  // Calls _cleanTextForTts without passing headings, as it uses the fixed list
   Future _speak() async {
     String textToSpeak = _cleanTextForTts(widget.description);
     if (textToSpeak.isNotEmpty) {
@@ -299,14 +305,14 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   child: const Icon(
                     Ionicons.information,
                     color: Colors.white,
-                    size: 18,
+                    size: 15,
                   ),
                 ),
               ),
               Expanded(
                 child: Text(
                   currentLine,
-                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 11),
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 9, fontWeight: FontWeight.w400),
                 ),
               ),
             ],
@@ -320,12 +326,11 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     return widgets;
   }
 
-  // Uses the _fixedDescriptionHeadings list
+  // Uses the _fixedDescriptionHeadings list conditionally
   List<Widget> _buildDescriptionSections(
       String description,
       ThemeData theme,
       ColorScheme colorScheme,
-      // REMOVED: List<String>? headings // This parameter is no longer needed
       ) {
     List<Widget> descriptionWidgets = [];
     List<String> sections = description.split(RegExp(r'\n\s*\n')).map((s) => s.trim()).toList();
@@ -335,7 +340,12 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     debugPrint('Number of sections after split: ${sections.length}');
     debugPrint('Fixed headings: $_fixedDescriptionHeadings');
     debugPrint('Number of fixed headings: ${_fixedDescriptionHeadings.length}');
+    debugPrint('Content Type: ${widget.contentType}');
 
+
+    // Only apply headings if contentType is not 'funFact' or 'disease'
+    bool applyHeadings = !(widget.contentType == 'funFact' || widget.contentType == 'disease');
+    debugPrint('Apply headings: $applyHeadings');
 
     for (int i = 0; i < sections.length; i++) {
       String currentSection = sections[i].trim();
@@ -343,8 +353,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       debugPrint('Section $i: "$currentSection"');
 
       if (currentSection.isNotEmpty) {
-        // Use the fixed headings list directly
-        bool shouldAddHeading = i < _fixedDescriptionHeadings.length && _fixedDescriptionHeadings[i].isNotEmpty;
+        bool shouldAddHeading = applyHeadings && i < _fixedDescriptionHeadings.length && _fixedDescriptionHeadings[i].isNotEmpty;
         debugPrint('Section $i should add heading: $shouldAddHeading');
 
         descriptionWidgets.add(
@@ -362,16 +371,15 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       _fixedDescriptionHeadings[i], // Use the fixed list here
-                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: "Montserrat-Bold", color: colorScheme.onSecondary),
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: "Montserrat"),
                       textAlign: TextAlign.left,
                     ),
                   ),
                 Text(
                   currentSection,
-                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 12.75),
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 10, fontWeight: FontWeight.w400),
                   textAlign: TextAlign.left,
                 ),
-
               ],
             ),
           ),
@@ -477,7 +485,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                                   children: [
                                     Text(
                                       "Nutritional Info (Per 100g):",
-                                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: "Montserrat-Bold"),
+                                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: "Montserrat"),
                                       textAlign: TextAlign.left,
                                     ),
                                     const SizedBox(height: 12),
