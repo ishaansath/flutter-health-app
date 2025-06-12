@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart';
 
 import 'app_data.dart' as AppData;
+import 'frosted_glass_container.dart';
 
 // Define an enum for clear TTS states
 enum TtsState { playing, stopped, paused, continued }
@@ -357,12 +358,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
         debugPrint('Section $i should add heading: $shouldAddHeading');
 
         descriptionWidgets.add(
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(10),
-            ),
+          FrostedGlassContainer(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -471,15 +467,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Pass no headings here, as _buildDescriptionSections uses the fixed list
                               ..._buildDescriptionSections(widget.description, theme, colorScheme),
                               const SizedBox(height: 20),
-                              Container(
-                                padding: const EdgeInsets.all(15),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                              FrostedGlassContainer(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

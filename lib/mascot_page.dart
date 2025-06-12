@@ -9,7 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ishaan/auth_firebase_data.dart';
 import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart';
-import 'package:lottie/lottie.dart'; // NEW: Import Lottie
+import 'package:lottie/lottie.dart';
+
+import 'frosted_glass_container.dart'; // NEW: Import Lottie
 
 // IMPORTANT: Replace with your actual Gemini API Key.
 const String apikey = 'AIzaSyB4q1yRNvlg0MRSImTbbzYddO6jpLTCMds'; // <<< REPLACE THIS!
@@ -486,9 +488,7 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      color: Colors.transparent, // Ensure this container is also transparent
+                    child: FrostedGlassContainer(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

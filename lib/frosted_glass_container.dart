@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 class FrostedGlassContainer extends StatelessWidget {
   final Widget child;
   final double width;
-  final double height;
   final double blur; // Not directly used in the current filter, but kept as a property
   final double borderRadius; // Not directly used in ClipRRect, but kept as a property
   final EdgeInsets padding; // Not directly used in inner Container, but kept as a property
@@ -13,7 +12,6 @@ class FrostedGlassContainer extends StatelessWidget {
     super.key,
     required this.child,
     this.width = double.infinity,
-    this.height = double.infinity,
     this.blur = 20, // This value is actually hardcoded in ImageFilter.blur
     this.borderRadius = 20, // This value is actually hardcoded in ClipRRect
     this.padding = const EdgeInsets.all(16), // This is hardcoded to 24, 14
@@ -29,7 +27,6 @@ class FrostedGlassContainer extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur), // Use the blur property here
         child: Container(
           width: width,
-          height: height,
           padding: padding, // Use the padding property here
           decoration: BoxDecoration(
             color: isDark

@@ -86,7 +86,6 @@ class OrganDetailPage extends StatelessWidget {
                   child: ModelView(modelPath: modelPath),
                 ),
               FrostedGlassContainer(
-                height: 100,
                 child: Text(
                   briefInfoText,
                   textAlign: TextAlign.center,

@@ -1,4 +1,4 @@
-// lib/body_screen.dart (MODIFIED - 2D Body Image Only)
+// lib/body_screen.dart (MODIFIED - Curved Navigation Bar with outlined/filled icons)
 
 import 'package:flutter/material.dart';
 import 'package:ishaan/organ_detail_page.dart';
@@ -7,13 +7,15 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:ishaan/nutrition_tab_content.dart';
 import 'package:ishaan/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// REMOVED: import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:ionicons/ionicons.dart'; // Import Ion Icons
-import 'package:ishaan/home_page.dart'; // NEW: Import HomePage
+import 'package:ishaan/home_page.dart'; // Import HomePage
 
 import 'app_data.dart' as AppData;
 import 'package:ishaan/main.dart'; // Import main.dart to access global notifiers
-import 'package:ishaan/shared_preferences_helper.dart' hide lastVisitedNutritionNotifier, saveLastVisitedOrgan; // NEW: Import the helper
+import 'package:ishaan/shared_preferences_helper.dart' hide lastVisitedNutritionNotifier, saveLastVisitedOrgan; // Import the helper
+
+// Import the curved_navigation_bar package
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 
 class BodyScreen extends StatefulWidget {
@@ -21,7 +23,6 @@ class BodyScreen extends StatefulWidget {
   final ValueNotifier<ThemeMode> themeModeNotifier;
   final ValueNotifier<String> bodyModelNotifier;
 
-  // NEW: Receive notifiers for recently visited items
   final ValueNotifier<Map<String, String>?> lastVisitedOrganNotifier;
   final ValueNotifier<Map<String, String>?> lastVisitedNutritionNotifier;
 
@@ -31,7 +32,6 @@ class BodyScreen extends StatefulWidget {
     required this.mode,
     required this.themeModeNotifier,
     required this.bodyModelNotifier,
-    // NEW: Add to constructor
     required this.lastVisitedOrganNotifier,
     required this.lastVisitedNutritionNotifier,
   });
@@ -45,16 +45,18 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
   late TabController _tabController;
   late FlutterTts flutterTts;
 
-  // NEW: Reordered tabs - 'Body' is now last
   final List<String> _topTabs = ['Home', 'Nutrition', 'Mascot', 'Body'];
 
   int _selectedIndex = 0;
+
+  // GlobalKey for CurvedNavigationBar, to allow programmatic control
+  GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
+
 
   @override
   void initState() {
     super.initState();
     _currentMode = widget.mode;
-    // Adjusted TabController length for the new 'Home' tab
     _tabController = TabController(length: _topTabs.length, vsync: this);
     flutterTts = FlutterTts();
     _initializeTtsGeneral();
@@ -65,6 +67,8 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           _selectedIndex = _tabController.index;
         });
         flutterTts.stop();
+        // Use setPage on the CurvedNavigationBar to sync when TabController changes
+        _bottomNavigationKey.currentState?.setPage(_selectedIndex);
       }
     });
 
@@ -78,23 +82,20 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  // Renamed and updated: Now returns 2D image paths for body
   String _getBodyImagePath(String modelKey) {
     String path;
     switch (modelKey) {
       case 'female_body':
-        path = 'assets/female_body.png'; // Make sure this file exists!
+        path = 'assets/female_body.png';
         break;
       case 'male_body':
-      default: // Default to male_body if not female or unrecognized
-        path = 'assets/male_body.png'; // Make sure this file exists!
+      default:
+        path = 'assets/male_body.png';
         break;
     }
     print('BodyScreen: _getBodyImagePath called with "$modelKey", returning path: "$path"');
     return path;
   }
-
-  // REMOVED: _getCameraOrbit and _getCameraTarget as they are for ModelViewer
 
   void _navigateToSettingsPage() {
     Navigator.push(
@@ -102,10 +103,10 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(
           themeModeNotifier: widget.themeModeNotifier,
-          bodyModelNotifier: widget.bodyModelNotifier, // Pass bodyModelNotifier
+          bodyModelNotifier: widget.bodyModelNotifier,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition( // Changed to FadeTransition for smoother transition
+          return FadeTransition(
             opacity: animation,
             child: child,
           );
@@ -228,18 +229,14 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _tabController,
         children: [
-          // NEW: Home Tab Content
           HomePage(
             mode: _currentMode,
             themeModeNotifier: widget.themeModeNotifier,
-            lastVisitedOrganNotifier: widget.lastVisitedOrganNotifier, // Pass notifier
-            lastVisitedNutritionNotifier: widget.lastVisitedNutritionNotifier, // Pass notifier
+            lastVisitedOrganNotifier: widget.lastVisitedOrganNotifier,
+            lastVisitedNutritionNotifier: widget.lastVisitedNutritionNotifier,
           ),
-          // Nutrition Tab Content
           NutritionTabContent(currentMode: _currentMode, themeModeNotifier: widget.themeModeNotifier, lastVisitedNutritionNotifier: widget.lastVisitedNutritionNotifier),
-          // Mascot Tab Content
           MascotPage(mode: _currentMode),
-          // Body Tab Content (2D Image and Organ Overlays)
           Center(
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -247,18 +244,16 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // ValueListenableBuilder to dynamically update the 2D body image
                   ValueListenableBuilder<String>(
                     valueListenable: widget.bodyModelNotifier,
                     builder: (context, currentModelKey, child) {
                       print('BodyScreen: ValueListenableBuilder rebuilding for 2D image. Current model key: "$currentModelKey"');
                       return Image.asset(
-                        _getBodyImagePath(currentModelKey), // Use the new image path method
-                        fit: BoxFit.contain, // Adjust fit as needed for your image aspect ratio
-                        // Add errorBuilder for debugging if image doesn't load
+                        _getBodyImagePath(currentModelKey),
+                        fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           print('Error loading body image: $error');
-                          return Center(
+                          return const Center(
                             child: Icon(Icons.broken_image, size: 100, color: Colors.red),
                           );
                         },
@@ -266,7 +261,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                     },
                   ),
 
-                  // Organ overlays with rounded box backgrounds (existing positions)
                   Positioned(
                     top: MediaQuery.of(context).size.height * 0.01,
                     right: MediaQuery.of(context).size.height * 0.04,
@@ -279,7 +273,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/brain.png', // Ensure this is a 2D image asset
+                          'assets/brain.png',
                           width: 40,
                           height: 40,
                         ),
@@ -294,11 +288,11 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: colorScheme.onSurface,
-                            borderRadius: BorderRadius.circular(8),
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/eyes.png', // Ensure this is a 2D image asset
+                          'assets/eyes.png',
                           width: 40,
                           height: 40,
                         ),
@@ -313,12 +307,12 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: colorScheme.onSurface,
-                            borderRadius: BorderRadius.circular(8),
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
 
                         ),
                         child: Image.asset(
-                          'assets/heart.png', // Ensure this is a 2D image asset
+                          'assets/heart.png',
                           width: 40,
                           height: 40,
                         ),
@@ -337,7 +331,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/lungs.png', // Ensure this is a 2D image asset
+                          'assets/lungs.png',
                           width: 40,
                           height: 40,
                         ),
@@ -356,7 +350,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/muscle.png', // Ensure this is a 2D image asset
+                          'assets/muscle.png',
                           width: 40,
                           height: 40,
                         ),
@@ -375,7 +369,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/liver.png', // Ensure this is a 2D image asset
+                          'assets/liver.png',
                           width: 40,
                           height: 40,
                         ),
@@ -394,7 +388,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/stomach.png', // Ensure this is a 2D image asset
+                          'assets/stomach.png',
                           width: 40,
                           height: 40,
                         ),
@@ -413,7 +407,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/legs.png', // Ensure this is a 2D image asset
+                          'assets/legs.png',
                           width: 40,
                           height: 40,
                         ),
@@ -428,11 +422,11 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                            color: colorScheme.onSurface,
-                            borderRadius: BorderRadius.circular(8),
+                          color: colorScheme.onSurface,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/kidneys.png', // Ensure this is a 2D image asset
+                          'assets/kidneys.png',
                           width: 40,
                           height: 40,
                         ),
@@ -451,7 +445,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/bladder.png', // Ensure this is a 2D image asset
+                          'assets/bladder.png',
                           width: 40,
                           height: 40,
                         ),
@@ -470,7 +464,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Image.asset(
-                          'assets/largeintestine.png', // Ensure this is a 2D image asset
+                          'assets/largeintestine.png',
                           width: 40,
                           height: 40,
                         ),
@@ -483,32 +477,24 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          _tabController.animateTo(
-            index,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-          );
-        },
-        items: _topTabs.map((tabName) {
+      bottomNavigationBar: CurvedNavigationBar(
+        key: _bottomNavigationKey, // Assign the GlobalKey
+        index: _selectedIndex, // Current selected index
+        height: 65.0, // Height of the navigation bar
+
+        // Define the items (icons) dynamically based on _topTabs
+        items: _topTabs.asMap().entries.map((entry) { // Use asMap().entries to get both index and value
+          final int index = entry.key;
+          final String tabName = entry.value;
+
           IconData outlineIcon;
           IconData filledIcon;
-          double iconSize = 24.0; // Default size
-          double selectedIconSize = 28.0; // Slightly larger when selected
 
+          // Determine icon based on tabName
           switch (tabName) {
             case 'Home':
               outlineIcon = Ionicons.home_outline;
               filledIcon = Ionicons.home;
-              break;
-            case 'Body':
-              outlineIcon = Ionicons.body_outline;
-              filledIcon = Ionicons.body;
               break;
             case 'Nutrition':
               outlineIcon = Ionicons.fast_food_outline;
@@ -518,35 +504,45 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
               outlineIcon = Ionicons.paw_outline;
               filledIcon = Ionicons.paw;
               break;
+            case 'Body':
+              outlineIcon = Ionicons.body_outline;
+              filledIcon = Ionicons.body;
+              break;
             default:
-              outlineIcon = Ionicons.help_circle_outline;
-              filledIcon = Ionicons.help_circle;
+              outlineIcon = Icons.help_outline; // Fallback icon
+              filledIcon = Icons.help;
           }
 
-          final bool isSelected = _selectedIndex == _topTabs.indexOf(tabName);
+          final bool isSelected = _selectedIndex == index; // Check if the current tab is selected
 
-          return BottomNavigationBarItem(
-            icon: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              height: isSelected ? selectedIconSize : iconSize,
-              width: isSelected ? selectedIconSize : iconSize,
-              alignment: Alignment.center,
-              child: Icon(
-                isSelected ? filledIcon : outlineIcon,
-                size: isSelected ? selectedIconSize : iconSize,
-                color: isSelected ? colorScheme.secondary : colorScheme.onSecondary.withOpacity(0.6),
-              ),
-            ),
-            label: tabName,
+          return Icon(
+            isSelected ? filledIcon : outlineIcon, // Use filled or outlined icon
+            size: 33, // Keep a consistent size for icons within CurvedNavigationBar
+            color: colorScheme.onSecondary, // Icons should be visible against the buttonBackgroundColor (secondary)
           );
         }).toList(),
-        backgroundColor: colorScheme.surface,
-        selectedItemColor: colorScheme.secondary,
-        unselectedItemColor: colorScheme.onSecondary.withOpacity(0.6),
-        type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: theme.textTheme.labelSmall,
+
+        // Dynamic colors for the CurvedNavigationBar itself
+        color: colorScheme.surface, // Background color of the entire bar
+        buttonBackgroundColor: colorScheme.secondary, // Color of the selected tab's circular button
+        backgroundColor: colorScheme.primary, // Color of the Scaffold's background that shows through the curve.
+
+        // Animation properties
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 600),
+
+        // Callback when a tab is tapped
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index; // Update the current page index
+          });
+          _tabController.animateTo(
+            index,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        },
+        letIndexChange: (index) => true, // Allows the index to change on tap
       ),
     );
   }
@@ -557,7 +553,6 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
 
     String dialogContent;
     final Map<String, dynamic>? organInfo = AppData.organData[organName]?.cast<String, dynamic>();
-    // Make sure the imagePath for organs in app_data.dart are 2D images (.png, .jpg)
     final String imagePath = organInfo?['image'] as String? ?? 'assets/placeholder.png';
 
     if (organInfo != null) {
@@ -593,17 +588,15 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await saveLastVisitedOrgan(organName, imagePath); // Save the organ with its image path
-              widget.lastVisitedOrganNotifier.value = await loadLastVisitedOrgan(); // Update the notifier for HomePage
+              await saveLastVisitedOrgan(organName, imagePath);
+              widget.lastVisitedOrganNotifier.value = await loadLastVisitedOrgan();
 
               Navigator.push(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) => OrganDetailPage(
-                    organName: organName,
-                    mode: _currentMode,
-                    organData: AppData.organData[organName]!,
                     organ: organName,
+                    mode: _currentMode, organName: '', organData: {},
                   ),
                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
                     return FadeTransition(

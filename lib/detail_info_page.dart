@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ishaan/frosted_glass_container.dart';
 import 'item_detail_page.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -137,15 +138,7 @@ class DetailInfoPage extends StatelessWidget {
                                 ),
                               );
                             },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surface,
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(
-                                    color: colorScheme.onSurface, width: 3),
-                              ),
+                            child:  FrostedGlassContainer(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ishaan/frosted_glass_container.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ishaan/organ_detail_page.dart';
@@ -361,7 +362,6 @@ class _HomePageState extends State<HomePage> {
     elevation: 2,
     child: InkWell(
     onTap: () {
-    // Use _lastVisitedOrganId to get the full organ data
     final organData = AppData.organData[_lastVisitedOrganId!];
     if (organData != null) {
     Navigator.push(
@@ -377,8 +377,9 @@ class _HomePageState extends State<HomePage> {
     );
     }
     },
-    child: Padding(
-    padding: const EdgeInsets.all(16.0),
+    child: FrostedGlassContainer(
+      child: Padding(
+    padding: const EdgeInsets.all(5.0),
     child: Row(
     children: [
     ClipRRect(
@@ -431,6 +432,7 @@ class _HomePageState extends State<HomePage> {
     ),
     ),
     ),
+    ),
     const SizedBox(height: 16),
 
     // Last Visited Nutrition Items (Side-by-Side)
@@ -460,7 +462,6 @@ class _HomePageState extends State<HomePage> {
     return Card(
     color: colorScheme.surface,
     margin: const EdgeInsets.only(right: 12.0),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
     elevation: 2,
     child: InkWell(
     onTap: () {
@@ -525,12 +526,11 @@ class _HomePageState extends State<HomePage> {
     ),
             ],
             Card(
-              color: colorScheme.surface,
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+              margin: const EdgeInsets.symmetric(vertical: 5.0),
               elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
+              child: FrostedGlassContainer(
+    child:  Padding(
+                padding: const EdgeInsets.all(5.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -546,7 +546,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-            ),
+              )  ),
           ],
         ),
       ),

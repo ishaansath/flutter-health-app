@@ -8,6 +8,8 @@ import 'package:string_similarity/string_similarity.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
 
+import 'frosted_glass_container.dart';
+
 class NutritionTabContent extends StatefulWidget {
   final String currentMode;
   final ValueNotifier<ThemeMode> themeModeNotifier;
@@ -208,7 +210,8 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
         elevation: 2,
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         color: colorScheme.surface,
-        child: Padding(
+        child: FrostedGlassContainer(
+    child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -241,6 +244,7 @@ class _NutritionTabContentState extends State<NutritionTabContent> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -11,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:ishaan/mascot_provider.dart';
 import 'package:ionicons/ionicons.dart';
 
+import 'frosted_glass_container.dart';
+
 // Placeholder for future About Page (kept simple)
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -284,6 +286,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
 
               // --- Account Settings Option ---
+              // MODIFIED to use FrostedGlassContainer
               _buildSettingsOption(
                 context,
                 theme,
@@ -306,10 +309,12 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 16.0),
 
               // --- NEW: Mascot Selection Option ---
+              // MODIFIED to use FrostedGlassContainer
               _buildMascotSelectionTile(context, theme, colorScheme, mascotProvider),
               const SizedBox(height: 16.0),
 
               // --- Theme Settings (Existing) ---
+              // Refactored to use FrostedGlassContainer
               _buildThemeExpansionTile(context, theme, colorScheme),
               const SizedBox(height: 16.0),
 
@@ -318,6 +323,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 16.0),
 
               // --- Help Page Link (Existing) ---
+              // MODIFIED to use FrostedGlassContainer
               _buildSettingsOption(
                 context,
                 theme,
@@ -334,6 +340,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 16.0),
 
               // --- About Page Link ---
+              // MODIFIED to use FrostedGlassContainer
               _buildSettingsOption(
                 context,
                 theme,
@@ -354,292 +361,296 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // --- Helper method for common settings options (Account, Help, About) ---
+  // MODIFIED: _buildSettingsOption to use FrostedGlassContainer
   Widget _buildSettingsOption(BuildContext context, ThemeData theme, ColorScheme colorScheme, {
     required String title,
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Card(
-      color: colorScheme.surface,
-      margin: const EdgeInsets.symmetric(vertical: 0.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        leading: Icon(
-          icon,
-          color: colorScheme.onSecondary,
-          size: 24.0,
+    return Padding( // Add Padding to replicate Card's margin
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: FrostedGlassContainer(
+        width: double.infinity,
+        borderRadius: 12.0,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: ListTile(
+          contentPadding: EdgeInsets.zero, // Removed inner padding from ListTile itself
+          leading: Icon(
+            icon,
+            color: colorScheme.onSecondary,
+            size: 24.0,
+          ),
+          title: Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 18,
+            color: colorScheme.onSecondary.withOpacity(0.7),
+          ),
+          onTap: onTap,
         ),
-        title: Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 18,
-          color: colorScheme.onSecondary.withOpacity(0.7),
-        ),
-        onTap: onTap,
       ),
     );
   }
 
+  // MODIFIED: _buildThemeExpansionTile to use FrostedGlassContainer (already done in previous turn, ensuring no localization changes)
   Widget _buildThemeExpansionTile(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
-    return Card(
-      color: colorScheme.surface,
-      margin: const EdgeInsets.symmetric(vertical: 0.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      child: Theme(
-        data: theme.copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          focusColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          unselectedWidgetColor: colorScheme.onSecondary,
-        ),
-        child: ExpansionTile(
-          initiallyExpanded: false,
-          backgroundColor: colorScheme.surface,
-          collapsedBackgroundColor: colorScheme.surface,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            side: const BorderSide(color: Colors.transparent),
+    return Padding( // Added Padding to replicate Card's margin
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: FrostedGlassContainer(
+        width: double.infinity, // Ensure it takes full width
+        borderRadius: 12.0, // Match desired rounded corners
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjust inner padding
+        child: Theme(
+          data: theme.copyWith(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            unselectedWidgetColor: colorScheme.onSecondary,
           ),
-          collapsedShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            side: const BorderSide(color: Colors.transparent),
-          ),
-          clipBehavior: Clip.antiAlias,
-          title: Row(
-            children: [
-              Icon(
-                _getThemeModeIcon(_currentSelectedThemeMode),
-                color: colorScheme.onSecondary,
-                size: 24.0,
-              ),
-              const SizedBox(width: 12.0),
-              Text(
-                'Theme',
-                style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
-              ),
-            ],
-          ),
-          subtitle: Text(
-            _getThemeModeName(_currentSelectedThemeMode),
-            style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
-          ),
-          iconColor: colorScheme.onSecondary,
-          collapsedIconColor: colorScheme.onSecondary.withOpacity(0.7),
-          children: <Widget>[
-            Column(
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            backgroundColor: Colors.transparent, // Make transparent to show frosted background
+            collapsedBackgroundColor: Colors.transparent, // Make transparent
+            tilePadding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              side: const BorderSide(color: Colors.transparent),
+            ),
+            collapsedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              side: const BorderSide(color: Colors.transparent),
+            ),
+            clipBehavior: Clip.antiAlias,
+            title: Row(
               children: [
-                RadioListTile<ThemeMode>(
-                  title: Text(
-                    'System Default',
-                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
-                  ),
-                  value: ThemeMode.system,
-                  groupValue: _currentSelectedThemeMode,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      setState(() {
-                        _currentSelectedThemeMode = value;
-                      });
-                      widget.themeModeNotifier.value = value;
-                      _saveThemeMode(value);
-                    }
-                  },
-                  activeColor: colorScheme.secondary,
+                Icon(
+                  _getThemeModeIcon(_currentSelectedThemeMode),
+                  color: colorScheme.onSecondary,
+                  size: 24.0,
                 ),
-                RadioListTile<ThemeMode>(
-                  title: Text(
-                    'Light Theme',
-                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
-                  ),
-                  value: ThemeMode.light,
-                  groupValue: _currentSelectedThemeMode,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      setState(() {
-                        _currentSelectedThemeMode = value;
-                      });
-                      widget.themeModeNotifier.value = value;
-                      _saveThemeMode(value);
-                    }
-                  },
-                  activeColor: colorScheme.secondary,
-                ),
-                RadioListTile<ThemeMode>(
-                  title: Text(
-                    'Dark Theme',
-                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
-                  ),
-                  value: ThemeMode.dark,
-                  groupValue: _currentSelectedThemeMode,
-                  onChanged: (ThemeMode? value) {
-                    if (value != null) {
-                      setState(() {
-                        _currentSelectedThemeMode = value;
-                      });
-                      widget.themeModeNotifier.value = value;
-                      _saveThemeMode(value);
-                    }
-                  },
-                  activeColor: colorScheme.secondary,
+                const SizedBox(width: 12.0),
+                Text(
+                  'Theme',
+                  style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
                 ),
               ],
             ),
-          ],
+            subtitle: Text(
+              _getThemeModeName(_currentSelectedThemeMode),
+              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
+            ),
+            iconColor: colorScheme.onSecondary,
+            collapsedIconColor: colorScheme.onSecondary.withOpacity(0.7),
+            children: <Widget>[
+              Column(
+                children: [
+                  RadioListTile<ThemeMode>(
+                    title: Text(
+                      'System Default',
+                      style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                    ),
+                    value: ThemeMode.system,
+                    groupValue: _currentSelectedThemeMode,
+                    onChanged: (ThemeMode? value) {
+                      if (value != null) {
+                        setState(() {
+                          _currentSelectedThemeMode = value;
+                        });
+                        widget.themeModeNotifier.value = value;
+                        _saveThemeMode(value);
+                      }
+                    },
+                    activeColor: colorScheme.secondary,
+                  ),
+                  RadioListTile<ThemeMode>(
+                    title: Text(
+                      'Light Theme',
+                      style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                    ),
+                    value: ThemeMode.light,
+                    groupValue: _currentSelectedThemeMode,
+                    onChanged: (ThemeMode? value) {
+                      if (value != null) {
+                        setState(() {
+                          _currentSelectedThemeMode = value;
+                        });
+                        widget.themeModeNotifier.value = value;
+                        _saveThemeMode(value);
+                      }
+                    },
+                    activeColor: colorScheme.secondary,
+                  ),
+                  RadioListTile<ThemeMode>(
+                    title: Text(
+                      'Dark Theme',
+                      style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                    ),
+                    value: ThemeMode.dark,
+                    groupValue: _currentSelectedThemeMode,
+                    onChanged: (ThemeMode? value) {
+                      if (value != null) {
+                        setState(() {
+                          _currentSelectedThemeMode = value;
+                        });
+                        widget.themeModeNotifier.value = value;
+                        _saveThemeMode(value);
+                      }
+                    },
+                    activeColor: colorScheme.secondary,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // --- NEW: Body Model Selection Expansion Tile ---
+  // MODIFIED: _buildBodyModelExpansionTile to use FrostedGlassContainer (already done in previous turn, ensuring no localization changes)
   Widget _buildBodyModelExpansionTile(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
-    return Card(
-      color: colorScheme.surface,
-      margin: const EdgeInsets.symmetric(vertical: 0.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      child: Theme(
-        data: theme.copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          focusColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          unselectedWidgetColor: colorScheme.onSecondary,
-        ),
-        child: ExpansionTile(
-          initiallyExpanded: false,
-          backgroundColor: colorScheme.surface,
-          collapsedBackgroundColor: colorScheme.surface,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            side: const BorderSide(color: Colors.transparent),
+    return Padding( // Add Padding if you want vertical margin like the original Card had
+      padding: const EdgeInsets.symmetric(vertical: 8.0), // Adjust this value to match your desired spacing
+      child: FrostedGlassContainer(
+        width: double.infinity, // Typically want it to take full width
+        borderRadius: 12.0, // Match the Card's border radius
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjust inner padding if needed
+        child: Theme(
+          data: theme.copyWith(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            unselectedWidgetColor: colorScheme.onSecondary,
           ),
-          collapsedShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            side: const BorderSide(color: Colors.transparent),
-          ),
-          clipBehavior: Clip.antiAlias,
-          title: Row(
-            children: [
-              Icon(
-                Icons.accessibility_new, // Icon for body model
-                color: colorScheme.onSecondary,
-                size: 24.0,
-              ),
-              const SizedBox(width: 12.0),
-              Text(
-                'Body Model',
-                style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
-              ),
-            ],
-          ),
-          subtitle: Text(
-            _getBodyModelDisplayName(_currentSelectedBodyModel),
-            style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
-          ),
-          iconColor: colorScheme.onSecondary,
-          collapsedIconColor: colorScheme.onSecondary.withOpacity(0.7),
-          children: <Widget>[
-            Column(
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            backgroundColor: Colors.transparent, // Make it transparent to show frosted background
+            collapsedBackgroundColor: Colors.transparent, // Make it transparent
+            tilePadding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0), // Adjusted to account for FrostedGlassContainer's padding
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0), // Keep this for internal tile shaping if desired
+              side: const BorderSide(color: Colors.transparent),
+            ),
+            collapsedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0), // Keep this
+              side: const BorderSide(color: Colors.transparent),
+            ),
+            clipBehavior: Clip.antiAlias, // Keep this if you want internal clipping
+            title: Row(
               children: [
-                RadioListTile<String>(
-                  title: Text(
-                    'Male Body',
-                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
-                  ),
-                  value: 'male_body', // Corresponds to 'assets/models/male_body.glb'
-                  groupValue: _currentSelectedBodyModel,
-                  onChanged: (String? value) {
-                    if (value != null) {
-                      setState(() {
-                        _currentSelectedBodyModel = value;
-                      });
-                      widget.bodyModelNotifier.value = value; // Update the notifier
-                      _saveBodyModel(value); // Save to SharedPreferences
-                    }
-                  },
-                  activeColor: colorScheme.secondary,
+                Icon(
+                  Icons.accessibility_new, // Icon for body model
+                  color: colorScheme.onSecondary,
+                  size: 24.0,
                 ),
-                RadioListTile<String>(
-                  title: Text(
-                    'Female Body',
-                    style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
-                  ),
-                  value: 'female_body', // Corresponds to 'assets/models/female_body.glb'
-                  groupValue: _currentSelectedBodyModel,
-                  onChanged: (String? value) {
-                    if (value != null) {
-                      setState(() {
-                        _currentSelectedBodyModel = value;
-                      });
-                      widget.bodyModelNotifier.value = value; // Update the notifier
-                      _saveBodyModel(value); // Save to SharedPreferences
-                    }
-                  },
-                  activeColor: colorScheme.secondary,
+                const SizedBox(width: 12.0),
+                Text(
+                  'Body Model', // NOT LOCALIZED, per request
+                  style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
                 ),
               ],
             ),
-          ],
+            subtitle: Text(
+              _getBodyModelDisplayName(_currentSelectedBodyModel),
+              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
+            ),
+            iconColor: colorScheme.onSecondary,
+            collapsedIconColor: colorScheme.onSecondary.withOpacity(0.7),
+            children: <Widget>[
+              Column(
+                children: [
+                  RadioListTile<String>(
+                    title: Text(
+                      'Male Body', // NOT LOCALIZED, per request
+                      style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                    ),
+                    value: 'male_body', // Corresponds to 'assets/models/male_body.glb'
+                    groupValue: _currentSelectedBodyModel,
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        setState(() {
+                          _currentSelectedBodyModel = value;
+                        });
+                        widget.bodyModelNotifier.value = value; // Update the notifier
+                        _saveBodyModel(value); // Save to SharedPreferences
+                      }
+                    },
+                    activeColor: colorScheme.secondary,
+                  ),
+                  RadioListTile<String>(
+                    title: Text(
+                      'Female Body', // NOT LOCALIZED, per request
+                      style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSecondary),
+                    ),
+                    value: 'female_body', // Corresponds to 'assets/models/female_body.glb'
+                    groupValue: _currentSelectedBodyModel,
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        setState(() {
+                          _currentSelectedBodyModel = value;
+                        });
+                        widget.bodyModelNotifier.value = value; // Update the notifier
+                        _saveBodyModel(value); // Save to SharedPreferences
+                      }
+                    },
+                    activeColor: colorScheme.secondary,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // --- NEW: Helper method for Selection ---
+  // MODIFIED: _buildMascotSelectionTile to use FrostedGlassContainer
   Widget _buildMascotSelectionTile(BuildContext context, ThemeData theme, ColorScheme colorScheme, MascotProvider mascotProvider) {
-    return Card(
-      color: colorScheme.surface,
-      margin: const EdgeInsets.symmetric(vertical: 0.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        leading: Icon(
-          Icons.sentiment_satisfied_alt, // Icon for mascot
-          color: colorScheme.onSecondary,
-          size: 24.0,
+    return Padding( // Added Padding to replicate Card's margin
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: FrostedGlassContainer(
+        width: double.infinity,
+        borderRadius: 12.0,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: ListTile(
+          contentPadding: EdgeInsets.zero, // Removed inner padding from ListTile itself
+          leading: Icon(
+            Icons.sentiment_satisfied_alt, // Icon for mascot
+            color: colorScheme.onSecondary,
+            size: 24.0,
+          ),
+          title: Text(
+            'Hero', // NOT LOCALIZED, per request
+            style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
+          ),
+          subtitle: Text(
+            'Current: ${mascotProvider.currentMascotName}', // Show current mascot
+            style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 18,
+            color: colorScheme.onSecondary.withOpacity(0.7),
+          ),
+          onTap: () => _showMascotSelectionDialog(context, theme, colorScheme, mascotProvider),
         ),
-        title: Text(
-          'Hero',
-          style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSecondary),
-        ),
-        subtitle: Text(
-          'Current: ${mascotProvider.currentMascotName}', // Show current mascot
-          style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSecondary.withOpacity(0.7)),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 18,
-          color: colorScheme.onSecondary.withOpacity(0.7),
-        ),
-        onTap: () => _showMascotSelectionDialog(context, mascotProvider, theme, colorScheme),
       ),
     );
   }
 
   // --- NEW: Mascot Selection Dialog ---
-  void _showMascotSelectionDialog(BuildContext context, MascotProvider mascotProvider, ThemeData theme, ColorScheme colorScheme) {
+  void _showMascotSelectionDialog(BuildContext context, ThemeData theme, ColorScheme colorScheme, MascotProvider mascotProvider) {
     showDialog(
       context: context,
       builder: (dialogContext) { // Use dialogContext to avoid conflicts
         return AlertDialog(
-          backgroundColor: colorScheme.surface,
           title: Text(
-            'Choose your Mascot',
+            'Choose your Mascot', // NOT LOCALIZED, per request
             style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onBackground),
           ),
           content: SizedBox(
@@ -651,14 +662,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 final mascotName = mascotProvider.allMascotStaticPaths.keys.elementAt(index);
                 final mascotImagePath = mascotProvider.allMascotStaticPaths[mascotName];
 
-                return ListTile(
+                return FrostedGlassContainer(
+                  child: ListTile(
                   leading: Image.asset(
                     mascotImagePath!, // Use static image for preview
                     width: 40,
                     height: 40,
                   ),
                   title: Text(
-                    mascotName,
+                    mascotName, // NOT LOCALIZED, per request
                     style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground),
                   ),
                   trailing: mascotProvider.currentMascotName == mascotName
@@ -668,6 +680,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     mascotProvider.setMascot(mascotName);
                     Navigator.pop(dialogContext); // Pop the dialog
                   },
+                )
                 );
               },
             ),
@@ -678,7 +691,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.pop(dialogContext);
               },
               child: Text(
-                'Cancel',
+                'Cancel', // NOT LOCALIZED, per request
                 style: TextStyle(color: colorScheme.secondary),
               ),
             ),
