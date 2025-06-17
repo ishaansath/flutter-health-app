@@ -480,7 +480,7 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
       bottomNavigationBar: CurvedNavigationBar(
         key: _bottomNavigationKey, // Assign the GlobalKey
         index: _selectedIndex, // Current selected index
-        height: 65.0, // Height of the navigation bar
+        height: 90.0, // Height of the navigation bar
 
         // Define the items (icons) dynamically based on _topTabs
         items: _topTabs.asMap().entries.map((entry) { // Use asMap().entries to get both index and value
@@ -522,14 +522,13 @@ class _BodyScreenState extends State<BodyScreen> with SingleTickerProviderStateM
           );
         }).toList(),
 
-        // Dynamic colors for the CurvedNavigationBar itself
         color: colorScheme.surface, // Background color of the entire bar
         buttonBackgroundColor: colorScheme.secondary, // Color of the selected tab's circular button
-        backgroundColor: colorScheme.primary, // Color of the Scaffold's background that shows through the curve.
+        backgroundColor: Colors.transparent, // Color of the Scaffold's background that shows through the curve.
 
         // Animation properties
         animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 600),
+        animationDuration: const Duration(milliseconds: 450),
 
         // Callback when a tab is tapped
         onTap: (index) {

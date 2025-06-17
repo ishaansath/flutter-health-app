@@ -493,7 +493,15 @@ class _MascotPageState extends State<MascotPage> with SingleTickerProviderStateM
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           GestureDetector(
-                            onTap: _isSpeaking ? _stopSpeaking : () => _speakText("Hello ${displayFirstName}! I'm ${mascotProvider.currentMascotName}, your friendly health and nutrition assistant. How can I help you today?"),
+                            onTap: () {
+                              if (_isSpeaking) {
+                                _stopSpeaking();
+                              } else {
+                                Future.delayed(const Duration(seconds: 3), () { // Changed to 2 seconds for example
+                                  _speakText("Hello ${displayFirstName}! I'm ${mascotProvider.currentMascotName}, your friendly health and nutrition assistant. How can I help you today?");
+                                });
+                              }
+                            },
                             child: _isSpeaking
                                 ? Image.asset(
                               mascotProvider.currentMascotSpeakingPath,

@@ -15,7 +15,7 @@ class FrostedGlassButton extends StatelessWidget {
     required this.text,
     this.icon,
     required this.onPressed,
-    this.width = 170,
+    this.width = 160,
     this.height = 60,
     this.blur = 10,
     this.borderRadius = 20,
@@ -74,7 +74,7 @@ class FrostedGlassButton extends StatelessWidget {
                   style: TextStyle(
                     color: colorScheme.onSecondary,
                     fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                    fontSize: 12,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -83,7 +83,7 @@ class FrostedGlassButton extends StatelessWidget {
                   Icon(
                     icon,
                     color: colorScheme.onSecondary,
-                    size: 19,
+                    size: 18,
                   ),
               ],
             ),
